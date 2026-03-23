@@ -47,47 +47,156 @@
          GENERAL TAB
     ========================================================= --}}
     @if($tab === 'general')
-    <div class="card space-y-6 max-w-2xl">
-        <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
-            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <h3 class="text-lg font-bold text-[#1a1a2e]">General Settings</h3>
-        </div>
-        <div class="space-y-4">
-            <div>
-                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Site Name</label>
-                <input type="text" name="site_name" value="{{ $settings['site_name'] ?? 'EarnRol' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {{-- General Settings --}}
+        <div class="card space-y-5">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <h3 class="text-base font-bold text-[#1a1a2e]">General Settings</h3>
             </div>
-            <div>
-                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Site URL</label>
-                <input type="url" name="site_url" value="{{ $settings['site_url'] ?? config('app.url') }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all">
-            </div>
-            <div>
-                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Contact Email</label>
-                <input type="email" name="contact_email" value="{{ $settings['contact_email'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="support@earnrol.com">
-            </div>
-            <div>
-                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Timezone</label>
-                <select name="timezone" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all">
-                    @foreach(\DateTimeZone::listIdentifiers() as $tz)
-                    <option value="{{ $tz }}" {{ ($settings['timezone'] ?? 'UTC') === $tz ? 'selected' : '' }}>{{ $tz }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div class="space-y-4">
                 <div>
-                    <p class="text-sm font-medium text-gray-800">Maintenance Mode</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Show a maintenance page to visitors</p>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Site Name</label>
+                    <input type="text" name="site_name" value="{{ $settings['site_name'] ?? 'EarnRol' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all">
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="hidden" name="maintenance_mode" value="0">
-                    <input type="checkbox" name="maintenance_mode" value="1" class="sr-only peer" {{ ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' }}>
-                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] peer-focus:ring-2 peer-focus:ring-[#e05a3a]/30 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                </label>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Site URL</label>
+                    <input type="url" name="site_url" value="{{ $settings['site_url'] ?? config('app.url') }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Contact Email</label>
+                    <input type="email" name="contact_email" value="{{ $settings['contact_email'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="support@earnrol.com">
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Timezone</label>
+                    <select name="timezone" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all">
+                        @foreach(\DateTimeZone::listIdentifiers() as $tz)
+                        <option value="{{ $tz }}" {{ ($settings['timezone'] ?? 'UTC') === $tz ? 'selected' : '' }}>{{ $tz }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Maintenance Mode</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Show a maintenance page to visitors</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="maintenance_mode" value="0">
+                        <input type="checkbox" name="maintenance_mode" value="1" class="sr-only peer" {{ ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                    </label>
+                </div>
             </div>
         </div>
+
+        {{-- Referral Program --}}
+        <div class="card space-y-5">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                </svg>
+                <h3 class="text-base font-bold text-[#1a1a2e]">Referral Program</h3>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Enable Referrals</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Allow users to earn commission by referring others</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="referral_enabled" value="0">
+                        <input type="checkbox" name="referral_enabled" value="1" class="sr-only peer" {{ ($settings['referral_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Referral Commission (%)</label>
+                    <input type="number" name="referral_commission" value="{{ $settings['referral_commission'] ?? '10' }}" min="0" max="100" step="0.1" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="10">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Percentage awarded to the referrer when their friend makes a first purchase</p>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Min Withdrawal (₦)</label>
+                    <input type="number" name="referral_min_withdrawal" value="{{ $settings['referral_min_withdrawal'] ?? '1000' }}" min="0" step="100" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="1000">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Minimum balance required before a referral credit withdrawal can be requested</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Announcement --}}
+        <div class="card space-y-5">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                </svg>
+                <h3 class="text-base font-bold text-[#1a1a2e]">Announcement</h3>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Enable Announcement</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Show an announcement banner on the user dashboard</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="announcement_enabled" value="0">
+                        <input type="checkbox" name="announcement_enabled" value="1" class="sr-only peer" {{ ($settings['announcement_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Announcement Message</label>
+                    <textarea name="announcement_message" rows="4" maxlength="1000"
+                              class="form-input bg-gray-50 border-transparent focus:bg-white transition-all resize-none"
+                              placeholder="Type your announcement here..."
+                              oninput="document.getElementById('ann_count').textContent = this.value.length">{{ $settings['announcement_message'] ?? '' }}</textarea>
+                    <p class="text-[11px] text-gray-400 mt-1.5">
+                        <span id="ann_count">{{ strlen($settings['announcement_message'] ?? '') }}</span>/1000 characters
+                    </p>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Auto-Dismiss Timer (seconds)</label>
+                    <input type="number" name="announcement_timer" value="{{ $settings['announcement_timer'] ?? '0' }}" min="0" step="1" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="0">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Set to 0 to keep the banner visible until the user closes it manually</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- VAT Settings --}}
+        <div class="card space-y-5">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <h3 class="text-base font-bold text-[#1a1a2e]">VAT / Tax Settings</h3>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Enable VAT</p>
+                        <p class="text-xs text-gray-400 mt-0.5">When enabled, VAT will be added to the price at checkout</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="vat_enabled" value="0">
+                        <input type="checkbox" name="vat_enabled" value="1" class="sr-only peer" {{ ($settings['vat_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">VAT Percentage (%)</label>
+                    <input type="number" name="vat_percentage" value="{{ $settings['vat_percentage'] ?? '7.5' }}" min="0" max="100" step="0.1" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="7.5">
+                    <p class="text-[11px] text-gray-400 mt-1.5">e.g. enter 7.5 for 7.5% VAT</p>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Tax Label</label>
+                    <input type="text" name="vat_label" value="{{ $settings['vat_label'] ?? 'VAT' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="VAT">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Label shown at checkout — e.g. VAT, GST, Sales Tax</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 
@@ -779,24 +888,47 @@ async function sendTestEmail() {
     resultDiv.classList.add('hidden');
     resultDiv.className = 'mt-3 text-xs';
     try {
+        console.log('Sending test email to:', email);
         const response = await fetch('{{ route("admin.settings.test-email") }}', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ email })
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ email: email })
         });
-        const data = await response.json();
+
+        console.log('Response status:', response.status);
+        
+        let data;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            console.error('Non-JSON response snippet:', text.substring(0, 500));
+            
+            // Try to extract title from HTML
+            const doc = new DOMParser().parseFromString(text, "text/html");
+            const title = doc.querySelector('title')?.innerText || 'Unknown Page';
+            
+            throw new Error('Server returned HTML: "' + title + '" (Status ' + response.status + '). This usually means a redirect to Login or Dashboard occurred.');
+        }
+
         resultDiv.classList.remove('hidden');
-        if (data.success) {
+        if (response.ok && data.success) {
             resultDiv.classList.add('text-green-600');
             resultDiv.innerText = '✓ ' + data.message;
         } else {
             resultDiv.classList.add('text-red-600');
-            resultDiv.innerText = '✗ ' + data.message;
+            resultDiv.innerText = '✗ ' + (data.message || 'Error ' + response.status);
         }
-    } catch {
+    } catch (error) {
+        console.error('Fetch error:', error);
         resultDiv.classList.remove('hidden');
         resultDiv.classList.add('text-red-600');
-        resultDiv.innerText = '✗ Could not connect to the server.';
+        resultDiv.innerText = '✗ Connection Error: ' + error.message;
     } finally {
         btn.disabled = false;
         spinner.classList.add('hidden');

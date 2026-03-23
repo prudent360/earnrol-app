@@ -64,6 +64,22 @@ class SettingsController extends Controller
                 'accent_color'    => '#1a2535',
                 'footer_text'     => '© ' . date('Y') . ' EarnRol. All rights reserved.',
             ],
+            'general' => [
+                'site_name'               => 'EarnRol',
+                'site_url'                => config('app.url'),
+                'contact_email'           => '',
+                'timezone'                => 'UTC',
+                'maintenance_mode'        => '0',
+                'referral_enabled'        => '0',
+                'referral_commission'     => '10',
+                'referral_min_withdrawal' => '1000',
+                'announcement_enabled'    => '0',
+                'announcement_message'    => '',
+                'announcement_timer'      => '0',
+                'vat_enabled'             => '0',
+                'vat_percentage'          => '7.5',
+                'vat_label'               => 'VAT',
+            ],
             default => [],
         };
 
