@@ -77,6 +77,7 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
+        $course->load(['chapters.lessons']);
         $categories  = Course::categories();
         $instructors = User::whereIn('role', ['mentor', 'superadmin'])->get();
 

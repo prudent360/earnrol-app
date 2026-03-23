@@ -13,9 +13,21 @@
     </a>
 </div>
 
-<form action="{{ route('admin.courses.update', $course) }}" method="POST" enctype="multipart/form-data">
-    @csrf @method('PUT')
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+{{-- Tab Navigation --}}
+<div class="flex items-center gap-8 mb-8 border-b border-gray-100">
+    <button type="button" onclick="switchTab('details')" class="tab-btn pb-4 text-sm font-bold border-b-2 transition-all border-[#e05a3a] text-[#e05a3a]">
+        Basic Info
+    </button>
+    <button type="button" onclick="switchTab('curriculum')" class="tab-btn pb-4 text-sm font-bold border-b-2 transition-all border-transparent text-gray-400 hover:text-gray-600">
+        Curriculum
+    </button>
+</div>
+
+{{-- Basic Info Tab --}}
+<div id="details-content" class="tab-content transition-all duration-300">
+    <form action="{{ route('admin.courses.update', $course) }}" method="POST" enctype="multipart/form-data">
+        @csrf @method('PUT')
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {{-- Main Details --}}
         <div class="lg:col-span-2 space-y-6">
@@ -167,9 +179,7 @@
                     </p>
                     <input type="file" id="thumbnail_input" name="thumbnail" accept="image/*" class="sr-only" onchange="previewThumb(this)">
                 </div>
-            </div>
-
-            {{-- Icon Color --}}
+            </div>            {{-- Icon Color --}}
             <div class="card space-y-4">
                 <h3 class="text-base font-bold text-[#1a1a2e] border-b border-gray-100 pb-4">Icon Color</h3>
                 <div class="flex items-center gap-3">
@@ -181,23 +191,34 @@
                            oninput="document.getElementById('icon_color').value = this.value">
                 </div>
             </div>
-
-            {{-- Danger Zone --}}
-            <div class="card border-red-100 space-y-3">
-                <h3 class="text-sm font-bold text-red-600">Danger Zone</h3>
-                <p class="text-xs text-gray-400">Deleting a course removes all enrollments permanently.</p>
-                <form method="POST" action="{{ route('admin.courses.destroy', $course) }}"
-                      onsubmit="return confirm('Delete {{ addslashes($course->title) }}? This cannot be undone.')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="w-full text-sm text-red-600 border border-red-200 hover:bg-red-50 transition-colors rounded-lg px-4 py-2 font-medium">
-                        Delete Course
-                    </button>
-                </form>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
+{{-- Curriculum Tab --}}
+<div id="curriculum-content" class="tab-content hidden transition-all duration-300">
+    <div class="card p-8">
+        @include('admin.courses.partials.curriculum')
+    </div>
+</div>
+
+{{-- Separate Delete Form --}}
+<div class="mt-12 pt-8 border-t border-gray-100 max-w-sm ml-auto">
+    <div class="card border-red-100 space-y-3 bg-red-50/30">
+        <h3 class="text-sm font-bold text-red-600">Danger Zone</h3>
+        <p class="text-xs text-gray-400">Deleting a course removes all associated modules and lessons permanently.</p>
+        <form method="POST" action="{{ route('admin.courses.destroy', $course) }}"
+              onsubmit="return confirm('Delete {{ addslashes($course->title) }}? This cannot be undone.')">
+            @csrf @method('DELETE')
+            <button type="submit" class="w-full text-sm text-red-600 border border-red-200 hover:bg-red-50 transition-colors rounded-lg px-4 py-2 font-medium">
+                Delete Course
+            </button>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
 <script>
 function previewThumb(input) {
     if (!input.files || !input.files[0]) return;
@@ -209,4 +230,5 @@ function previewThumb(input) {
     reader.readAsDataURL(input.files[0]);
 }
 </script>
+@endpush
 @endsection

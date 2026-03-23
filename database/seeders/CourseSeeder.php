@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Course;
+use App\Models\Chapter;
+use App\Models\Lesson;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class CourseSeeder extends Seeder
@@ -157,8 +160,38 @@ class CourseSeeder extends Seeder
         ];
 
         foreach ($courses as $data) {
-            // Don't create if already exists (re-run safe)
-            Course::firstOrCreate(['title' => $data['title']], $data);
+            $course = Course::firstOrCreate(['title' => $data['title']], $data);
+            
+            // Add sample curriculum if no chapters exist
+            if ($course->chapters()->count() === 0) {
+                $chapter = Chapter::create([
+                    'course_id' => $course->id,
+                    'title' => 'Getting Started',
+                    'order' => 1
+                ]);
+
+                Lesson::create([
+                    'chapter_id' => $chapter->id,
+                    'title' => 'Introduction to ' . $course->title,
+                    'slug' => Str::slug('Introduction to ' . $course->title),
+                    'video_url' => 'https://www.youtube.com/watch?v=Ia-UEYY8koE',
+                    'duration_minutes' => 10,
+                    'order' => 1,
+                    'is_preview' => true,
+                    'content' => 'Welcome to this course! In this lesson, we will cover the basics.'
+                ]);
+
+                Lesson::create([
+                    'chapter_id' => $chapter->id,
+                    'title' => 'Environment Setup',
+                    'slug' => Str::slug('Environment Setup ' . $course->id),
+                    'video_url' => 'https://www.youtube.com/watch?v=4pP-v4-qR_4',
+                    'duration_minutes' => 15,
+                    'order' => 2,
+                    'is_preview' => false,
+                    'content' => 'Now let\'s set up your development environment.'
+                ]);
+            }
         }
     }
 }

@@ -32,19 +32,30 @@ class CourseController extends Controller
 
     public function show(Course $course)
     {
-        $course->load('instructor');
+        $course->load(['instructor', 'chapters.lessons']);
+        
         $enrolled = Auth::check()
             ? Enrollment::where('user_id', Auth::id())->where('course_id', $course->id)->first()
             : null;
 
-        return view('courses.show', compact('course', 'enrolled'));
+        $nextLesson = null;
+        if ($enrolled) {
+            // Find first incomplete lesson or last watched
+            $nextLesson = $course->lessons()->first(); // Simplified for now
+        }
+
+        return view('courses.show', compact('course', 'enrolled', 'nextLesson'));
     }
 
     public function enroll(Course $course)
     {
+        if (!$course->is_free && $course->price > 0) {
+            return redirect()->route('payments.checkout', $course);
+        }
+
         $existing = Enrollment::where('user_id', Auth::id())
-                              ->where('course_id', $course->id)
-                              ->first();
+                                ->where('course_id', $course->id)
+                                ->first();
 
         if (!$existing) {
             Enrollment::create([

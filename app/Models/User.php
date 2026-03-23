@@ -7,6 +7,10 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -69,5 +73,55 @@ class User extends Authenticatable
     public function hasRole(string $role): bool
     {
         return $this->role === $role;
+    }
+
+    /**
+     * Check if the user is a mentor.
+     */
+    public function isMentor(): bool
+    {
+        return $this->role === 'mentor' || ($this->mentorProfile && $this->mentorProfile->exists());
+    }
+
+    /**
+     * Check if the user is a student (default role).
+     */
+    public function isStudent(): bool
+    {
+        return $this->role === 'student' || $this->role === null || $this->role === '';
+    }
+
+    public function mentorProfile(): HasOne
+    {
+        return $this->hasOne(Mentor::class);
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function enrolledCourses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class, 'enrollments')
+                    ->withPivot('progress', 'completed_at')
+                    ->withTimestamps();
+    }
+
+    public function mentorshipSessions(): HasMany
+    {
+        return $this->hasMany(MentorshipSession::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function completedLessons(): BelongsToMany
+    {
+        return $this->belongsToMany(Lesson::class, 'lesson_user')
+                    ->wherePivot('is_completed', true)
+                    ->withTimestamps();
     }
 }
