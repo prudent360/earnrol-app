@@ -31,6 +31,7 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
 
 /*
@@ -53,10 +54,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
-        // Settings
+        // Settings — test-email must be declared before {tab} to avoid wildcard conflict
+        Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
         Route::get('/settings/{tab?}', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings/{tab}', [SettingsController::class, 'update'])->name('settings.update');
-        Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
     });
 
     // Learning / Courses
