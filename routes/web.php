@@ -31,6 +31,8 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+use App\Http\Controllers\Admin\SettingsController;
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Platform Routes
@@ -40,6 +42,22 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Admin Routes
+    Route::middleware('role:superadmin')->prefix('admin')->name('admin.')->group(function () {
+        // User Management
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Settings
+        Route::get('/settings/{tab?}', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings/{tab}', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
+    });
 
     // Learning / Courses
     Route::get('/learning', [CourseController::class, 'index'])->name('courses.index');
