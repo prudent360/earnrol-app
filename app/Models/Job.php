@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Job extends Model
 {
@@ -17,5 +18,10 @@ class Job extends Model
     public function poster(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class);
     }
 }
