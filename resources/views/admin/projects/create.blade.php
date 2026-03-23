@@ -1,0 +1,64 @@
+@extends('layouts.app')
+
+@section('title', 'Create Project')
+@section('page_title', 'Create a New Project')
+
+@section('content')
+<div class="max-w-3xl">
+    <form action="{{ route('admin.projects.store') }}" method="POST" class="card space-y-6">
+        @csrf
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
+            <input type="text" name="title" class="form-input w-full" required placeholder="e.g. E-Commerce API with Laravel">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <input type="text" name="category" class="form-input w-full" placeholder="e.g. Web Development">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select name="status" class="form-input w-full">
+                    <option value="pending">Pending</option>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">GitHub URL</label>
+                <input type="url" name="github_url" class="form-input w-full" placeholder="https://github.com/...">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Live URL</label>
+                <input type="url" name="live_url" class="form-input w-full" placeholder="https://...">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Assign to Student/User (Owner)</label>
+            <select name="user_id" class="form-input w-full" required>
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}" {{ $user->id == auth()->id() ? 'selected' : '' }}>
+                        {{ $user->name }} ({{ $user->role }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea name="description" rows="5" class="form-input w-full" placeholder="Project details..."></textarea>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+            <a href="{{ route('admin.projects.index') }}" class="btn-outline">Cancel</a>
+            <button type="submit" class="btn-primary px-8">Create Project</button>
+        </div>
+    </form>
+</div>
+@endsection

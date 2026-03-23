@@ -70,6 +70,7 @@
         <thead>
             <tr class="border-b border-gray-100 bg-gray-50 text-left">
                 <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Course</th>
+                <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Instructor</th>
                 <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Category</th>
                 <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Level</th>
                 <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Price</th>
@@ -91,6 +92,14 @@
                             <p class="font-medium text-[#1a1a2e]">{{ $course->title }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ $course->lesson_count }} lessons · {{ $course->duration_hours }}h</p>
                         </div>
+                    </div>
+                </td>
+                <td class="px-5 py-4 hidden md:table-cell">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500">
+                            {{ strtoupper(substr($course->instructor->name ?? 'U', 0, 1)) }}
+                        </div>
+                        <span class="text-xs text-gray-600">{{ $course->instructor->name ?? 'Unknown' }}</span>
                     </div>
                 </td>
                 <td class="px-5 py-4 hidden md:table-cell">

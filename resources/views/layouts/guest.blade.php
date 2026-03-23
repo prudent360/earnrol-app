@@ -3,17 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="@yield('meta_description', 'EarnRol — AI-Powered Talent OS for Hiring, Upskilling & Retention')">
-    <meta name="keywords" content="@yield('meta_keywords', 'tech talent, upskilling, hiring, cloud computing, DevOps, mentorship, Africa')">
+    <meta name="description" content="@yield('meta_description', 'Earnrol offers industry-led tech training, internship placements, and genuine UK work experience — designed for ambitious professionals and immigrants.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'UK tech training, tech internships, work experience, tech careers, immigrants in tech')">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="@yield('title', 'EarnRol') — AI-Powered Talent Platform">
-    <meta property="og:description" content="@yield('meta_description', 'EarnRol — AI-Powered Talent OS for Hiring, Upskilling & Retention')">
+    <meta property="og:title" content="@yield('title', 'Earnrol | UK Tech Training, Internships & Work Experience')">
+    <meta property="og:description" content="@yield('meta_description', 'Earnrol offers industry-led tech training, internship placements, and genuine UK work experience — designed for ambitious professionals and immigrants.')">
     <meta property="og:type" content="website">
-    <title>@yield('title', 'EarnRol') — AI-Powered Talent Platform</title>
+    <title>@yield('title', 'Earnrol | UK Tech Training, Internships & Work Experience')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if($favicon = \App\Models\Setting::get('favicon_path'))
+        <link rel="icon" type="image/x-icon" href="{{ Storage::url($favicon) }}">
+    @endif
     @stack('head')
 </head>
 <body class="bg-[#f5f6fa] font-sans">
@@ -23,10 +26,14 @@
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-[#e05a3a] rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-lg">E</span>
-                </div>
-                <span class="text-white font-bold text-xl tracking-tight">EarnRol</span>
+                @if($logo = \App\Models\Setting::get('logo_dark_path'))
+                    <img src="{{ Storage::url($logo) }}" alt="{{ \App\Models\Setting::get('app_name', 'EarnRol') }}" class="h-9 w-auto">
+                @else
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shadow-sm" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
+                        <span class="text-white font-bold text-lg">{{ substr(\App\Models\Setting::get('app_name', 'EarnRol'), 0, 1) }}</span>
+                    </div>
+                    <span class="text-white font-bold text-xl tracking-tight">{{ \App\Models\Setting::get('app_name', 'EarnRol') }}</span>
+                @endif
             </a>
 
             {{-- Desktop Nav --}}
@@ -76,10 +83,14 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
                 <div class="md:col-span-1">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-9 h-9 bg-[#e05a3a] rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">E</span>
-                        </div>
-                        <span class="text-white font-bold text-xl">EarnRol</span>
+                        @if($logo = \App\Models\Setting::get('logo_dark_path'))
+                            <img src="{{ Storage::url($logo) }}" alt="{{ \App\Models\Setting::get('app_name', 'EarnRol') }}" class="h-8 w-auto">
+                        @else
+                            <div class="w-9 h-9 bg-[#e05a3a] rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">{{ substr(\App\Models\Setting::get('app_name', 'EarnRol'), 0, 1) }}</span>
+                            </div>
+                            <span class="text-white font-bold text-xl">{{ \App\Models\Setting::get('app_name', 'EarnRol') }}</span>
+                        @endif
                     </div>
                     <p class="text-sm leading-relaxed">Africa's #1 AI-powered talent platform. Bridging the gap between learning and real-world tech careers.</p>
                 </div>

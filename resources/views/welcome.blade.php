@@ -1,8 +1,7 @@
 @extends('layouts.guest')
 
-@section('title', 'EarnRol')
-@section('meta_description', 'EarnRol is Africa\'s AI-Powered Talent OS. Hire, upskill, and retain top tech talent through project-based learning, mentorship, and AI matching.')
-@section('meta_keywords', 'AI talent platform, tech upskilling, cloud computing, DevOps, Africa, mentorship, hiring, project-based learning')
+@section('meta_description', 'Earnrol offers industry-led tech training, internship placements, and genuine UK work experience — designed for ambitious professionals and immigrants.')
+@section('meta_keywords', 'UK tech training, tech internships, work experience, tech careers, immigrants in tech, cloud computing, DevOps')
 
 @section('content')
 

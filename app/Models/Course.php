@@ -35,6 +35,14 @@ class Course extends Model
         });
     }
 
+    /**
+     * Use slug for route model binding instead of id.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');

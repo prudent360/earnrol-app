@@ -416,6 +416,41 @@
             </div>
             <p class="text-[11px] text-gray-400">Keys are available at <span class="font-semibold">dashboard.flutterwave.com</span> → Settings → API</p>
         </div>
+
+        {{-- Paystack --}}
+        <div class="card space-y-5 lg:col-span-2">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-8 bg-[#09a5db] rounded flex items-center justify-center text-white text-[10px] font-black">PAYSTACK</div>
+                    <div>
+                        <h3 class="text-base font-bold text-[#1a1a2e]">Paystack</h3>
+                        <p class="text-xs text-gray-400">Excellent for African markets — supports cards, bank transfer, and mobile money</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="paystack_enabled" value="0">
+                    <input type="checkbox" name="paystack_enabled" value="1" class="sr-only peer" {{ ($settings['paystack_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#09a5db] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Public Key</label>
+                    <input type="text" name="paystack_public_key" value="{{ $settings['paystack_public_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm" placeholder="pk_test_...">
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Secret Key</label>
+                    <div class="relative">
+                        <input type="password" name="paystack_secret_key" id="paystack_secret_key" value="{{ $settings['paystack_secret_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm pr-12" placeholder="sk_test_...">
+                        <button type="button" onclick="togglePassword('paystack_secret_key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <p class="text-[11px] text-gray-400">Keys are available at <span class="font-semibold">dashboard.paystack.com</span> → Settings → API Keys & Webhooks</p>
+        </div>
     </div>
 
 
@@ -577,7 +612,13 @@
                         <h3 class="text-base font-bold text-[#1a1a2e]">{{ $tpl['label'] }}</h3>
                         <p class="text-xs text-gray-400 mt-0.5">{{ $tpl['desc'] }}</p>
                     </div>
-                    <span class="text-xs bg-blue-100 text-blue-700 font-medium px-3 py-1 rounded-full">Editing</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs bg-blue-100 text-blue-700 font-medium px-3 py-1 rounded-full">Editing</span>
+                        <button type="button" onclick="testCurrentTemplate('{{ $activeTemplate }}')" class="btn-primary !bg-gray-100 !text-gray-700 !border-none text-xs py-1 px-3 hover:!bg-gray-200 transition-all flex items-center gap-2">
+                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                             Test this Template
+                        </button>
+                    </div>
                 </div>
 
                 <div>
@@ -932,6 +973,35 @@ async function sendTestEmail() {
     } finally {
         btn.disabled = false;
         spinner.classList.add('hidden');
+    }
+}
+
+async function testCurrentTemplate(key) {
+    const email = prompt("Enter email address to send test template to:", "{{ Auth::user()->email }}");
+    if (!email) return;
+
+    try {
+        const response = await fetch('{{ route("admin.settings.test-email") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ 
+                email: email,
+                template: key
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert("✓ Success: " + data.message);
+        } else {
+            alert("✗ Error: " + data.message);
+        }
+    } catch (error) {
+        alert("✗ Connection Error: " + error.message);
     }
 }
 </script>

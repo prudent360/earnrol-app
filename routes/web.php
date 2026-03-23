@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\MentorshipController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 
 /*
@@ -38,6 +39,8 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\ChapterController as AdminChapterController;
 use App\Http\Controllers\Admin\LessonController as AdminLessonController;
+use App\Http\Controllers\Admin\JobController as AdminJobController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin Routes
-    Route::middleware('role:superadmin')->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
         // User Management
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
@@ -60,12 +63,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
         // Course Management
-        Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
-        Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
-        Route::post('/courses', [AdminCourseController::class, 'store'])->name('courses.store');
-        Route::get('/courses/{course}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
-        Route::put('/courses/{course}', [AdminCourseController::class, 'update'])->name('courses.update');
-        Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+        Route::resource('courses', AdminCourseController::class);
+
+        // Job/Project Management
+        Route::resource('jobs', AdminJobController::class);
+        Route::resource('projects', AdminProjectController::class);
 
         // Curriculum Management (AJAX)
         Route::post('/courses/{course}/chapters', [AdminChapterController::class, 'store'])->name('chapters.store');
@@ -95,13 +97,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/learning/{course}/lessons/{lesson:slug}', [LessonController::class, 'show'])->name('courses.lessons.show');
     Route::post('/learning/{course}/lessons/{lesson:slug}/complete', [LessonController::class, 'complete'])->name('courses.lessons.complete');
 
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+
     // Projects
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 
     // Mentorship
     Route::get('/mentorship', [MentorshipController::class, 'index'])->name('mentorship.index');
+    Route::get('/mentorship/sessions', [MentorshipSessionController::class, 'index'])->name('mentorship.sessions.index');
     Route::get('/mentorship/{mentor}', [MentorshipController::class, 'show'])->name('mentorship.show');
+    Route::post('/mentorship/{mentor}/book', [MentorshipSessionController::class, 'store'])->name('mentorship.book');
+    Route::get('/mentorship/sessions/{session}/join', [MentorshipSessionController::class, 'join'])->name('mentorship.sessions.join');
 
     // Jobs
     Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');

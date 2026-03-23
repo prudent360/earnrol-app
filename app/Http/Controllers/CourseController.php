@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Notifications\EnrolledInCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,6 +65,9 @@ class CourseController extends Controller
                 'progress'  => 0,
             ]);
             $course->increment('student_count');
+
+            // Send enrollment notification
+            Auth::user()->notify(new EnrolledInCourse($course));
         }
 
         return redirect()->route('courses.show', $course)

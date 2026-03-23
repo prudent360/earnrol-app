@@ -38,8 +38,11 @@ class SettingsController extends Controller
                 'flutterwave_public_key' => '',
                 'flutterwave_secret_key' => '',
                 'flutterwave_enc_key'    => '',
-                'currency'              => 'USD',
-                'currency_symbol'       => '$',
+                'paystack_enabled'       => '0',
+                'paystack_public_key'    => '',
+                'paystack_secret_key'    => '',
+                'currency'              => 'GBP',
+                'currency_symbol'       => '£',
                 'currency_position'     => 'before',
             ],
             'templates' => [
@@ -123,24 +126,45 @@ class SettingsController extends Controller
 
     public function sendTestEmail(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
-
         try {
-            \Illuminate\Support\Facades\Mail::raw(
-                'This is a test email to verify your SMTP configuration in EarnRol.',
-                function ($message) use ($request) {
-                    $message->to($request->email)->subject('SMTP Verification — EarnRol');
-                }
-            );
+            $request->validate(['email' => 'required|email']);
+            
+            // Apply current DB settings (user should save before testing)
+            \App\Services\Mail\MailConfigService::apply();
+
+            $templateKey = $request->get('template');
+            $subject = 'Test Email from ' . config('app.name');
+            $body = 'This is a test email from ' . config('app.name') . '. If you received this, your SMTP settings are working correctly!';
+
+            if ($templateKey) {
+                // Parse the requested template with dummy data
+                [$subject, $body] = \App\Services\Mail\TemplateService::parse($templateKey, [
+                    'name'              => 'Test User',
+                    'course_name'       => 'Mastering Laravel',
+                    'course_url'        => url('/learning/1'),
+                    'job_title'         => 'Full Stack Developer',
+                    'company'           => 'EarnRol Tech',
+                    'application_url'   => url('/applications/1'),
+                    'mentor_name'       => 'John Doe',
+                    'session_datetime'  => now()->addDays(2)->format('M d, Y H:i A'),
+                    'meeting_url'       => 'https://meet.google.com/test-session',
+                    'reset_url'         => url('/password/reset/token'),
+                ]);
+            }
+
+            \Illuminate\Support\Facades\Mail::raw($body, function ($message) use ($request, $subject) {
+                $message->to($request->email)
+                        ->subject($subject);
+            });
 
             return response()->json([
                 'success' => true,
-                'message' => 'Test email sent to ' . $request->email,
+                'message' => 'Test email sent successfully to ' . $request->email
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Failed to send test email: ' . $e->getMessage()
             ], 500);
         }
     }

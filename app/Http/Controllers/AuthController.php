@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 
 class AuthController extends Controller
 {
@@ -53,6 +54,9 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        
+        // Send Welcome Email
+        $user->notify(new WelcomeNotification());
 
         return redirect()->route('dashboard')->with('success', 'Welcome to EarnRol! Your journey starts now.');
     }

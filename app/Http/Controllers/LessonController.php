@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Enrollment;
+use App\Notifications\LessonCompleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -59,6 +60,8 @@ class LessonController extends Controller
                 'progress' => $progress,
                 'completed_at' => ($progress == 100) ? now() : $enrollment->completed_at
             ]);
+            // Send lesson completion notification
+            $user->notify(new LessonCompleted($lesson, $course));
         }
 
         return response()->json([

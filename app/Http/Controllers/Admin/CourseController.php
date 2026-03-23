@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\User;
+use App\Notifications\CourseUpdated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -116,6 +118,15 @@ class CourseController extends Controller
         }
 
         $course->update($data);
+
+        // Notify enrolled students about the update
+        if ($course->status === 'published') {
+            $enrolledUsers = User::whereHas('enrollments', function ($q) use ($course) {
+                $q->where('course_id', $course->id);
+            })->get();
+
+            Notification::send($enrolledUsers, new CourseUpdated($course));
+        }
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Course updated successfully.');
