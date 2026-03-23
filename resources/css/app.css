@@ -46,8 +46,8 @@
     .card {
         background: #ffffff;
         border-radius: 12px;
-        border: 1px solid #eaecf0;
-        box-shadow: 0 1px 2px 0 rgba(16,24,40,0.04), 0 4px 12px 0 rgba(16,24,40,0.05);
+        border: 1px solid #e5e7eb;
+        box-shadow: none;
         padding: 1.5rem;
     }
     .sidebar-link {
@@ -74,8 +74,8 @@
     .stat-card {
         background: #ffffff;
         border-radius: 12px;
-        border: 1px solid #eaecf0;
-        box-shadow: 0 1px 2px 0 rgba(16,24,40,0.04), 0 4px 12px 0 rgba(16,24,40,0.05);
+        border: 1px solid #e5e7eb;
+        box-shadow: none;
         padding: 1.25rem;
         display: flex;
         align-items: center;
