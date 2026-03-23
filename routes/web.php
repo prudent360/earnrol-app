@@ -33,6 +33,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,6 +55,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
+        // Course Management
+        Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
+        Route::post('/courses', [AdminCourseController::class, 'store'])->name('courses.store');
+        Route::get('/courses/{course}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
+        Route::put('/courses/{course}', [AdminCourseController::class, 'update'])->name('courses.update');
+        Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+
         // Settings — test-email must be declared before {tab} to avoid wildcard conflict
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
         Route::get('/settings/{tab?}', [SettingsController::class, 'index'])->name('settings.index');
@@ -63,6 +72,7 @@ Route::middleware('auth')->group(function () {
     // Learning / Courses
     Route::get('/learning', [CourseController::class, 'index'])->name('courses.index');
     Route::get('/learning/{course}', [CourseController::class, 'show'])->name('courses.show');
+    Route::post('/learning/{course}/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
 
     // Projects
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
