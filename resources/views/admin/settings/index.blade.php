@@ -237,34 +237,26 @@
             </div>
         </div>
 
-        {{-- Active Gateways Summary --}}
+        {{-- Stripe Status --}}
         <div class="card lg:col-span-2 space-y-4">
             <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">Gateway Status</h3>
+                <h3 class="text-base font-bold text-[#1a1a2e]">Payment Gateway</h3>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                @foreach([
-                    ['name' => 'Stripe', 'key' => 'stripe_enabled', 'color' => '#635BFF', 'logo' => 'STRIPE'],
-                    ['name' => 'PayPal', 'key' => 'paypal_enabled', 'color' => '#003087', 'logo' => 'PAYPAL'],
-                    ['name' => 'Flutterwave', 'key' => 'flutterwave_enabled', 'color' => '#F5A623', 'logo' => 'FLW'],
-                ] as $gw)
-                <div class="flex items-center justify-between p-4 rounded-xl border {{ ($settings[$gw['key']] ?? '0') === '1' ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200' }}">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-7 rounded flex items-center justify-center text-white text-[9px] font-black" style="background:{{ $gw['color'] }}">
-                            {{ $gw['logo'] }}
-                        </div>
-                        <span class="text-sm font-medium text-gray-700">{{ $gw['name'] }}</span>
+            <div class="flex items-center justify-between p-4 rounded-xl border {{ ($settings['stripe_enabled'] ?? '0') === '1' ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200' }}">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-7 rounded flex items-center justify-center text-white text-[9px] font-black" style="background:#635BFF">
+                        STRIPE
                     </div>
-                    <span class="text-xs font-bold {{ ($settings[$gw['key']] ?? '0') === '1' ? 'text-green-600' : 'text-gray-400' }}">
-                        {{ ($settings[$gw['key']] ?? '0') === '1' ? 'Active' : 'Off' }}
-                    </span>
+                    <span class="text-sm font-medium text-gray-700">Stripe</span>
                 </div>
-                @endforeach
+                <span class="text-xs font-bold {{ ($settings['stripe_enabled'] ?? '0') === '1' ? 'text-green-600' : 'text-gray-400' }}">
+                    {{ ($settings['stripe_enabled'] ?? '0') === '1' ? 'Active' : 'Off' }}
+                </span>
             </div>
-            <p class="text-xs text-gray-400">Enable or disable each gateway in the sections below. Only active gateways will be shown to customers at checkout.</p>
+            <p class="text-xs text-gray-400">When Stripe is disabled, students can enrol in cohorts for free.</p>
         </div>
     </div>
 
@@ -325,132 +317,6 @@
             </div>
         </div>
 
-        {{-- PayPal --}}
-        <div class="card space-y-5">
-            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-8 bg-[#003087] rounded flex items-center justify-center text-white text-[10px] font-black tracking-wider">PAYPAL</div>
-                    <h3 class="text-base font-bold text-[#1a1a2e]">PayPal</h3>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="hidden" name="paypal_enabled" value="0">
-                    <input type="checkbox" name="paypal_enabled" value="1" class="sr-only peer" {{ ($settings['paypal_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
-                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#003087] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                <span class="text-xs font-medium text-blue-800">Mode</span>
-                <div class="flex rounded-lg overflow-hidden border border-blue-200">
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paypal_sandbox" value="1" class="sr-only peer" {{ ($settings['paypal_sandbox'] ?? '1') === '1' ? 'checked' : '' }}>
-                        <span class="block px-3 py-1 text-xs font-medium peer-checked:bg-yellow-500 peer-checked:text-white text-blue-700 transition-colors">Sandbox</span>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paypal_sandbox" value="0" class="sr-only peer" {{ ($settings['paypal_sandbox'] ?? '1') === '0' ? 'checked' : '' }}>
-                        <span class="block px-3 py-1 text-xs font-medium peer-checked:bg-green-500 peer-checked:text-white text-blue-700 transition-colors">Live</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Client ID</label>
-                    <input type="text" name="paypal_client_id" value="{{ $settings['paypal_client_id'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm" placeholder="AX...">
-                </div>
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Client Secret</label>
-                    <div class="relative">
-                        <input type="password" name="paypal_client_secret" id="paypal_client_secret" value="{{ $settings['paypal_client_secret'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm pr-12" placeholder="EH...">
-                        <button type="button" onclick="togglePassword('paypal_client_secret')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-blue-50 rounded-lg p-3">
-                    <p class="text-[11px] text-blue-700">Get your credentials from <span class="font-semibold">developer.paypal.com</span> → My Apps & Credentials</p>
-                </div>
-            </div>
-        </div>
-
-        {{-- Flutterwave --}}
-        <div class="card space-y-5 lg:col-span-2">
-            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-8 bg-[#F5A623] rounded flex items-center justify-center text-white text-[10px] font-black">FLW</div>
-                    <div>
-                        <h3 class="text-base font-bold text-[#1a1a2e]">Flutterwave</h3>
-                        <p class="text-xs text-gray-400">Recommended for Africa — supports cards, bank transfer, USSD, M-Pesa</p>
-                    </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="hidden" name="flutterwave_enabled" value="0">
-                    <input type="checkbox" name="flutterwave_enabled" value="1" class="sr-only peer" {{ ($settings['flutterwave_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
-                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#F5A623] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                </label>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Public Key</label>
-                    <input type="text" name="flutterwave_public_key" value="{{ $settings['flutterwave_public_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm" placeholder="FLWPUBK-...">
-                </div>
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Secret Key</label>
-                    <div class="relative">
-                        <input type="password" name="flutterwave_secret_key" id="flutterwave_secret_key" value="{{ $settings['flutterwave_secret_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm pr-12" placeholder="FLWSECK-...">
-                        <button type="button" onclick="togglePassword('flutterwave_secret_key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Encryption Key</label>
-                    <div class="relative">
-                        <input type="password" name="flutterwave_enc_key" id="flutterwave_enc_key" value="{{ $settings['flutterwave_enc_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm pr-12" placeholder="FLWSECK_TEST...">
-                        <button type="button" onclick="togglePassword('flutterwave_enc_key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <p class="text-[11px] text-gray-400">Keys are available at <span class="font-semibold">dashboard.flutterwave.com</span> → Settings → API</p>
-        </div>
-
-        {{-- Paystack --}}
-        <div class="card space-y-5 lg:col-span-2">
-            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-8 bg-[#09a5db] rounded flex items-center justify-center text-white text-[10px] font-black">PAYSTACK</div>
-                    <div>
-                        <h3 class="text-base font-bold text-[#1a1a2e]">Paystack</h3>
-                        <p class="text-xs text-gray-400">Excellent for African markets — supports cards, bank transfer, and mobile money</p>
-                    </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="hidden" name="paystack_enabled" value="0">
-                    <input type="checkbox" name="paystack_enabled" value="1" class="sr-only peer" {{ ($settings['paystack_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
-                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#09a5db] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
-                </label>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Public Key</label>
-                    <input type="text" name="paystack_public_key" value="{{ $settings['paystack_public_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm" placeholder="pk_test_...">
-                </div>
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Secret Key</label>
-                    <div class="relative">
-                        <input type="password" name="paystack_secret_key" id="paystack_secret_key" value="{{ $settings['paystack_secret_key'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm pr-12" placeholder="sk_test_...">
-                        <button type="button" onclick="togglePassword('paystack_secret_key')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <p class="text-[11px] text-gray-400">Keys are available at <span class="font-semibold">dashboard.paystack.com</span> → Settings → API Keys & Webhooks</p>
-        </div>
     </div>
 
 
