@@ -52,13 +52,34 @@
 
     {{-- Apply --}}
     @if($job->status === 'active')
-    <div class="card">
+    <div class="card" id="apply">
         <h3 class="font-bold text-[#1a1a2e] mb-2">Ready to Apply?</h3>
-        <p class="text-sm text-gray-500 mb-4">Submit your application and the employer will be in touch.</p>
-        <form method="POST" action="{{ route('jobs.apply', $job) }}">
-            @csrf
-            <button type="submit" class="btn-primary px-8">Apply Now</button>
-        </form>
+        
+        @if(auth()->check() && auth()->user()->jobApplications()->where('job_id', $job->id)->exists())
+            <div class="bg-green-50 border border-green-100 rounded-xl p-4 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                    <p class="text-green-800 font-bold text-sm">Application Sent!</p>
+                    <p class="text-green-600 text-xs">You have already applied for this position. The employer will contact you if they're interested.</p>
+                </div>
+            </div>
+        @else
+            <p class="text-sm text-gray-500 mb-4">Submit your application details below.</p>
+            <form method="POST" action="{{ route('jobs.apply', $job) }}" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Upload Resume (PDF/Docx)</label>
+                    <input type="file" name="resume" required class="form-input w-full text-sm block px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Cover Letter (Optional)</label>
+                    <textarea name="cover_letter" rows="4" placeholder="Tell the employer why you're a good fit..." class="form-input w-full text-sm block px-3 py-2 border rounded-lg focus:ring-orange-500 focus:border-orange-500"></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto px-8">Submit Application</button>
+            </form>
+        @endif
     </div>
     @endif
 

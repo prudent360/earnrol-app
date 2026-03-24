@@ -83,7 +83,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
                         <label for="password" class="form-label mb-0">Password</label>
-                        <a href="#" class="text-sm text-[#e05a3a] hover:underline">Forgot password?</a>
+                        <a href="{{ route('password.request') }}" class="text-sm text-[#e05a3a] hover:underline">Forgot password?</a>
                     </div>
                     <input type="password" id="password" name="password" required
                         class="form-input @error('password') border-red-400 @enderror"

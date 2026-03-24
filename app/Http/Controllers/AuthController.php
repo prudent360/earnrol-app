@@ -58,7 +58,9 @@ class AuthController extends Controller
         // Send Welcome Email
         $user->notify(new WelcomeNotification());
 
-        return redirect()->route('dashboard')->with('success', 'Welcome to EarnRol! Your journey starts now.');
+        // Redirect to email verification notice
+        return redirect()->route('verification.notice')
+            ->with('success', 'Welcome to EarnRol! Please verify your email to get started.');
     }
 
     public function logout(Request $request)

@@ -39,6 +39,36 @@ class JobController extends Controller
 
     public function apply(Request $request, Job $job)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please login to apply for this job.');
+        }
+
+        if ($job->status !== 'active') {
+            return back()->with('error', 'This job listing is no longer active.');
+        }
+
+        // Check if already applied
+        if (auth()->user()->jobApplications()->where('job_id', $job->id)->exists()) {
+            return back()->with('error', 'You have already applied for this job.');
+        }
+
+        $request->validate([
+            'resume' => 'required|file|mimes:pdf,doc,docx|max:5120', // 5MB max
+            'cover_letter' => 'nullable|string|max:5000',
+        ]);
+
+        $resumePath = null;
+        if ($request->hasFile('resume')) {
+            $resumePath = $request->file('resume')->store('resumes', 'public');
+        }
+
+        $job->applications()->create([
+            'user_id' => auth()->id(),
+            'resume_path' => $resumePath,
+            'cover_letter' => $request->cover_letter,
+            'status' => 'pending',
+        ]);
+
         return back()->with('success', 'Application submitted! The employer will contact you soon.');
     }
 }

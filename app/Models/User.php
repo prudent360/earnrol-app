@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -101,6 +101,11 @@ class User extends Authenticatable
         return $this->hasMany(Enrollment::class);
     }
 
+    public function projectEnrollments(): HasMany
+    {
+        return $this->hasMany(ProjectEnrollment::class);
+    }
+
     public function enrolledCourses(): BelongsToMany
     {
         return $this->belongsToMany(Course::class, 'enrollments')
@@ -118,10 +123,22 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
+    public function jobApplications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
     public function completedLessons(): BelongsToMany
     {
         return $this->belongsToMany(Lesson::class, 'lesson_user')
                     ->wherePivot('is_completed', true)
+                    ->withTimestamps();
+    }
+
+    public function lessonProgress(): BelongsToMany
+    {
+        return $this->belongsToMany(Lesson::class, 'lesson_user')
+                    ->withPivot('is_completed', 'last_watched_at')
                     ->withTimestamps();
     }
 }

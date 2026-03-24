@@ -16,6 +16,8 @@
             <tr class="border-b border-gray-100 bg-gray-50 text-left">
                 <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider">Project Title</th>
                 <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider">Level</th>
+                <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider">Points</th>
                 <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider">Owner</th>
                 <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 <th class="px-5 py-3.5 font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
@@ -26,6 +28,8 @@
             <tr class="hover:bg-gray-50/50">
                 <td class="px-5 py-4 font-medium text-[#1a1a2e]">{{ $project->title }}</td>
                 <td class="px-5 py-4 text-gray-600 capitalize">{{ $project->category ?? 'N/A' }}</td>
+                <td class="px-5 py-4 text-gray-600 capitalize text-xs">{{ $project->difficulty }}</td>
+                <td class="px-5 py-4 text-gray-600 font-bold text-xs">{{ $project->points }} pts</td>
                 <td class="px-5 py-4">
                     <span class="text-xs text-gray-500">{{ $project->owner->name ?? 'System' }}</span>
                 </td>

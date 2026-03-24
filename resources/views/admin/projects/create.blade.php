@@ -21,10 +21,29 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select name="status" class="form-input w-full">
-                    <option value="pending">Pending</option>
+                    <option value="pending">Available (Pending)</option>
                     <option value="active">Active</option>
                     <option value="completed">Completed</option>
                 </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                <select name="difficulty" class="form-input w-full">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate" selected>Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Points</label>
+                <input type="number" name="points" value="10" class="form-input w-full">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tags (Comma separated)</label>
+                <input type="text" name="tags" class="form-input w-full" placeholder="AWS, PHP, React">
             </div>
         </div>
 

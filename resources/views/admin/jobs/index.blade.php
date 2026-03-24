@@ -35,7 +35,12 @@
                     </span>
                 </td>
                 <td class="px-5 py-4 text-right">
-                    <div class="flex justify-end gap-2">
+                    <div class="flex justify-end gap-3 items-center">
+                        <a href="{{ route('admin.jobs.applications', $job) }}" class="text-orange-600 font-bold hover:underline flex items-center gap-1">
+                            Applications
+                            <span class="bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded text-[10px]">{{ $job->applications()->count() }}</span>
+                        </a>
+                        <div class="h-4 w-px bg-gray-200"></div>
                         <a href="{{ route('admin.jobs.edit', $job) }}" class="text-blue-600 hover:underline">Edit</a>
                         <form action="{{ route('admin.jobs.destroy', $job) }}" method="POST" onsubmit="return confirm('Delete this job?')">
                             @csrf @method('DELETE')

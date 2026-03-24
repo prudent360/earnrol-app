@@ -22,10 +22,29 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select name="status" class="form-input w-full">
-                    <option value="pending" {{ $project->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="pending" {{ $project->status === 'pending' ? 'selected' : '' }}>Available (Pending)</option>
                     <option value="active" {{ $project->status === 'active' ? 'selected' : '' }}>Active</option>
                     <option value="completed" {{ $project->status === 'completed' ? 'selected' : '' }}>Completed</option>
                 </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                <select name="difficulty" class="form-input w-full">
+                    <option value="beginner" {{ $project->difficulty === 'beginner' ? 'selected' : '' }}>Beginner</option>
+                    <option value="intermediate" {{ $project->difficulty === 'intermediate' ? 'selected' : '' }}>Intermediate</option>
+                    <option value="advanced" {{ $project->difficulty === 'advanced' ? 'selected' : '' }}>Advanced</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Points</label>
+                <input type="number" name="points" value="{{ $project->points }}" class="form-input w-full">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tags (Comma separated)</label>
+                <input type="text" name="tags" value="{{ $project->tags }}" class="form-input w-full">
             </div>
         </div>
 

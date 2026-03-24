@@ -14,7 +14,11 @@
     <div class="relative">
         <p class="text-gray-400 text-sm mb-1">Good {{ now()->hour < 12 ? 'Morning' : (now()->hour < 17 ? 'Afternoon' : 'Evening') }},</p>
         <h2 class="text-2xl font-bold text-white mb-1">{{ auth()->user()->name ?? 'Learner' }} 👋</h2>
-        <p class="text-gray-300 text-sm">You're on a <span class="font-bold" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">7-day streak!</span> Keep it up to earn your next badge.</p>
+        @if($streakDays > 0)
+        <p class="text-gray-300 text-sm">You're on a <span class="font-bold" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">{{ $streakDays }}-day streak!</span> Keep it up to earn your next badge.</p>
+        @else
+        <p class="text-gray-300 text-sm">Start learning today to <span class="font-bold" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">begin your streak!</span></p>
+        @endif
         <div class="mt-4 flex items-center gap-4">
             <a href="{{ route('courses.index') }}" class="btn-primary text-sm py-2.5">
                 Continue Learning
@@ -53,7 +57,7 @@
             <svg class="w-6 h-6 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
         </div>
         <div>
-            <p class="text-2xl font-bold text-[#1a1a2e]">0</p>
+            <p class="text-2xl font-bold text-[#1a1a2e]">{{ $projectsDoneCount }}</p>
             <p class="text-sm text-[#6b7280]">Projects Done</p>
         </div>
     </div>
@@ -110,65 +114,67 @@
             <h3 class="text-lg font-bold text-[#1a1a2e]">Recent Projects</h3>
             <a href="{{ route('projects.index') }}" class="text-sm text-[#e05a3a] font-medium hover:underline">View all</a>
         </div>
+        @php
+            $userProjects = \App\Models\ProjectEnrollment::where('user_id', auth()->id())
+                ->with('project')
+                ->latest()
+                ->take(2)
+                ->get();
+        @endphp
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @forelse($userProjects as $pe)
             <div class="card">
                 <div class="flex items-start justify-between mb-3">
+                    @if($pe->completed_at)
                     <span class="badge bg-[#22c55e]/10 text-[#22c55e]">Completed</span>
-                    <span class="text-xs text-[#6b7280]">2 days ago</span>
-                </div>
-                <h4 class="font-semibold text-[#1a1a2e] mb-1">Deploy a 3-Tier Web App on AWS</h4>
-                <p class="text-xs text-[#6b7280] mb-3">EC2, RDS, S3, CloudFront, Route53</p>
-                <div class="flex gap-1 flex-wrap">
-                    <span class="tag">AWS</span><span class="tag">EC2</span><span class="tag">RDS</span>
-                </div>
-            </div>
-            <div class="card">
-                <div class="flex items-start justify-between mb-3">
+                    @else
                     <span class="badge bg-[#f59e0b]/10 text-[#f59e0b]">In Progress</span>
-                    <span class="text-xs text-[#6b7280]">Started today</span>
+                    @endif
+                    <span class="text-xs text-[#6b7280]">{{ $pe->created_at->diffForHumans() }}</span>
                 </div>
-                <h4 class="font-semibold text-[#1a1a2e] mb-1">CI/CD Pipeline with Jenkins</h4>
-                <p class="text-xs text-[#6b7280] mb-3">Jenkins, Docker, GitHub Actions</p>
-                <div class="flex gap-1 flex-wrap">
-                    <span class="tag">Jenkins</span><span class="tag">Docker</span>
-                </div>
+                <h4 class="font-semibold text-[#1a1a2e] mb-1">{{ $pe->project->title ?? 'Untitled Project' }}</h4>
+                <p class="text-xs text-[#6b7280] mb-3">{{ Str::limit($pe->project->description ?? '', 60) }}</p>
             </div>
+            @empty
+            <div class="col-span-2 bg-white rounded-2xl p-8 border border-dashed border-gray-300 text-center">
+                <p class="text-gray-500 text-sm mb-4">You haven't started any projects yet.</p>
+                <a href="{{ route('projects.index') }}" class="text-[#e05a3a] font-bold text-sm hover:underline">Browse Projects →</a>
+            </div>
+            @endforelse
         </div>
     </div>
 
     {{-- Right sidebar --}}
     <div class="space-y-4">
 
-        {{-- AI Job Matches --}}
+        {{-- Job Matches --}}
         <div class="card">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-[#1a1a2e]">AI Job Matches</h3>
-                <span class="badge bg-[#e05a3a]/10 text-[#e05a3a]">3 new</span>
+                <h3 class="font-bold text-[#1a1a2e]">Latest Jobs</h3>
+                @if($recentJobs->count() > 0)
+                <span class="badge bg-[#e05a3a]/10 text-[#e05a3a]">{{ $recentJobs->count() }} new</span>
+                @endif
             </div>
             <div class="space-y-3">
-                @php
-                $jobs = [
-                    ['title' => 'Cloud Engineer', 'company' => 'Google', 'match' => 94, 'type' => 'Remote'],
-                    ['title' => 'DevOps Engineer', 'company' => 'Andela', 'match' => 87, 'type' => 'Hybrid'],
-                    ['title' => 'AWS Architect', 'company' => 'Flutterwave', 'match' => 81, 'type' => 'On-site'],
-                ];
-                @endphp
-                @foreach($jobs as $job)
-                <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-[#f5f6fa] transition-colors cursor-pointer">
+                @forelse($recentJobs as $job)
+                <a href="{{ route('jobs.show', $job) }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[#f5f6fa] transition-colors">
                     <div class="w-9 h-9 bg-[#1a2535] rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                        {{ substr($job['company'], 0, 1) }}
+                        {{ substr($job->company ?? 'J', 0, 1) }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold text-[#1a1a2e] truncate">{{ $job['title'] }}</p>
-                        <p class="text-xs text-[#6b7280]">{{ $job['company'] }} · {{ $job['type'] }}</p>
+                        <p class="text-sm font-semibold text-[#1a1a2e] truncate">{{ $job->title }}</p>
+                        <p class="text-xs text-[#6b7280]">{{ $job->company }} · {{ $job->type ?? 'Full-time' }}</p>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        <span class="text-sm font-bold text-[#22c55e]">{{ $job['match'] }}%</span>
-                        <p class="text-xs text-[#6b7280]">match</p>
+                        <p class="text-xs text-[#6b7280]">{{ $job->location ?? 'Remote' }}</p>
                     </div>
+                </a>
+                @empty
+                <div class="text-center py-4">
+                    <p class="text-xs text-gray-400">No jobs posted yet.</p>
                 </div>
-                @endforeach
-                <a href="{{ route('jobs.index') }}" class="block text-center text-sm text-[#e05a3a] font-medium hover:underline pt-1">View all matches →</a>
+                @endforelse
+                <a href="{{ route('jobs.index') }}" class="block text-center text-sm text-[#e05a3a] font-medium hover:underline pt-1">View all jobs →</a>
             </div>
         </div>
 
@@ -207,15 +213,7 @@
         <div class="card">
             <h3 class="font-bold text-[#1a1a2e] mb-4">Skill Progress</h3>
             <div class="space-y-4">
-                @php
-                $skills = [
-                    ['name' => 'Cloud Computing', 'pct' => 72, 'color' => '#e05a3a'],
-                    ['name' => 'DevOps', 'pct' => 45, 'color' => '#3b82f6'],
-                    ['name' => 'Linux', 'pct' => 88, 'color' => '#22c55e'],
-                    ['name' => 'Networking', 'pct' => 30, 'color' => '#8b5cf6'],
-                ];
-                @endphp
-                @foreach($skills as $skill)
+                @forelse($skillProgress as $skill)
                 <div>
                     <div class="flex items-center justify-between text-sm mb-1">
                         <span class="text-[#1a1a2e] font-medium">{{ $skill['name'] }}</span>
@@ -225,11 +223,16 @@
                         <div class="progress-fill" style="width:{{ $skill['pct'] }}%; background-color:{{ $skill['color'] }};"></div>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <div class="text-center py-4">
+                    <p class="text-xs text-gray-400">Enroll in courses to start tracking skill progress.</p>
+                </div>
+                @endforelse
             </div>
         </div>
 
     </div>
+
 </div>
 
 @endsection

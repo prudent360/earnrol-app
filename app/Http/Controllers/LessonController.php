@@ -27,7 +27,7 @@ class LessonController extends Controller
         $course->load(['chapters.lessons']);
 
         // Mark current lesson as "last watched" (update pivot table)
-        Auth::user()->completedLessons()->syncWithoutDetaching([
+        Auth::user()->lessonProgress()->syncWithoutDetaching([
             $lesson->id => ['last_watched_at' => now()]
         ]);
 
@@ -37,24 +37,26 @@ class LessonController extends Controller
     public function complete(Course $course, Lesson $lesson)
     {
         $user = Auth::user();
+        $progress = 0;
         
         // Mark as completed in pivot
-        $user->completedLessons()->syncWithoutDetaching([
+        $user->lessonProgress()->syncWithoutDetaching([
             $lesson->id => ['is_completed' => true]
         ]);
-
-        // Calculate new progress for enrollment
-        $enrollment = Enrollment::where('user_id', $user->id)
-                                ->where('course_id', $course->id)
-                                ->first();
-        
-        if ($enrollment) {
-            $totalLessons = $course->lessons()->count();
-            $completedLessons = $user->completedLessons()
-                                     ->whereIn('lesson_id', $course->lessons()->pluck('id'))
-                                     ->count();
-                                     
-            $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+ 
+         // Calculate new progress for enrollment
+         $enrollment = Enrollment::where('user_id', $user->id)
+                                 ->where('course_id', $course->id)
+                                 ->first();
+         
+         if ($enrollment) {
+             $totalLessons = $course->lessons()->count();
+             $completedLessons = $user->lessonProgress()
+                                      ->wherePivot('is_completed', true)
+                                      ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+                                      ->count();
+                                      
+             $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
             
             $enrollment->update([
                 'progress' => $progress,

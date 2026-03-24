@@ -120,7 +120,7 @@ async function markAsCompleted() {
     const btnText = document.getElementById('btnText');
     
     btn.disabled = true;
-    btnText.innerText = 'Applying...';
+    btnText.innerText = 'Marking...';
 
     try {
         const response = await fetch('{{ route("courses.lessons.complete", [$course, $lesson]) }}', {
