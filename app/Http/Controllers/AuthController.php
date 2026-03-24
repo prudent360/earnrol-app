@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Notifications\WelcomeNotification;
 
 class AuthController extends Controller
 {
@@ -54,13 +53,9 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        
-        // Send Welcome Email
-        $user->notify(new WelcomeNotification());
 
-        // Redirect to email verification notice
-        return redirect()->route('verification.notice')
-            ->with('success', 'Welcome to EarnRol! Please verify your email to get started.');
+        return redirect()->route('dashboard')
+            ->with('success', 'Welcome to EarnRol!');
     }
 
     public function logout(Request $request)
