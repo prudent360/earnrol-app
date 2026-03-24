@@ -64,25 +64,166 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @foreach($enrolledCohorts as $enrollment)
+        @php $ec = $enrollment->cohort; @endphp
         <div class="card">
             <div class="flex items-center gap-2 mb-3">
-                <span class="badge {{ $enrollment->cohort->status === 'active' ? 'bg-green-100 text-green-700' : ($enrollment->cohort->status === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500') }}">
-                    {{ ucfirst($enrollment->cohort->status) }}
+                <span class="badge {{ $ec->status === 'active' ? 'bg-green-100 text-green-700' : ($ec->status === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500') }}">
+                    {{ ucfirst($ec->status) }}
                 </span>
+                <span class="badge bg-emerald-100 text-emerald-700">Enrolled</span>
             </div>
-            <h4 class="font-bold text-[#1a1a2e] mb-1">{{ $enrollment->cohort->title }}</h4>
-            <p class="text-xs text-gray-400 mb-3">Starts {{ $enrollment->cohort->start_date->format('M d, Y') }}</p>
-            <div class="flex items-center gap-4">
-                <a href="{{ route('cohorts.materials', $enrollment->cohort) }}" class="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
+            <h4 class="font-bold text-[#1a1a2e] mb-1">{{ $ec->title }}</h4>
+            <p class="text-xs text-gray-400 mb-3">Starts {{ $ec->start_date->format('M d, Y') }}</p>
+            <div class="flex items-center flex-wrap gap-3">
+                <button type="button" onclick="openCohortModal('enrolled-{{ $ec->id }}')" class="text-sm font-bold text-[#1a2535] hover:underline flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Details
+                </button>
+                <a href="{{ route('cohorts.materials', $ec) }}" class="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Materials
                 </a>
-                @if($enrollment->cohort->status === 'active' && $enrollment->cohort->google_meet_link)
-                <a href="{{ $enrollment->cohort->google_meet_link }}" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-[#e05a3a] hover:underline flex items-center gap-1">
+                @if($ec->status === 'active' && $ec->google_meet_link)
+                <a href="{{ $ec->google_meet_link }}" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-[#e05a3a] hover:underline flex items-center gap-1">
                     Join Class
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
                 @endif
+            </div>
+        </div>
+
+        {{-- Enrolled Cohort Detail Modal --}}
+        <div id="cohort-modal-enrolled-{{ $ec->id }}" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCohortModal('enrolled-{{ $ec->id }}')"></div>
+            <div class="fixed inset-0 overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4">
+                    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <button onclick="closeCohortModal('enrolled-{{ $ec->id }}')" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center hover:bg-gray-100 transition-colors">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+
+                        @if($ec->cover_image)
+                        <div class="rounded-t-2xl overflow-hidden">
+                            <img src="{{ Storage::url($ec->cover_image) }}" alt="{{ $ec->title }}" class="w-full h-48 object-cover">
+                        </div>
+                        @endif
+
+                        <div class="p-6 space-y-5">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="badge {{ $ec->status === 'active' ? 'bg-green-100 text-green-700' : ($ec->status === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500') }}">
+                                        {{ ucfirst($ec->status) }}
+                                    </span>
+                                    <span class="badge bg-emerald-100 text-emerald-700">Enrolled</span>
+                                </div>
+                                <h2 class="text-xl font-bold text-[#1a1a2e]">{{ $ec->title }}</h2>
+                                @if($ec->description)
+                                <p class="text-sm text-gray-600 mt-2 leading-relaxed">{{ $ec->description }}</p>
+                                @endif
+                            </div>
+
+                            {{-- Key Details --}}
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Start Date</p>
+                                    <p class="text-sm font-semibold text-[#1a1a2e] mt-0.5">{{ $ec->start_date->format('M d, Y') }}</p>
+                                </div>
+                                @if($ec->end_date)
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">End Date</p>
+                                    <p class="text-sm font-semibold text-[#1a1a2e] mt-0.5">{{ $ec->end_date->format('M d, Y') }}</p>
+                                </div>
+                                @endif
+                                @if($ec->duration)
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Duration</p>
+                                    <p class="text-sm font-semibold text-[#1a1a2e] mt-0.5">{{ $ec->duration }}</p>
+                                </div>
+                                @endif
+                                @if($ec->schedule)
+                                <div class="bg-gray-50 rounded-xl p-3 col-span-2 sm:col-span-1">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Schedule</p>
+                                    <p class="text-sm font-semibold text-[#1a1a2e] mt-0.5">{{ $ec->schedule }}</p>
+                                </div>
+                                @endif
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Format</p>
+                                    <p class="text-sm font-semibold text-[#1a1a2e] mt-0.5">Live Online</p>
+                                </div>
+                            </div>
+
+                            {{-- Facilitator --}}
+                            @if($ec->facilitator_name)
+                            <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+                                @if($ec->facilitator_image)
+                                <img src="{{ Storage::url($ec->facilitator_image) }}" alt="{{ $ec->facilitator_name }}" class="w-12 h-12 rounded-full object-cover flex-shrink-0">
+                                @else
+                                <div class="w-12 h-12 rounded-full bg-[#1a2535] flex items-center justify-center flex-shrink-0">
+                                    <span class="text-lg font-bold text-white">{{ strtoupper(substr($ec->facilitator_name, 0, 1)) }}</span>
+                                </div>
+                                @endif
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Facilitator</p>
+                                    <p class="text-sm font-bold text-[#1a1a2e]">{{ $ec->facilitator_name }}</p>
+                                    @if($ec->facilitator_bio)
+                                    <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ $ec->facilitator_bio }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+
+                            {{-- What You'll Learn --}}
+                            @if(count($ec->what_you_will_learn_list) > 0)
+                            <div>
+                                <h3 class="text-sm font-bold text-[#1a1a2e] mb-3 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-[#e05a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    What You'll Learn
+                                </h3>
+                                <ul class="space-y-2">
+                                    @foreach($ec->what_you_will_learn_list as $item)
+                                    <li class="flex items-start gap-2">
+                                        <svg class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        <span class="text-sm text-gray-700">{{ $item }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            @endif
+
+                            {{-- Prerequisites --}}
+                            @if(count($ec->prerequisites_list) > 0)
+                            <div>
+                                <h3 class="text-sm font-bold text-[#1a1a2e] mb-3 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Prerequisites
+                                </h3>
+                                <ul class="space-y-2">
+                                    @foreach($ec->prerequisites_list as $item)
+                                    <li class="flex items-start gap-2">
+                                        <svg class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        <span class="text-sm text-gray-700">{{ $item }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            @endif
+
+                            {{-- Actions for enrolled student --}}
+                            <div class="pt-4 border-t border-gray-100 space-y-3">
+                                @if($ec->status === 'active' && $ec->google_meet_link)
+                                <a href="{{ $ec->google_meet_link }}" target="_blank" rel="noopener noreferrer" class="btn-primary w-full justify-center py-3 text-sm inline-flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    Join Live Class
+                                </a>
+                                @endif
+                                <a href="{{ route('cohorts.materials', $ec) }}" class="w-full py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors inline-flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    View Materials
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         @endforeach

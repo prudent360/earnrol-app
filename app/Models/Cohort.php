@@ -44,11 +44,12 @@ class Cohort extends Model
         if (!$this->start_date || !$this->end_date) {
             return null;
         }
-        $weeks = $this->start_date->diffInWeeks($this->end_date);
-        if ($weeks < 1) {
-            $days = $this->start_date->diffInDays($this->end_date);
+        $days = $this->start_date->diffInDays($this->end_date);
+        if ($days < 7) {
+            $days = max(1, (int) ceil($days));
             return $days . ' ' . ($days === 1 ? 'day' : 'days');
         }
+        $weeks = (int) ceil($days / 7);
         return $weeks . ' ' . ($weeks === 1 ? 'week' : 'weeks');
     }
 
