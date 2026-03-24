@@ -51,9 +51,10 @@ class LessonController extends Controller
          
          if ($enrollment) {
              $totalLessons = $course->lessons()->count();
+             $lessonIds = $course->lessons()->pluck('lessons.id');
              $completedLessons = $user->lessonProgress()
                                       ->wherePivot('is_completed', true)
-                                      ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+                                      ->whereIn('lessons.id', $lessonIds)
                                       ->count();
                                       
              $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
