@@ -6,7 +6,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\MentorshipController;
-use App\Http\Controllers\JobController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
@@ -49,9 +48,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\ChapterController as AdminChapterController;
 use App\Http\Controllers\Admin\LessonController as AdminLessonController;
-use App\Http\Controllers\Admin\JobController as AdminJobController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
-use App\Http\Controllers\Admin\JobApplicationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,15 +91,8 @@ Route::middleware('auth')->group(function () {
         // Course Management
         Route::resource('courses', AdminCourseController::class);
 
-        // Job/Project Management
-        Route::resource('jobs', AdminJobController::class);
-        Route::get('jobs/{job}/applications', [JobApplicationController::class, 'index'])->name('jobs.applications');
+        // Project Management
         Route::resource('projects', AdminProjectController::class);
-        
-        // Job Applications
-        Route::get('job-applications/{application}', [JobApplicationController::class, 'show'])->name('job-applications.show');
-        Route::patch('job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.update-status');
-        Route::delete('job-applications/{application}', [JobApplicationController::class, 'destroy'])->name('job-applications.destroy');
 
         // Curriculum Management (AJAX)
         Route::post('/courses/{course}/chapters', [AdminChapterController::class, 'store'])->name('chapters.store');
@@ -149,8 +139,4 @@ Route::middleware('auth')->group(function () {
     Route::post('/mentorship/{mentor}/book', [MentorshipSessionController::class, 'store'])->name('mentorship.book');
     Route::get('/mentorship/sessions/{session}/join', [MentorshipSessionController::class, 'join'])->name('mentorship.sessions.join');
 
-    // Jobs
-    Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
-    Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
-    Route::post('/jobs/{job}/apply', [JobController::class, 'apply'])->name('jobs.apply');
 });

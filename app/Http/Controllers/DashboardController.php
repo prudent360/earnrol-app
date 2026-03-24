@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\Enrollment;
 use App\Models\MentorshipSession;
 use App\Models\ProjectEnrollment;
-use App\Models\Job;
 use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,13 +40,7 @@ class DashboardController extends Controller
                                               ->whereNotNull('completed_at')
                                               ->count();
 
-        // P1 Fix: Dynamic "Recent Jobs" instead of hardcoded data
-        $recentJobs = Job::where('status', 'published')
-                         ->latest()
-                         ->take(3)
-                         ->get();
-
-        // P1 Fix: Dynamic "Skill Progress" from course enrollments by category
+// P1 Fix: Dynamic "Skill Progress" from course enrollments by category
         $skillProgress = $this->computeSkillProgress($user);
 
         // P1 Fix: Dynamic streak (consecutive days with lesson activity)
@@ -60,7 +53,6 @@ class DashboardController extends Controller
             'mentorSessionsCount',
             'nextSession',
             'projectsDoneCount',
-            'recentJobs',
             'skillProgress',
             'streakDays'
         ));

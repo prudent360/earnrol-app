@@ -24,8 +24,8 @@
                 Continue Learning
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
             </a>
-            <a href="{{ route('jobs.index') }}" class="text-white/70 hover:text-white text-sm font-medium transition-colors flex items-center gap-1">
-                Browse Jobs
+            <a href="{{ route('projects.index') }}" class="text-white/70 hover:text-white text-sm font-medium transition-colors flex items-center gap-1">
+                Browse Projects
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
             </a>
         </div>
@@ -147,38 +147,7 @@
     {{-- Right sidebar --}}
     <div class="space-y-4">
 
-        {{-- Job Matches --}}
-        <div class="card">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-[#1a1a2e]">Latest Jobs</h3>
-                @if($recentJobs->count() > 0)
-                <span class="badge bg-[#e05a3a]/10 text-[#e05a3a]">{{ $recentJobs->count() }} new</span>
-                @endif
-            </div>
-            <div class="space-y-3">
-                @forelse($recentJobs as $job)
-                <a href="{{ route('jobs.show', $job) }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[#f5f6fa] transition-colors">
-                    <div class="w-9 h-9 bg-[#1a2535] rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                        {{ substr($job->company ?? 'J', 0, 1) }}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold text-[#1a1a2e] truncate">{{ $job->title }}</p>
-                        <p class="text-xs text-[#6b7280]">{{ $job->company }} · {{ $job->type ?? 'Full-time' }}</p>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <p class="text-xs text-[#6b7280]">{{ $job->location ?? 'Remote' }}</p>
-                    </div>
-                </a>
-                @empty
-                <div class="text-center py-4">
-                    <p class="text-xs text-gray-400">No jobs posted yet.</p>
-                </div>
-                @endforelse
-                <a href="{{ route('jobs.index') }}" class="block text-center text-sm text-[#e05a3a] font-medium hover:underline pt-1">View all jobs →</a>
-            </div>
-        </div>
-
-        {{-- Upcoming Mentorship --}}
+{{-- Upcoming Mentorship --}}
         <div class="card">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-[#1a1a2e]">Next Session</h3>

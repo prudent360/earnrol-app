@@ -123,12 +123,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Payment::class);
     }
 
-    public function jobApplications(): HasMany
-    {
-        return $this->hasMany(JobApplication::class);
-    }
-
-    public function completedLessons(): BelongsToMany
+public function completedLessons(): BelongsToMany
     {
         return $this->belongsToMany(Lesson::class, 'lesson_user')
                     ->wherePivot('is_completed', true)
