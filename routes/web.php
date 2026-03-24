@@ -74,9 +74,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-classes', [CohortController::class, 'index'])->name('cohorts.index');
     Route::post('/cohorts/{cohort}/enrol', [CohortController::class, 'enrollFree'])->name('cohorts.enrol-free');
 
-    // Payments
-    Route::post('/cohorts/{cohort}/checkout', [PaymentController::class, 'initialize'])->name('payments.checkout');
-    Route::get('/payments/callback', [PaymentController::class, 'callback'])->name('payments.callback');
+    // Payments — Stripe
+    Route::post('/cohorts/{cohort}/checkout/stripe', [PaymentController::class, 'stripeCheckout'])->name('payments.stripe.checkout');
+    Route::get('/payments/stripe/callback', [PaymentController::class, 'stripeCallback'])->name('payments.callback');
+
+    // Payments — PayPal
+    Route::post('/cohorts/{cohort}/checkout/paypal', [PaymentController::class, 'paypalCheckout'])->name('payments.paypal.checkout');
+    Route::get('/payments/paypal/callback', [PaymentController::class, 'paypalCallback'])->name('payments.paypal.callback');
 
     // Admin Routes
     Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
