@@ -63,7 +63,11 @@ class LessonController extends Controller
                 'completed_at' => ($progress == 100) ? now() : $enrollment->completed_at
             ]);
             // Send lesson completion notification
-            $user->notify(new LessonCompleted($lesson, $course));
+            try {
+                $user->notify(new LessonCompleted($lesson, $course));
+            } catch (\Exception $e) {
+                // Notification failure should not block lesson completion
+            }
         }
 
         return response()->json([

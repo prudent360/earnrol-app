@@ -132,15 +132,18 @@ async function markAsCompleted() {
         });
 
         const data = await response.json();
-        
+
         if (data.success) {
             btn.classList.replace('bg-orange-600', 'bg-green-600');
             btnText.innerText = 'Completed!';
             document.getElementById('globalProgress').innerText = data.progress + '% completed';
             document.getElementById('progressBar').style.width = data.progress + '%';
-            
+
             // Reload after 1s to show checkmarks in sidebar
             setTimeout(() => window.location.reload(), 1000);
+        } else {
+            btn.disabled = false;
+            btnText.innerText = 'Mark as Completed';
         }
     } catch (error) {
         console.error('Error:', error);
