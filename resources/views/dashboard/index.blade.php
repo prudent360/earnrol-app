@@ -70,7 +70,7 @@
                     {{ ucfirst($enrollment->cohort->status) }}
                 </span>
             </div>
-            <h4 class="font-bold text-[#1a1a2e] mb-1">{{ $enrollment->cohort->title }}</h4>
+            <a href="{{ route('cohorts.show', $enrollment->cohort) }}" class="font-bold text-[#1a1a2e] mb-1 block hover:text-[#e05a3a] transition-colors">{{ $enrollment->cohort->title }}</a>
             <p class="text-xs text-gray-400 mb-3">Starts {{ $enrollment->cohort->start_date->format('M d, Y') }}</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('cohorts.materials', $enrollment->cohort) }}" class="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
@@ -111,7 +111,7 @@
                 <span class="badge bg-orange-100 text-orange-600">{{ $cohort->spotsLeft() }} spots left</span>
                 @endif
             </div>
-            <h4 class="font-bold text-[#1a1a2e] mb-1">{{ $cohort->title }}</h4>
+            <a href="{{ route('cohorts.show', $cohort) }}" class="font-bold text-[#1a1a2e] mb-1 block hover:text-[#e05a3a] transition-colors">{{ $cohort->title }}</a>
             @if($cohort->description)
             <p class="text-xs text-gray-500 mb-3">{{ Str::limit($cohort->description, 80) }}</p>
             @endif
@@ -121,6 +121,8 @@
                     {{ \App\Models\Setting::get('currency_symbol', '£') }}{{ number_format($cohort->price, 2) }}
                 </span>
             </div>
+
+            <a href="{{ route('cohorts.show', $cohort) }}" class="text-xs font-medium text-[#e05a3a] hover:underline mb-3 inline-block">View Details &rarr;</a>
 
             @if($cohort->isFull())
                 <button disabled class="w-full py-2.5 rounded-xl bg-gray-200 text-gray-500 text-sm font-bold cursor-not-allowed">Cohort Full</button>

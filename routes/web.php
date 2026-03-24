@@ -72,8 +72,9 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // My Classes
+    // Cohorts
     Route::get('/my-classes', [CohortController::class, 'index'])->name('cohorts.index');
+    Route::get('/cohorts/{cohort}', [CohortController::class, 'show'])->name('cohorts.show');
     Route::post('/cohorts/{cohort}/enrol', [CohortController::class, 'enrollFree'])->name('cohorts.enrol-free');
 
     // Cohort Materials (student view)

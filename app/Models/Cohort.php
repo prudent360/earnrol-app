@@ -12,6 +12,8 @@ class Cohort extends Model
         'title', 'description', 'price', 'currency',
         'google_meet_link', 'start_date', 'end_date',
         'status', 'max_students',
+        'facilitator_name', 'facilitator_bio', 'facilitator_image',
+        'schedule', 'what_you_will_learn', 'prerequisites', 'cover_image',
     ];
 
     protected $casts = [
@@ -35,6 +37,31 @@ class Cohort extends Model
     public function materials(): HasMany
     {
         return $this->hasMany(CohortMaterial::class);
+    }
+
+    public function getDurationAttribute(): ?string
+    {
+        if (!$this->start_date || !$this->end_date) {
+            return null;
+        }
+        $weeks = $this->start_date->diffInWeeks($this->end_date);
+        if ($weeks < 1) {
+            $days = $this->start_date->diffInDays($this->end_date);
+            return $days . ' ' . ($days === 1 ? 'day' : 'days');
+        }
+        return $weeks . ' ' . ($weeks === 1 ? 'week' : 'weeks');
+    }
+
+    public function getWhatYouWillLearnListAttribute(): array
+    {
+        if (!$this->what_you_will_learn) return [];
+        return array_filter(array_map('trim', explode("\n", $this->what_you_will_learn)));
+    }
+
+    public function getPrerequisitesListAttribute(): array
+    {
+        if (!$this->prerequisites) return [];
+        return array_filter(array_map('trim', explode("\n", $this->prerequisites)));
     }
 
     public function isFull(): bool
