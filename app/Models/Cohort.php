@@ -32,6 +32,11 @@ class Cohort extends Model
                     ->withTimestamps();
     }
 
+    public function materials(): HasMany
+    {
+        return $this->hasMany(CohortMaterial::class);
+    }
+
     public function isFull(): bool
     {
         if (is_null($this->max_students)) {

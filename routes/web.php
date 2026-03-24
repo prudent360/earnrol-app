@@ -9,9 +9,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PasswordResetController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
+use App\Http\Controllers\CohortMaterialController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\CohortController as AdminCohortController;
+use App\Http\Controllers\Admin\CohortMaterialController as AdminCohortMaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +76,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-classes', [CohortController::class, 'index'])->name('cohorts.index');
     Route::post('/cohorts/{cohort}/enrol', [CohortController::class, 'enrollFree'])->name('cohorts.enrol-free');
 
+    // Cohort Materials (student view)
+    Route::get('/cohorts/{cohort}/materials', [CohortMaterialController::class, 'show'])->name('cohorts.materials');
+    Route::post('/cohorts/{cohort}/assignments/{material}/submit', [CohortMaterialController::class, 'submit'])->name('cohorts.submit');
+
     // Payments — Stripe
     Route::post('/cohorts/{cohort}/checkout/stripe', [PaymentController::class, 'stripeCheckout'])->name('payments.stripe.checkout');
     Route::get('/payments/stripe/callback', [PaymentController::class, 'stripeCallback'])->name('payments.callback');
@@ -94,6 +100,14 @@ Route::middleware('auth')->group(function () {
 
         // Cohort Management
         Route::resource('cohorts', AdminCohortController::class);
+
+        // Cohort Materials (admin)
+        Route::get('/cohorts/{cohort}/materials', [AdminCohortMaterialController::class, 'index'])->name('cohorts.materials.index');
+        Route::get('/cohorts/{cohort}/materials/create', [AdminCohortMaterialController::class, 'create'])->name('cohorts.materials.create');
+        Route::post('/cohorts/{cohort}/materials', [AdminCohortMaterialController::class, 'store'])->name('cohorts.materials.store');
+        Route::delete('/cohorts/{cohort}/materials/{material}', [AdminCohortMaterialController::class, 'destroy'])->name('cohorts.materials.destroy');
+        Route::get('/cohorts/{cohort}/materials/{material}/submissions', [AdminCohortMaterialController::class, 'submissions'])->name('cohorts.materials.submissions');
+        Route::put('/cohorts/{cohort}/submissions/{submission}/grade', [AdminCohortMaterialController::class, 'grade'])->name('cohorts.submissions.grade');
 
         // Settings
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');

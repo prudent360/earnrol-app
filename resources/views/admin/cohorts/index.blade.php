@@ -48,6 +48,7 @@
                         {{ $cohort->start_date->format('M d, Y') }}
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
+                        <a href="{{ route('admin.cohorts.materials.index', $cohort) }}" class="text-green-600 hover:text-green-800 text-sm font-medium">Materials</a>
                         <a href="{{ route('admin.cohorts.edit', $cohort) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
                         <form action="{{ route('admin.cohorts.destroy', $cohort) }}" method="POST" class="inline">
                             @csrf
