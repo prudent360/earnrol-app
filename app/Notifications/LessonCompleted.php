@@ -30,7 +30,7 @@ class LessonCompleted extends Notification
             'message'   => 'You completed "' . $this->lesson->title . '" in "' . $this->course->title . '"',
             'course_id' => $this->course->id,
             'lesson_id' => $this->lesson->id,
-            'url'       => '/learning/' . $this->course->id . '/lessons/' . $this->lesson->slug,
+            'url'       => '/learning/' . $this->course->slug . '/lessons/' . $this->lesson->slug,
         ];
     }
 }
