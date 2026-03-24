@@ -245,7 +245,7 @@
                 </svg>
                 <h3 class="text-base font-bold text-[#1a1a2e]">Gateway Status</h3>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="flex items-center justify-between p-4 rounded-xl border {{ ($settings['stripe_enabled'] ?? '0') === '1' ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200' }}">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-7 rounded flex items-center justify-center text-white text-[9px] font-black" style="background:#635BFF">STRIPE</div>
@@ -262,6 +262,15 @@
                     </div>
                     <span class="text-xs font-bold {{ ($settings['paypal_enabled'] ?? '0') === '1' ? 'text-green-600' : 'text-gray-400' }}">
                         {{ ($settings['paypal_enabled'] ?? '0') === '1' ? 'Active' : 'Off' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between p-4 rounded-xl border {{ ($settings['bank_transfer_enabled'] ?? '0') === '1' ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200' }}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-7 rounded flex items-center justify-center text-white text-[9px] font-black bg-gray-700">BANK</div>
+                        <span class="text-sm font-medium text-gray-700">Bank Transfer</span>
+                    </div>
+                    <span class="text-xs font-bold {{ ($settings['bank_transfer_enabled'] ?? '0') === '1' ? 'text-green-600' : 'text-gray-400' }}">
+                        {{ ($settings['bank_transfer_enabled'] ?? '0') === '1' ? 'Active' : 'Off' }}
                     </span>
                 </div>
             </div>
@@ -373,7 +382,56 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    {{-- Bank Transfer --}}
+    <div class="card space-y-5 mt-8">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-8 bg-gray-700 rounded flex items-center justify-center text-white text-[10px] font-black tracking-wider">BANK</div>
+                <div>
+                    <h3 class="text-base font-bold text-[#1a1a2e]">Bank Transfer</h3>
+                    <p class="text-[11px] text-gray-400">Students pay via bank transfer and upload receipt for admin approval</p>
+                </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="hidden" name="bank_transfer_enabled" value="0">
+                <input type="checkbox" name="bank_transfer_enabled" value="1" class="sr-only peer" {{ ($settings['bank_transfer_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-gray-700 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+            </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Bank Name</label>
+                <input type="text" name="bank_name" value="{{ $settings['bank_name'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="e.g. Barclays">
+            </div>
+            <div>
+                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Account Name</label>
+                <input type="text" name="bank_account_name" value="{{ $settings['bank_account_name'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="e.g. EarnRol Ltd">
+            </div>
+            <div>
+                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Sort Code</label>
+                <input type="text" name="bank_sort_code" value="{{ $settings['bank_sort_code'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="e.g. 20-00-00">
+            </div>
+            <div>
+                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Account Number</label>
+                <input type="text" name="bank_account_number" value="{{ $settings['bank_account_number'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="e.g. 12345678">
+            </div>
+            <div class="md:col-span-2">
+                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">IBAN (optional, for international transfers)</label>
+                <input type="text" name="bank_iban" value="{{ $settings['bank_iban'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="e.g. GB29 NWBK 6016 1331 9268 19">
+            </div>
+            <div class="md:col-span-2">
+                <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Payment Reference Note</label>
+                <input type="text" name="bank_reference_note" value="{{ $settings['bank_reference_note'] ?? '' }}" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="Instructions shown to students...">
+                <p class="text-[11px] text-gray-400 mt-1">This note is shown to students on the transfer page.</p>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 rounded-lg p-3">
+            <p class="text-[11px] text-amber-700">Students will see your bank details and upload a payment receipt. You must manually approve each transfer from the <span class="font-semibold">Payments</span> section before the student is enrolled.</p>
+        </div>
     </div>
 
 

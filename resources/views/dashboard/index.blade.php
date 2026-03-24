@@ -425,24 +425,30 @@
                                 @if($cohort->isFull())
                                     <button disabled class="w-full py-3 rounded-xl bg-gray-200 text-gray-500 text-sm font-bold cursor-not-allowed">Cohort Full</button>
                                 @elseif($paymentEnabled && $cohort->price > 0)
-                                    <div class="flex gap-3">
+                                    <div class="space-y-2">
                                         @if($stripeEnabled)
-                                        <form method="POST" action="{{ route('payments.stripe.checkout', $cohort) }}" class="flex-1">
+                                        <form method="POST" action="{{ route('payments.stripe.checkout', $cohort) }}">
                                             @csrf
                                             <button type="submit" class="btn-primary w-full justify-center py-3 text-sm">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                                                {{ $paypalEnabled ? 'Pay with Card' : 'Enrol Now' }}
+                                                Pay with Card
                                             </button>
                                         </form>
                                         @endif
                                         @if($paypalEnabled)
-                                        <form method="POST" action="{{ route('payments.paypal.checkout', $cohort) }}" class="flex-1">
+                                        <form method="POST" action="{{ route('payments.paypal.checkout', $cohort) }}">
                                             @csrf
                                             <button type="submit" class="w-full py-3 rounded-xl text-sm font-bold bg-[#003087] text-white hover:bg-[#002060] transition-colors inline-flex items-center justify-center gap-1">
                                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/></svg>
-                                                PayPal
+                                                Pay with PayPal
                                             </button>
                                         </form>
+                                        @endif
+                                        @if($bankTransferEnabled)
+                                        <a href="{{ route('payments.bank-transfer', $cohort) }}" class="w-full py-3 rounded-xl text-sm font-bold bg-gray-700 text-white hover:bg-gray-800 transition-colors inline-flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                            Bank Transfer
+                                        </a>
                                         @endif
                                     </div>
                                 @else

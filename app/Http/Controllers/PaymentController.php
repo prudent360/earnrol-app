@@ -134,6 +134,77 @@ class PaymentController extends Controller
     }
 
     /**
+     * Show bank transfer details page
+     */
+    public function bankTransferForm(Cohort $cohort)
+    {
+        $user = Auth::user();
+
+        $check = $this->preCheck($cohort, $user);
+        if ($check) return $check;
+
+        if (!Setting::get('bank_transfer_enabled')) {
+            return back()->with('error', 'Bank transfer is not enabled.');
+        }
+
+        // Check if user already has a pending transfer for this cohort
+        $pendingPayment = Payment::where('user_id', $user->id)
+            ->where('payable_type', Cohort::class)
+            ->where('payable_id', $cohort->id)
+            ->where('gateway', 'bank_transfer')
+            ->where('status', 'pending')
+            ->first();
+
+        $bankDetails = [
+            'bank_name'        => Setting::get('bank_name', ''),
+            'account_name'     => Setting::get('bank_account_name', ''),
+            'sort_code'        => Setting::get('bank_sort_code', ''),
+            'account_number'   => Setting::get('bank_account_number', ''),
+            'iban'             => Setting::get('bank_iban', ''),
+            'reference_note'   => Setting::get('bank_reference_note', ''),
+            'currency_symbol'  => Setting::get('currency_symbol', '£'),
+        ];
+
+        return view('payments.bank-transfer', compact('cohort', 'bankDetails', 'pendingPayment'));
+    }
+
+    /**
+     * Submit bank transfer receipt
+     */
+    public function bankTransferSubmit(Request $request, Cohort $cohort)
+    {
+        $user = Auth::user();
+
+        $check = $this->preCheck($cohort, $user);
+        if ($check) return $check;
+
+        if (!Setting::get('bank_transfer_enabled')) {
+            return back()->with('error', 'Bank transfer is not enabled.');
+        }
+
+        $request->validate([
+            'receipt' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        $receiptPath = $request->file('receipt')->store('receipts', 'public');
+
+        Payment::create([
+            'user_id'       => $user->id,
+            'payable_type'  => Cohort::class,
+            'payable_id'    => $cohort->id,
+            'amount'        => $cohort->price,
+            'reference'     => 'BT-' . strtoupper(uniqid()),
+            'gateway'       => 'bank_transfer',
+            'status'        => 'pending',
+            'currency'      => Setting::get('currency', 'GBP'),
+            'receipt_path'  => $receiptPath,
+        ]);
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Receipt uploaded! Your payment is being reviewed. You will be enrolled once approved.');
+    }
+
+    /**
      * Pre-check: already enrolled or cohort full
      */
     protected function preCheck(Cohort $cohort, $user)

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\CohortController as AdminCohortController;
 use App\Http\Controllers\Admin\CohortMaterialController as AdminCohortMaterialController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +89,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/cohorts/{cohort}/checkout/paypal', [PaymentController::class, 'paypalCheckout'])->name('payments.paypal.checkout');
     Route::get('/payments/paypal/callback', [PaymentController::class, 'paypalCallback'])->name('payments.paypal.callback');
 
+    // Payments — Bank Transfer
+    Route::get('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferForm'])->name('payments.bank-transfer');
+    Route::post('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferSubmit'])->name('payments.bank-transfer.submit');
+
     // Admin Routes
     Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
         // User Management
@@ -108,6 +113,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/cohorts/{cohort}/materials/{material}', [AdminCohortMaterialController::class, 'destroy'])->name('cohorts.materials.destroy');
         Route::get('/cohorts/{cohort}/materials/{material}/submissions', [AdminCohortMaterialController::class, 'submissions'])->name('cohorts.materials.submissions');
         Route::put('/cohorts/{cohort}/submissions/{submission}/grade', [AdminCohortMaterialController::class, 'grade'])->name('cohorts.submissions.grade');
+
+        // Payments
+        Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+        Route::post('/payments/{payment}/approve', [AdminPaymentController::class, 'approve'])->name('payments.approve');
+        Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
 
         // Settings
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');

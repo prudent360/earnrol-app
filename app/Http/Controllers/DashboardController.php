@@ -29,13 +29,14 @@ class DashboardController extends Controller
             ->orderBy('start_date')
             ->get();
 
-        $stripeEnabled = (bool) Setting::get('stripe_enabled', false);
-        $paypalEnabled = (bool) Setting::get('paypal_enabled', false);
-        $paymentEnabled = $stripeEnabled || $paypalEnabled;
+        $stripeEnabled       = (bool) Setting::get('stripe_enabled', false);
+        $paypalEnabled       = (bool) Setting::get('paypal_enabled', false);
+        $bankTransferEnabled = (bool) Setting::get('bank_transfer_enabled', false);
+        $paymentEnabled      = $stripeEnabled || $paypalEnabled || $bankTransferEnabled;
 
         return view('dashboard.index', compact(
             'enrolledCohorts', 'activeCohort', 'availableCohorts',
-            'paymentEnabled', 'stripeEnabled', 'paypalEnabled'
+            'paymentEnabled', 'stripeEnabled', 'paypalEnabled', 'bankTransferEnabled'
         ));
     }
 }

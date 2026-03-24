@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Payment extends Model
 {
     protected $fillable = [
-        'user_id', 'payable_id', 'payable_type', 
-        'amount', 'currency', 'status', 
-        'reference', 'gateway', 'gateway_response'
+        'user_id', 'payable_id', 'payable_type',
+        'amount', 'currency', 'status',
+        'reference', 'gateway', 'gateway_response',
+        'receipt_path', 'admin_note',
     ];
 
     protected $casts = [
