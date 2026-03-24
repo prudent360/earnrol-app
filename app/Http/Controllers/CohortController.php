@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TemplateMail;
 use App\Models\Cohort;
 use App\Models\CohortEnrollment;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class CohortController extends Controller
 {
@@ -38,6 +40,17 @@ class CohortController extends Controller
             'cohort_id' => $cohort->id,
             'enrolled_at' => now(),
         ]);
+
+        // Send enrollment confirmation email
+        try {
+            Mail::to($user->email)->send(new TemplateMail('enroll', [
+                'name' => $user->name,
+                'cohort_name' => $cohort->title,
+                'dashboard_url' => route('dashboard'),
+            ]));
+        } catch (\Exception $e) {
+            // Don't block enrollment if email fails
+        }
 
         return redirect()->route('dashboard')->with('success', 'You are now enrolled in ' . $cohort->title . '!');
     }

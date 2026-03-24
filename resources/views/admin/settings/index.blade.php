@@ -491,11 +491,9 @@
     @elseif($tab === 'templates')
     @php
     $templates = [
-        'welcome'    => ['label' => 'Welcome Email',              'desc' => 'Sent when a new user registers', 'vars' => ['{{name}}', '{{login_url}}', '{{app_name}}']],
-        'reset'      => ['label' => 'Password Reset',             'desc' => 'Sent when a user requests a password reset', 'vars' => ['{{name}}', '{{reset_url}}', '{{app_name}}']],
-        'enroll'     => ['label' => 'Course Enrollment',          'desc' => 'Sent after successful course enrollment', 'vars' => ['{{name}}', '{{course_name}}', '{{course_url}}']],
-        'job_applied'=> ['label' => 'Job Application Confirmation','desc' => 'Sent to applicant after applying for a job', 'vars' => ['{{name}}', '{{job_title}}', '{{company}}', '{{application_url}}']],
-        'mentor'     => ['label' => 'Mentor Session Booked',      'desc' => 'Sent when a mentorship session is confirmed', 'vars' => ['{{name}}', '{{mentor_name}}', '{{session_datetime}}', '{{meeting_url}}']],
+        'welcome'    => ['label' => 'Welcome Email',       'desc' => 'Sent when a new user registers', 'vars' => ['{{name}}', '{{login_url}}', '{{app_name}}']],
+        'reset'      => ['label' => 'Password Reset',      'desc' => 'Sent when a user requests a password reset', 'vars' => ['{{name}}', '{{reset_url}}', '{{app_name}}']],
+        'enroll'     => ['label' => 'Cohort Enrollment',   'desc' => 'Sent after successful cohort enrollment', 'vars' => ['{{name}}', '{{cohort_name}}', '{{dashboard_url}}', '{{app_name}}']],
     ];
     $activeTemplate = request('template', 'welcome');
     @endphp

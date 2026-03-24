@@ -40,7 +40,7 @@ class SettingsController extends Controller
             ],
             'templates' => [
                 'tpl_welcome_subject'    => 'Welcome to EarnRol, {{name}}!',
-                'tpl_welcome_body'       => "Hi {{name}},\n\nWelcome to EarnRol! We're thrilled to have you on board.\n\nYour account is ready. Start exploring courses, projects, and mentorship opportunities today.\n\nGet started: {{login_url}}\n\nBest,\nThe EarnRol Team",
+                'tpl_welcome_body'       => "Hi {{name}},\n\nWelcome to EarnRol! We're thrilled to have you on board.\n\nYour account is ready. Browse available cohorts and enrol in a live class to start learning.\n\nGet started: {{login_url}}\n\nBest,\nThe EarnRol Team",
                 'tpl_reset_subject'     => 'Reset your EarnRol password',
                 'tpl_reset_body'        => "Hi {{name}},\n\nWe received a request to reset the password for your EarnRol account.\n\nClick the link below to reset your password (valid for 60 minutes):\n{{reset_url}}\n\nIf you did not request this, please ignore this email.\n\nBest,\nThe EarnRol Team",
                 'tpl_enroll_subject'    => 'You\'re enrolled in {{cohort_name}}!',

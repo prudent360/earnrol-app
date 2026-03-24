@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TemplateMail;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -54,8 +56,20 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Welcome to EarnRol!');
+        // Send welcome email
+        try {
+            Mail::to($user->email)->send(new TemplateMail('welcome', [
+                'name' => $user->name,
+            ]));
+        } catch (\Exception $e) {
+            // Don't block registration if email fails
+        }
+
+        // Send email verification
+        $user->sendEmailVerificationNotification();
+
+        return redirect()->route('verification.notice')
+            ->with('success', 'Welcome to EarnRol! Please verify your email.');
     }
 
     public function logout(Request $request)

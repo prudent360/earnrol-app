@@ -6,10 +6,12 @@ use App\Models\Cohort;
 use App\Models\CohortEnrollment;
 use App\Models\Payment;
 use App\Models\Setting;
+use App\Mail\TemplateMail;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -167,6 +169,19 @@ class PaymentController extends Controller
             ]);
 
             $cohort = Cohort::find($payment->payable_id);
+            $user = \App\Models\User::find($payment->user_id);
+
+            // Send enrollment confirmation email
+            try {
+                Mail::to($user->email)->send(new TemplateMail('enroll', [
+                    'name' => $user->name,
+                    'cohort_name' => $cohort->title ?? 'the cohort',
+                    'dashboard_url' => route('dashboard'),
+                ]));
+            } catch (\Exception $e) {
+                // Don't block enrollment if email fails
+            }
+
             return redirect()->route('dashboard')
                 ->with('success', 'Payment successful! You are now enrolled in ' . ($cohort->title ?? 'the cohort') . '.');
         }

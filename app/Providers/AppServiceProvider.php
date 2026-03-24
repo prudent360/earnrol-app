@@ -6,19 +6,18 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        // Apply SMTP settings from database on every request
+        try {
+            \App\Services\Mail\MailConfigService::apply();
+        } catch (\Exception $e) {
+            // Silently fail if DB not yet migrated
+        }
     }
 }
