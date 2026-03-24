@@ -23,18 +23,6 @@ class CohortController extends Controller
         return view('cohorts.index', compact('enrollments'));
     }
 
-    public function show(Cohort $cohort)
-    {
-        $user = Auth::user();
-        $isEnrolled = $user->cohortEnrollments()->where('cohort_id', $cohort->id)->exists();
-
-        $stripeEnabled  = (bool) Setting::get('stripe_enabled');
-        $paypalEnabled  = (bool) Setting::get('paypal_enabled');
-        $paymentEnabled = $stripeEnabled || $paypalEnabled;
-
-        return view('cohorts.detail', compact('cohort', 'isEnrolled', 'stripeEnabled', 'paypalEnabled', 'paymentEnabled'));
-    }
-
     public function enrollFree(Cohort $cohort)
     {
         $user = Auth::user();
