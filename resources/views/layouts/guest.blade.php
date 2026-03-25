@@ -39,13 +39,18 @@
             {{-- Desktop Nav --}}
             <nav class="hidden md:flex items-center gap-8">
                 <a href="{{ route('home') }}#how-it-works" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">How It Works</a>
-                <a href="{{ route('home') }}#features" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">Features</a>
-                <a href="{{ route('home') }}#pricing" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">Pricing</a>
-                <a href="{{ route('home') }}#about" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">About</a>
             </nav>
 
             {{-- Auth buttons --}}
             <div class="flex items-center gap-3">
+                @auth
+                <a href="{{ route('dashboard') }}" class="btn-primary text-sm px-5 py-2.5">
+                    My Account
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </a>
+                @else
                 <a href="{{ route('login') }}" class="text-gray-300 hover:text-white text-sm font-medium transition-colors hidden md:inline">Sign In</a>
                 <a href="{{ route('register') }}" class="btn-primary text-sm px-5 py-2.5">
                     Get Started Free
@@ -53,6 +58,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                     </svg>
                 </a>
+                @endauth
                 {{-- Mobile menu --}}
                 <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,10 +71,12 @@
         {{-- Mobile menu --}}
         <div id="mobile-menu" class="md:hidden hidden border-t border-white/10 px-6 py-4 space-y-3">
             <a href="{{ route('home') }}#how-it-works" class="block text-gray-300 hover:text-white text-sm font-medium">How It Works</a>
-            <a href="{{ route('home') }}#features" class="block text-gray-300 hover:text-white text-sm font-medium">Features</a>
-            <a href="{{ route('home') }}#pricing" class="block text-gray-300 hover:text-white text-sm font-medium">Pricing</a>
-            <a href="{{ route('home') }}#about" class="block text-gray-300 hover:text-white text-sm font-medium">About</a>
+            @auth
+            <a href="{{ route('dashboard') }}" class="block text-gray-300 hover:text-white text-sm font-medium">My Account</a>
+            @else
             <a href="{{ route('login') }}" class="block text-gray-300 hover:text-white text-sm font-medium">Sign In</a>
+            <a href="{{ route('register') }}" class="block text-gray-300 hover:text-white text-sm font-medium">Get Started Free</a>
+            @endauth
         </div>
     </header>
 
