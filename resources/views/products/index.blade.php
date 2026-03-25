@@ -22,7 +22,7 @@
             {{-- File Type Icon --}}
             <div class="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br {{ $iconColor }} flex flex-col items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
                 <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $docType['svg'] }}"/>
                 </svg>
                 <span class="text-[8px] font-black text-white/80 uppercase tracking-wider mt-0.5">{{ $label }}</span>
             </div>
