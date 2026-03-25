@@ -118,46 +118,6 @@
     </div>
 </section>
 
-{{-- WHAT YOU'LL LEARN --}}
-<section id="features" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-14">
-            <span class="text-[#e05a3a] font-semibold text-sm uppercase tracking-wider">Training Topics</span>
-            <h2 class="section-title mt-2">In-demand skills taught by experts</h2>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="card hover:shadow-md hover:-translate-y-1 transition-all duration-200 text-center">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style="background-color:#e05a3a20;">
-                    <svg class="w-6 h-6 text-[#e05a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
-                </div>
-                <h3 class="text-lg font-bold text-[#1a1a2e] mb-2">Cloud Computing</h3>
-                <p class="text-[#6b7280] text-sm">AWS, Azure, GCP — hands-on cloud infrastructure</p>
-            </div>
-            <div class="card hover:shadow-md hover:-translate-y-1 transition-all duration-200 text-center">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style="background-color:#f59e0b20;">
-                    <svg class="w-6 h-6 text-[#f59e0b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </div>
-                <h3 class="text-lg font-bold text-[#1a1a2e] mb-2">DevOps & CI/CD</h3>
-                <p class="text-[#6b7280] text-sm">Docker, Kubernetes, Jenkins, Terraform</p>
-            </div>
-            <div class="card hover:shadow-md hover:-translate-y-1 transition-all duration-200 text-center">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style="background-color:#22c55e20;">
-                    <svg class="w-6 h-6 text-[#22c55e]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <h3 class="text-lg font-bold text-[#1a1a2e] mb-2">Cybersecurity</h3>
-                <p class="text-[#6b7280] text-sm">Security fundamentals, ethical hacking, compliance</p>
-            </div>
-            <div class="card hover:shadow-md hover:-translate-y-1 transition-all duration-200 text-center">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style="background-color:#3b82f620;">
-                    <svg class="w-6 h-6 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                </div>
-                <h3 class="text-lg font-bold text-[#1a1a2e] mb-2">Software Engineering</h3>
-                <p class="text-[#6b7280] text-sm">Full-stack development, APIs, databases</p>
-            </div>
-        </div>
-    </div>
-</section>
-
 {{-- WHY EARNROL --}}
 <section class="py-20 bg-[#f5f6fa]">
     <div class="max-w-7xl mx-auto px-6">
