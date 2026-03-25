@@ -13,6 +13,7 @@ use App\Notifications\NewBankTransferAdmin;
 use App\Notifications\NewEnrollmentAdmin;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
+use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -264,6 +265,9 @@ class PaymentController extends Controller
             $user->notify(new EnrollmentConfirmed($cohort));
             $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
             Notification::send($admins, new NewEnrollmentAdmin($user, $cohort, $payment->gateway));
+
+            // Credit referral commission if eligible
+            ReferralService::creditCommissionIfEligible($payment);
 
             return redirect()->route('dashboard')
                 ->with('success', 'Payment successful! You are now enrolled in ' . ($cohort->title ?? 'the cohort') . '.');

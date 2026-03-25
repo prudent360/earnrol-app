@@ -33,9 +33,10 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    public function showRegister()
+    public function showRegister(Request $request)
     {
-        return view('auth.register');
+        $ref = $request->query('ref');
+        return view('auth.register', compact('ref'));
     }
 
     public function register(Request $request)
@@ -47,12 +48,20 @@ class AuthController extends Controller
             'role'     => ['nullable', 'string', 'in:learner,employer,mentor'],
         ]);
 
+        $referrer = null;
+        if ($request->filled('ref')) {
+            $referrer = User::where('referral_code', $request->ref)->first();
+        }
+
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role'     => $data['role'] ?? 'learner',
+            'name'        => $data['name'],
+            'email'       => $data['email'],
+            'password'    => Hash::make($data['password']),
+            'role'        => $data['role'] ?? 'learner',
+            'referred_by' => $referrer?->id,
         ]);
+
+        $user->generateReferralCode();
 
         Auth::login($user);
 

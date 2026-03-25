@@ -12,6 +12,7 @@ use App\Notifications\EnrollmentConfirmed;
 use App\Notifications\NewEnrollmentAdmin;
 use App\Notifications\PaymentApproved;
 use App\Notifications\PaymentRejected;
+use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -67,6 +68,9 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             // Don't block approval if email fails
         }
+
+        // Credit referral commission if eligible
+        ReferralService::creditCommissionIfEligible($payment);
 
         // Notify student + admins
         $user->notify(new PaymentApproved($payment));

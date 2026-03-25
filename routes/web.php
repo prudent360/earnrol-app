@@ -5,7 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CohortController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentHistoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordResetController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\CohortController as AdminCohortController;
 use App\Http\Controllers\Admin\CohortMaterialController as AdminCohortMaterialController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +90,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/cohorts/{cohort}/materials', [CohortMaterialController::class, 'show'])->name('cohorts.materials');
     Route::post('/cohorts/{cohort}/assignments/{material}/submit', [CohortMaterialController::class, 'submit'])->name('cohorts.submit');
 
+    // Payment History
+    Route::get('/my-payments', [PaymentHistoryController::class, 'index'])->name('payments.history');
+    Route::get('/my-payments/export', [PaymentHistoryController::class, 'exportCsv'])->name('payments.history.export');
+
+    // Referrals
+    Route::get('/referrals', [ReferralController::class, 'index'])->name('referrals.index');
+    Route::put('/referrals/bank-details', [ReferralController::class, 'updateBankDetails'])->name('referrals.bank-details');
+    Route::post('/referrals/withdraw', [ReferralController::class, 'requestWithdrawal'])->name('referrals.withdraw');
+
     // Payments — Stripe
     Route::post('/cohorts/{cohort}/checkout/stripe', [PaymentController::class, 'stripeCheckout'])->name('payments.stripe.checkout');
     Route::get('/payments/stripe/callback', [PaymentController::class, 'stripeCallback'])->name('payments.callback');
@@ -124,6 +136,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
         Route::post('/payments/{payment}/approve', [AdminPaymentController::class, 'approve'])->name('payments.approve');
         Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
+
+        // Withdrawals
+        Route::get('/withdrawals', [AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
+        Route::post('/withdrawals/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
+        Route::post('/withdrawals/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
 
         // Settings
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
