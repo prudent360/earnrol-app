@@ -47,35 +47,68 @@
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-6">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style="background-color:#e05a3a30;">
-                        <svg class="w-6 h-6 text-[#e05a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <div class="relative hidden lg:block">
+                {{-- Glow effects behind the image --}}
+                <div class="absolute -inset-4 bg-[#e05a3a]/20 rounded-3xl blur-3xl"></div>
+                <div class="absolute -top-8 -right-8 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-8 -left-8 w-48 h-48 bg-[#e05a3a]/15 rounded-full blur-3xl"></div>
+
+                {{-- Dashboard image with glass frame --}}
+                <div class="relative">
+                    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-3 shadow-2xl">
+                        {{-- Browser-style top bar --}}
+                        <div class="flex items-center gap-2 px-3 py-2 mb-2">
+                            <div class="flex gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-red-400/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-400/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-400/80"></div>
+                            </div>
+                            <div class="flex-1 bg-white/10 rounded-lg px-3 py-1 text-xs text-gray-400 text-center">
+                                earnrol.co.uk/dashboard
+                            </div>
+                        </div>
+                        {{-- Dashboard screenshot --}}
+                        <img src="{{ asset('images/dashboard-preview.png') }}" alt="EarnRol Dashboard" class="rounded-xl w-full shadow-lg">
                     </div>
-                    <div class="text-lg font-bold text-white mb-1">Live Classes</div>
-                    <div class="text-gray-400 text-sm">Interactive sessions with real instructors</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-6">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style="background-color:#3b82f630;">
-                        <svg class="w-6 h-6 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+
+                    {{-- Floating accent cards --}}
+                    <div class="absolute -bottom-6 -left-6 bg-white/95 backdrop-blur-lg rounded-2xl p-4 shadow-xl border border-white/50 animate-float">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-[#1a1a2e]">Live Now</p>
+                                <p class="text-[10px] text-gray-400">Join via Google Meet</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-lg font-bold text-white mb-1">Cohort-Based</div>
-                    <div class="text-gray-400 text-sm">Learn together with a small group</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-6">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style="background-color:#22c55e30;">
-                        <svg class="w-6 h-6 text-[#22c55e]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+
+                    <div class="absolute -top-4 -right-4 bg-white/95 backdrop-blur-lg rounded-2xl p-4 shadow-xl border border-white/50 animate-float-delayed">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-[#e05a3a]/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-[#e05a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-[#1a1a2e]">Small Cohorts</p>
+                                <p class="text-[10px] text-gray-400">Personalised learning</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-lg font-bold text-white mb-1">Industry Expert</div>
-                    <div class="text-gray-400 text-sm">Taught by working professionals</div>
                 </div>
-                <div class="bg-[#e05a3a] rounded-2xl p-6">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-white/20">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <div class="text-lg font-bold text-white mb-1">Flexible Schedule</div>
-                    <div class="text-white/70 text-sm">Classes that fit your life</div>
-                </div>
+
+                <style>
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-8px); }
+                    }
+                    @keyframes float-delayed {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-6px); }
+                    }
+                    .animate-float { animation: float 4s ease-in-out infinite; }
+                    .animate-float-delayed { animation: float-delayed 5s ease-in-out 1s infinite; }
+                </style>
             </div>
         </div>
     </div>
