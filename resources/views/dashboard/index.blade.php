@@ -31,23 +31,30 @@
 
 {{-- Referral Banner --}}
 @if(\App\Models\Setting::get('referral_enabled') && auth()->user()->referral_code)
-<div class="bg-gradient-to-r from-[#1a2535] to-[#2a3f55] rounded-2xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-[#e05a3a]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-[#e05a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+<div class="rounded-2xl p-5 mb-6 relative overflow-hidden" style="background: linear-gradient(135deg, #1a2535 0%, #2a3f55 40%, #e05a3a 100%);">
+    {{-- Decorative elements --}}
+    <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+    <div class="absolute right-20 bottom-0 w-20 h-20 bg-[#e05a3a]/30 rounded-full blur-xl"></div>
+    <div class="absolute left-1/2 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
+
+    <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 border border-white/20">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+            </div>
+            <div>
+                <p class="text-white font-bold text-sm">Refer & Earn {{ \App\Models\Setting::get('referral_commission', 10) }}% Commission</p>
+                <p class="text-white/60 text-xs mt-0.5">Share your link with friends and earn on their first payment</p>
+            </div>
         </div>
-        <div>
-            <p class="text-white font-bold text-sm">Refer & Earn {{ \App\Models\Setting::get('referral_commission', 10) }}% Commission</p>
-            <p class="text-gray-400 text-xs mt-0.5 truncate max-w-xs">{{ auth()->user()->referralLink() }}</p>
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="navigator.clipboard.writeText('{{ auth()->user()->referralLink() }}').then(()=>{ this.textContent='Copied!'; setTimeout(()=>{ this.textContent='Copy Link'; }, 2000); })" class="bg-white text-[#1a2535] hover:bg-gray-100 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg">
+                Copy Link
+            </button>
+            <a href="{{ route('referrals.index') }}" class="bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-colors border border-white/20">
+                View Referrals
+            </a>
         </div>
-    </div>
-    <div class="flex items-center gap-2 flex-shrink-0">
-        <button onclick="navigator.clipboard.writeText('{{ auth()->user()->referralLink() }}').then(()=>{ this.textContent='Copied!'; setTimeout(()=>{ this.textContent='Copy Link'; }, 2000); })" class="bg-[#e05a3a] hover:bg-[#c94e31] text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors">
-            Copy Link
-        </button>
-        <a href="{{ route('referrals.index') }}" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors">
-            View Referrals
-        </a>
     </div>
 </div>
 @endif

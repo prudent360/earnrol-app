@@ -9,8 +9,10 @@
 {{-- Referral Link & Wallet Overview --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
     {{-- Referral Link Card --}}
-    <div class="lg:col-span-2 bg-gradient-to-br from-[#1a2535] to-[#243347] rounded-2xl p-6 text-white relative overflow-hidden">
-        <div class="absolute -right-10 -top-10 w-40 h-40 bg-[#e05a3a]/20 rounded-full blur-3xl"></div>
+    <div class="lg:col-span-2 rounded-2xl p-6 text-white relative overflow-hidden" style="background: linear-gradient(135deg, #1a2535 0%, #243347 50%, #e05a3a 100%);">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute right-32 bottom-0 w-28 h-28 bg-[#e05a3a]/30 rounded-full blur-2xl"></div>
+        <div class="absolute left-1/3 -top-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
         <div class="relative">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 bg-[#e05a3a]/20 rounded-xl flex items-center justify-center">
