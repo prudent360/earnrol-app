@@ -178,15 +178,16 @@ class ReportController extends Controller
                 ->get(),
 
             // Revenue per cohort
-            'cohortRevenue' => Cohort::select('cohorts.*')
-                ->leftJoin('payments', function ($join) {
-                    $join->on('payments.payable_id', '=', 'cohorts.id')
-                         ->where('payments.payable_type', 'App\\Models\\Cohort')
-                         ->where('payments.status', 'completed');
-                })
-                ->selectRaw('COALESCE(SUM(payments.amount), 0) as total_revenue')
-                ->selectRaw('COUNT(DISTINCT payments.id) as payment_count')
-                ->groupBy('cohorts.id')
+            'cohortRevenue' => Cohort::addSelect([
+                    'total_revenue' => Payment::selectRaw('COALESCE(SUM(amount), 0)')
+                        ->whereColumn('payable_id', 'cohorts.id')
+                        ->where('payable_type', 'App\\Models\\Cohort')
+                        ->where('status', 'completed'),
+                    'payment_count' => Payment::selectRaw('COUNT(*)')
+                        ->whereColumn('payable_id', 'cohorts.id')
+                        ->where('payable_type', 'App\\Models\\Cohort')
+                        ->where('status', 'completed'),
+                ])
                 ->orderByDesc('total_revenue')
                 ->take(10)
                 ->get(),
@@ -217,15 +218,16 @@ class ReportController extends Controller
                 ->get(),
 
             // Product revenue
-            'productRevenue' => DigitalProduct::select('digital_products.*')
-                ->leftJoin('payments', function ($join) {
-                    $join->on('payments.payable_id', '=', 'digital_products.id')
-                         ->where('payments.payable_type', 'App\\Models\\DigitalProduct')
-                         ->where('payments.status', 'completed');
-                })
-                ->selectRaw('COALESCE(SUM(payments.amount), 0) as total_revenue')
-                ->selectRaw('COUNT(DISTINCT payments.id) as payment_count')
-                ->groupBy('digital_products.id')
+            'productRevenue' => DigitalProduct::addSelect([
+                    'total_revenue' => Payment::selectRaw('COALESCE(SUM(amount), 0)')
+                        ->whereColumn('payable_id', 'digital_products.id')
+                        ->where('payable_type', 'App\\Models\\DigitalProduct')
+                        ->where('status', 'completed'),
+                    'payment_count' => Payment::selectRaw('COUNT(*)')
+                        ->whereColumn('payable_id', 'digital_products.id')
+                        ->where('payable_type', 'App\\Models\\DigitalProduct')
+                        ->where('status', 'completed'),
+                ])
                 ->orderByDesc('total_revenue')
                 ->take(10)
                 ->get(),
@@ -258,11 +260,13 @@ class ReportController extends Controller
                 ->get(),
 
             // Top earners
-            'topEarners' => User::select('users.*')
-                ->join('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
-                ->selectRaw('SUM(referral_earnings.amount) as total_earned')
-                ->selectRaw('COUNT(referral_earnings.id) as earnings_count')
-                ->groupBy('users.id')
+            'topEarners' => User::addSelect([
+                    'total_earned' => ReferralEarning::selectRaw('COALESCE(SUM(amount), 0)')
+                        ->whereColumn('user_id', 'users.id'),
+                    'earnings_count' => ReferralEarning::selectRaw('COUNT(*)')
+                        ->whereColumn('user_id', 'users.id'),
+                ])
+                ->whereHas('referralEarnings')
                 ->orderByDesc('total_earned')
                 ->take(10)
                 ->get(),
