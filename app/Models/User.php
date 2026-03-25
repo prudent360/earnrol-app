@@ -22,6 +22,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'phone',
+        'date_of_birth',
+        'address',
+        'city',
+        'state',
+        'postal_code',
+        'country',
         'referral_code',
         'referred_by',
         'wallet_balance',
@@ -42,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'wallet_balance' => 'decimal:2',
+            'date_of_birth' => 'date',
         ];
     }
 

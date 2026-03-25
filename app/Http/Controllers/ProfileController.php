@@ -25,9 +25,21 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $data = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'name'          => ['required', 'string', 'max:255'],
+            'email'         => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone'         => ['nullable', 'string', 'max:20'],
+            'date_of_birth' => ['nullable', 'date', 'before:today'],
+            'address'       => ['nullable', 'string', 'max:255'],
+            'city'          => ['nullable', 'string', 'max:100'],
+            'state'         => ['nullable', 'string', 'max:100'],
+            'postal_code'   => ['nullable', 'string', 'max:20'],
+            'country'       => ['nullable', 'string', 'max:100'],
         ]);
+
+        // If email changed, reset verification
+        if ($user->email !== $data['email']) {
+            $data['email_verified_at'] = null;
+        }
 
         $user->update($data);
 

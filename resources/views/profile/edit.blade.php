@@ -8,6 +8,30 @@
 
 <div class="max-w-2xl mx-auto space-y-6">
 
+    {{-- Email Verification Banner --}}
+    @if(!$user->hasVerifiedEmail())
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            </div>
+            <div class="flex-1">
+                <h4 class="text-sm font-bold text-amber-800">Email Not Verified</h4>
+                <p class="text-xs text-amber-700 mt-1">Please verify your email address to access all features. Check your inbox for the verification link.</p>
+                @if(session('status') === 'verification-link-sent')
+                <p class="text-xs text-green-700 font-semibold mt-2">A new verification link has been sent to your email!</p>
+                @endif
+            </div>
+            <form method="POST" action="{{ route('verification.send') }}">
+                @csrf
+                <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-shrink-0">
+                    Resend Link
+                </button>
+            </form>
+        </div>
+    </div>
+    @endif
+
     {{-- Personal Information --}}
     <div class="card">
         <div class="flex items-center gap-3 mb-6">
@@ -16,28 +40,71 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold text-[#1a1a2e]">Personal Information</h3>
-                <p class="text-sm text-[#6b7280]">Update your name and email address</p>
+                <p class="text-sm text-[#6b7280]">Update your personal details</p>
             </div>
         </div>
 
         <form action="{{ route('profile.update') }}" method="POST" class="space-y-5">
             @csrf
             @method('PUT')
-            <div>
-                <label for="name" class="form-label">Full Name</label>
-                <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required class="form-input @error('name') border-red-400 @enderror">
-                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required class="form-input @error('name') border-red-400 @enderror">
+                    @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required class="form-input @error('email') border-red-400 @enderror">
+                    @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" class="form-input @error('phone') border-red-400 @enderror" placeholder="e.g. +44 7700 900000">
+                    @error('phone')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="date_of_birth" class="form-label">Date of Birth</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d')) }}" class="form-input @error('date_of_birth') border-red-400 @enderror">
+                    @error('date_of_birth')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Role</label>
+                    <input type="text" value="{{ ucfirst($user->role ?? 'Learner') }}" disabled class="form-input bg-gray-50 text-[#6b7280] cursor-not-allowed">
+                </div>
             </div>
-            <div>
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required class="form-input @error('email') border-red-400 @enderror">
-                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+
+            <div class="pt-2 border-t border-gray-100">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Address</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label for="address" class="form-label">Street Address</label>
+                        <input type="text" id="address" name="address" value="{{ old('address', $user->address) }}" class="form-input @error('address') border-red-400 @enderror" placeholder="e.g. 123 High Street">
+                        @error('address')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" name="city" value="{{ old('city', $user->city) }}" class="form-input @error('city') border-red-400 @enderror" placeholder="e.g. London">
+                        @error('city')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="state" class="form-label">State / County</label>
+                        <input type="text" id="state" name="state" value="{{ old('state', $user->state) }}" class="form-input @error('state') border-red-400 @enderror" placeholder="e.g. Greater London">
+                        @error('state')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="postal_code" class="form-label">Postal Code</label>
+                        <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $user->postal_code) }}" class="form-input @error('postal_code') border-red-400 @enderror" placeholder="e.g. SW1A 1AA">
+                        @error('postal_code')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" id="country" name="country" value="{{ old('country', $user->country) }}" class="form-input @error('country') border-red-400 @enderror" placeholder="e.g. United Kingdom">
+                        @error('country')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                </div>
             </div>
-            <div>
-                <label class="form-label">Role</label>
-                <input type="text" value="{{ ucfirst($user->role ?? 'Learner') }}" disabled class="form-input bg-gray-50 text-[#6b7280] cursor-not-allowed">
-                <p class="text-xs text-[#6b7280] mt-1">Your role cannot be changed from here.</p>
-            </div>
+
             <div class="flex justify-end pt-2">
                 <button type="submit" class="btn-primary py-2.5">
                     Save Changes

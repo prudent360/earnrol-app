@@ -23,13 +23,8 @@ class ReferralService
             return;
         }
 
-        // Only credit on first completed payment
-        $hasPriorPayment = Payment::where('user_id', $user->id)
-            ->where('status', 'completed')
-            ->where('id', '!=', $payment->id)
-            ->exists();
-
-        if ($hasPriorPayment) {
+        // Prevent duplicate commission for the same payment
+        if (ReferralEarning::where('payment_id', $payment->id)->exists()) {
             return;
         }
 
