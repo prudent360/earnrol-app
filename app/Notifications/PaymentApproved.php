@@ -30,10 +30,11 @@ class PaymentApproved extends Notification
         $symbol = Setting::get('currency_symbol', '£');
 
         return (new TemplateMail('payment_approved', [
-            'name'          => $notifiable->name,
-            'cohort_name'   => $cohortTitle,
-            'amount'        => $symbol . number_format((float)$this->payment->amount, 2),
-            'dashboard_url' => route('dashboard'),
+            'name'              => $notifiable->name,
+            'cohort_name'       => $cohortTitle,
+            'amount'            => $symbol . number_format((float)$this->payment->amount, 2),
+            'payment_reference' => $this->payment->reference ?? $this->payment->id,
+            'dashboard_url'     => route('dashboard'),
         ]))->to($notifiable->email);
     }
 

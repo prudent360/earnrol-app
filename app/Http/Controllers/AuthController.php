@@ -69,7 +69,8 @@ class AuthController extends Controller
         try {
             if (\App\Services\Mail\TemplateService::isEnabled('welcome')) {
                 Mail::to($user->email)->send(new TemplateMail('welcome', [
-                    'name' => $user->name,
+                    'name'  => $user->name,
+                    'email' => $user->email,
                 ]));
             }
         } catch (\Exception $e) {

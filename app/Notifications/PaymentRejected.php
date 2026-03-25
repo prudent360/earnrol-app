@@ -28,9 +28,10 @@ class PaymentRejected extends Notification
         $cohortTitle = $this->payment->payable->title ?? 'a cohort';
 
         return (new TemplateMail('payment_rejected', [
-            'name'        => $notifiable->name,
-            'cohort_name' => $cohortTitle,
-            'reason'      => $this->payment->admin_note ?? 'No reason provided.',
+            'name'              => $notifiable->name,
+            'cohort_name'       => $cohortTitle,
+            'payment_reference' => $this->payment->reference ?? $this->payment->id,
+            'reason'            => $this->payment->admin_note ?? 'No reason provided.',
         ]))->to($notifiable->email);
     }
 
