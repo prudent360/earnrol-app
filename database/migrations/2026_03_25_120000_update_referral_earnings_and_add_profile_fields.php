@@ -8,9 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Allow multiple commissions per referred user (one per payment)
+        // MySQL: must drop FK before dropping the unique index it uses
         Schema::table('referral_earnings', function (Blueprint $table) {
+            $table->dropForeign(['referred_user_id']);
             $table->dropUnique(['referred_user_id']);
+            $table->index('referred_user_id');
+            $table->foreign('referred_user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         // Add profile fields to users
