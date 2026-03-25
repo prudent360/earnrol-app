@@ -6,12 +6,17 @@ use App\Models\Cohort;
 use App\Models\CohortEnrollment;
 use App\Models\Payment;
 use App\Models\Setting;
+use App\Models\User;
 use App\Mail\TemplateMail;
+use App\Notifications\EnrollmentConfirmed;
+use App\Notifications\NewBankTransferAdmin;
+use App\Notifications\NewEnrollmentAdmin;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 class PaymentController extends Controller
 {
@@ -188,7 +193,7 @@ class PaymentController extends Controller
 
         $receiptPath = $request->file('receipt')->store('receipts', 'public');
 
-        Payment::create([
+        $payment = Payment::create([
             'user_id'       => $user->id,
             'payable_type'  => Cohort::class,
             'payable_id'    => $cohort->id,
@@ -199,6 +204,10 @@ class PaymentController extends Controller
             'currency'      => Setting::get('currency', 'GBP'),
             'receipt_path'  => $receiptPath,
         ]);
+
+        // Notify all admins
+        $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
+        Notification::send($admins, new NewBankTransferAdmin($payment));
 
         return redirect()->route('dashboard')
             ->with('success', 'Receipt uploaded! Your payment is being reviewed. You will be enrolled once approved.');
@@ -240,7 +249,7 @@ class PaymentController extends Controller
             ]);
 
             $cohort = Cohort::find($payment->payable_id);
-            $user = \App\Models\User::find($payment->user_id);
+            $user = User::find($payment->user_id);
 
             // Send enrollment confirmation email
             try {
@@ -249,9 +258,12 @@ class PaymentController extends Controller
                     'cohort_name' => $cohort->title ?? 'the cohort',
                     'dashboard_url' => route('dashboard'),
                 ]));
-            } catch (\Exception $e) {
-                // Don't block enrollment if email fails
-            }
+            } catch (\Exception $e) {}
+
+            // Notify student + admins
+            $user->notify(new EnrollmentConfirmed($cohort));
+            $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
+            Notification::send($admins, new NewEnrollmentAdmin($user, $cohort, $payment->gateway));
 
             return redirect()->route('dashboard')
                 ->with('success', 'Payment successful! You are now enrolled in ' . ($cohort->title ?? 'the cohort') . '.');

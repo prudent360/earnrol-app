@@ -6,8 +6,12 @@ use App\Mail\TemplateMail;
 use App\Models\Cohort;
 use App\Models\CohortEnrollment;
 use App\Models\Setting;
+use App\Models\User;
+use App\Notifications\EnrollmentConfirmed;
+use App\Notifications\NewEnrollmentAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 class CohortController extends Controller
 {
@@ -48,9 +52,12 @@ class CohortController extends Controller
                 'cohort_name' => $cohort->title,
                 'dashboard_url' => route('dashboard'),
             ]));
-        } catch (\Exception $e) {
-            // Don't block enrollment if email fails
-        }
+        } catch (\Exception $e) {}
+
+        // Notify student + admins
+        $user->notify(new EnrollmentConfirmed($cohort));
+        $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
+        Notification::send($admins, new NewEnrollmentAdmin($user, $cohort, 'free'));
 
         return redirect()->route('dashboard')->with('success', 'You are now enrolled in ' . $cohort->title . '!');
     }

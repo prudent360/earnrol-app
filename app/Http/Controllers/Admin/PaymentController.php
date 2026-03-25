@@ -7,8 +7,14 @@ use App\Mail\TemplateMail;
 use App\Models\Cohort;
 use App\Models\CohortEnrollment;
 use App\Models\Payment;
+use App\Models\User;
+use App\Notifications\EnrollmentConfirmed;
+use App\Notifications\NewEnrollmentAdmin;
+use App\Notifications\PaymentApproved;
+use App\Notifications\PaymentRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
@@ -62,6 +68,12 @@ class PaymentController extends Controller
             // Don't block approval if email fails
         }
 
+        // Notify student + admins
+        $user->notify(new PaymentApproved($payment));
+        $user->notify(new EnrollmentConfirmed($cohort));
+        $admins = User::whereIn('role', ['admin', 'superadmin'])->where('id', '!=', auth()->id())->get();
+        Notification::send($admins, new NewEnrollmentAdmin($user, $cohort, $payment->gateway));
+
         return back()->with('success', $user->name . ' has been enrolled in ' . ($cohort->title ?? 'the cohort') . '.');
     }
 
@@ -75,6 +87,9 @@ class PaymentController extends Controller
             'status'     => 'failed',
             'admin_note' => $request->get('admin_note', 'Payment rejected by admin.'),
         ]);
+
+        // Notify student
+        $payment->user->notify(new PaymentRejected($payment));
 
         return back()->with('success', 'Payment rejected.');
     }

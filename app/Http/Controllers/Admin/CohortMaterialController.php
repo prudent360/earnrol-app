@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Cohort;
 use App\Models\CohortMaterial;
 use App\Models\CohortSubmission;
+use App\Notifications\AssignmentGraded;
+use App\Notifications\NewMaterialUploaded;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class CohortMaterialController extends Controller
@@ -51,6 +54,12 @@ class CohortMaterialController extends Controller
 
         $material->save();
 
+        // Notify enrolled students
+        $enrolledStudents = $cohort->students;
+        if ($enrolledStudents->count() > 0) {
+            Notification::send($enrolledStudents, new NewMaterialUploaded($material));
+        }
+
         return redirect()->route('admin.cohorts.materials.index', $cohort)
             ->with('success', ucfirst($data['type']) . ' added successfully.');
     }
@@ -88,6 +97,9 @@ class CohortMaterialController extends Controller
         ]);
 
         $submission->update($data);
+
+        // Notify student
+        $submission->user->notify(new AssignmentGraded($submission));
 
         return back()->with('success', 'Submission graded successfully.');
     }
