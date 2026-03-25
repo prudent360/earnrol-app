@@ -79,14 +79,14 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     <div class="card">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Trend</h3>
-        <div class="h-48" id="revenue-chart"></div>
+        <canvas id="revenue-chart" height="180"></canvas>
         @if(empty($revenueChart))
         <p class="text-sm text-gray-400 text-center py-8">No revenue data for this period.</p>
         @endif
     </div>
     <div class="card">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">User Signups</h3>
-        <div class="h-48" id="signups-chart"></div>
+        <canvas id="signups-chart" height="180"></canvas>
         @if(empty($signupsChart))
         <p class="text-sm text-gray-400 text-center py-8">No signup data for this period.</p>
         @endif
@@ -171,45 +171,57 @@
     </div>
 </div>
 
-{{-- Revenue Chart --}}
-<div class="card mb-8">
-    <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Over Time</h3>
-    <div class="h-48" id="revenue-chart"></div>
-    @if(empty($revenueChart))
-    <p class="text-sm text-gray-400 text-center py-8">No revenue data for this period.</p>
-    @endif
+{{-- Revenue Chart + Doughnut --}}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="card lg:col-span-2">
+        <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Over Time</h3>
+        <canvas id="revenue-chart" height="180"></canvas>
+        @if(empty($revenueChart))
+        <p class="text-sm text-gray-400 text-center py-8">No revenue data for this period.</p>
+        @endif
+    </div>
+    <div class="card flex flex-col items-center justify-center">
+        <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Sources</h3>
+        @if($cohortRevenue > 0 || $productRevenue > 0)
+        <canvas id="source-doughnut" height="200"></canvas>
+        @else
+        <p class="text-sm text-gray-400 text-center py-8">No revenue data yet.</p>
+        @endif
+    </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     {{-- By Gateway --}}
     <div class="card">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue by Gateway</h3>
+        @if($byGateway->count() > 0)
+        <div class="flex items-center justify-center mb-5">
+            <div class="w-48 h-48">
+                <canvas id="gateway-doughnut"></canvas>
+            </div>
+        </div>
         <div class="space-y-3">
-            @forelse($byGateway as $gw)
+            @foreach($byGateway as $gw)
             @php
                 $gwColors = ['stripe' => 'bg-[#635BFF]', 'paypal' => 'bg-[#003087]', 'bank_transfer' => 'bg-gray-700'];
                 $gwColor = $gwColors[$gw->gateway] ?? 'bg-gray-400';
                 $pct = $periodRevenue > 0 ? ($gw->total / $periodRevenue) * 100 : 0;
             @endphp
-            <div>
-                <div class="flex items-center justify-between mb-1.5">
-                    <div class="flex items-center gap-2">
-                        <div class="w-2.5 h-2.5 rounded-full {{ $gwColor }}"></div>
-                        <span class="text-sm font-medium text-[#1a1a2e]">{{ ucfirst(str_replace('_', ' ', $gw->gateway)) }}</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-sm font-bold text-[#1a1a2e]">{{ $currencySymbol }}{{ number_format($gw->total, 2) }}</span>
-                        <span class="text-[10px] text-gray-400 ml-1">({{ $gw->count }})</span>
-                    </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full {{ $gwColor }}"></div>
+                    <span class="text-sm font-medium text-[#1a1a2e]">{{ ucfirst(str_replace('_', ' ', $gw->gateway)) }}</span>
                 </div>
-                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div class="h-full {{ $gwColor }} rounded-full" style="width: {{ $pct }}%"></div>
+                <div class="text-right">
+                    <span class="text-sm font-bold text-[#1a1a2e]">{{ $currencySymbol }}{{ number_format($gw->total, 2) }}</span>
+                    <span class="text-[10px] text-gray-400 ml-1">({{ $gw->count }})</span>
                 </div>
             </div>
-            @empty
-            <p class="text-sm text-gray-400 text-center py-4">No gateway data for this period.</p>
-            @endforelse
+            @endforeach
         </div>
+        @else
+        <p class="text-sm text-gray-400 text-center py-4">No gateway data for this period.</p>
+        @endif
     </div>
 
     {{-- Payment Status --}}
@@ -298,7 +310,7 @@
 {{-- Signups Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Signup Trend</h3>
-    <div class="h-48" id="signups-chart"></div>
+    <canvas id="signups-chart" height="180"></canvas>
     @if(empty($signupsChart))
     <p class="text-sm text-gray-400 text-center py-8">No signup data for this period.</p>
     @endif
@@ -377,7 +389,7 @@
 {{-- Enrollment Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Enrollment Trend</h3>
-    <div class="h-48" id="enrollment-chart"></div>
+    <canvas id="enrollment-chart" height="180"></canvas>
     @if(empty($enrollmentChart))
     <p class="text-sm text-gray-400 text-center py-8">No enrollment data for this period.</p>
     @endif
@@ -457,7 +469,7 @@
 {{-- Sales Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Sales Trend</h3>
-    <div class="h-48" id="sales-chart"></div>
+    <canvas id="sales-chart" height="180"></canvas>
     @if(empty($salesChart))
     <p class="text-sm text-gray-400 text-center py-8">No sales data for this period.</p>
     @endif
@@ -541,7 +553,7 @@
 {{-- Earnings Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Commission Earned Over Time</h3>
-    <div class="h-48" id="earnings-chart"></div>
+    <canvas id="earnings-chart" height="180"></canvas>
     @if(empty($earningsChart))
     <p class="text-sm text-gray-400 text-center py-8">No referral data for this period.</p>
     @endif
@@ -596,68 +608,239 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Simple bar chart renderer using CSS
-    function renderChart(containerId, data, color) {
-        const container = document.getElementById(containerId);
-        if (!container || Object.keys(data).length === 0) return;
+    const currency = @json($currencySymbol);
 
-        const values = Object.values(data).map(Number);
-        const labels = Object.keys(data);
-        const max = Math.max(...values, 1);
+    // Shared defaults
+    Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = '#9ca3af';
 
-        let html = '<div class="flex items-end gap-1 h-full px-1">';
-        labels.forEach((label, i) => {
-            const pct = (values[i] / max) * 100;
-            const dateObj = new Date(label + 'T00:00:00');
-            const shortLabel = dateObj.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-            html += `
-                <div class="flex-1 flex flex-col items-center justify-end h-full group relative">
-                    <div class="absolute -top-6 bg-[#1a2535] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                        ${shortLabel}: ${typeof values[i] === 'number' && values[i] % 1 !== 0 ? Number(values[i]).toFixed(2) : values[i]}
-                    </div>
-                    <div class="w-full rounded-t-md transition-all duration-300 hover:opacity-80" style="height: ${Math.max(pct, 2)}%; background: ${color};"></div>
-                </div>
-            `;
+    // Helper: create area/line chart
+    function createAreaChart(canvasId, data, color, isCurrency) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || Object.keys(data).length === 0) return;
+
+        const labels = Object.keys(data).map(d => {
+            const dt = new Date(d + 'T00:00:00');
+            return dt.toLocaleDateString('en', { month: 'short', day: 'numeric' });
         });
-        html += '</div>';
-        html += '<div class="flex justify-between mt-2 px-1">';
-        if (labels.length <= 14) {
-            labels.forEach(label => {
-                const dateObj = new Date(label + 'T00:00:00');
-                html += `<span class="text-[9px] text-gray-400 flex-1 text-center">${dateObj.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
-            });
-        } else {
-            const first = new Date(labels[0] + 'T00:00:00');
-            const last = new Date(labels[labels.length - 1] + 'T00:00:00');
-            html += `<span class="text-[9px] text-gray-400">${first.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
-            html += `<span class="text-[9px] text-gray-400">${last.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
-        }
-        html += '</div>';
+        const values = Object.values(data).map(Number);
 
-        container.innerHTML = html;
+        new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    borderColor: color,
+                    backgroundColor: color + '18',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: values.length > 30 ? 0 : 3,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: color,
+                    pointBorderWidth: 2,
+                    pointHoverBackgroundColor: color,
+                    pointHoverBorderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1a2535',
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(ctx) {
+                                const val = ctx.parsed.y;
+                                return isCurrency
+                                    ? currency + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                    : val.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 8,
+                            maxRotation: 0,
+                            font: { size: 10 }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6', drawBorder: false },
+                        border: { display: false },
+                        ticks: {
+                            maxTicksLimit: 5,
+                            font: { size: 10 },
+                            callback: function(val) {
+                                return isCurrency
+                                    ? currency + val.toLocaleString()
+                                    : val.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    }
+
+    // Helper: create bar chart
+    function createBarChart(canvasId, data, color) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || Object.keys(data).length === 0) return;
+
+        const labels = Object.keys(data).map(d => {
+            const dt = new Date(d + 'T00:00:00');
+            return dt.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+        });
+        const values = Object.values(data).map(Number);
+
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: color + '30',
+                    hoverBackgroundColor: color + '60',
+                    borderColor: color,
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1a2535',
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: false,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxTicksLimit: 8, maxRotation: 0, font: { size: 10 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6', drawBorder: false },
+                        border: { display: false },
+                        ticks: { maxTicksLimit: 5, font: { size: 10 }, precision: 0 }
+                    }
+                }
+            }
+        });
+    }
+
+    // Helper: create doughnut chart
+    function createDoughnut(canvasId, labels, values, colors) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                    hoverOffset: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { size: 12, weight: '600' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1a2535',
+                        bodyFont: { size: 13 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                                return ctx.label + ': ' + currency + ctx.parsed.toLocaleString(undefined, { minimumFractionDigits: 2 }) + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // Render charts based on current tab
     @if(isset($revenueChart) && !empty($revenueChart))
-    renderChart('revenue-chart', @json($revenueChart), '#10b981');
+    createAreaChart('revenue-chart', @json($revenueChart), '#10b981', true);
     @endif
 
     @if(isset($signupsChart) && !empty($signupsChart))
-    renderChart('signups-chart', @json($signupsChart), '#3b82f6');
+    createBarChart('signups-chart', @json($signupsChart), '#3b82f6');
     @endif
 
     @if(isset($enrollmentChart) && !empty($enrollmentChart))
-    renderChart('enrollment-chart', @json($enrollmentChart), '#6366f1');
+    createBarChart('enrollment-chart', @json($enrollmentChart), '#6366f1');
     @endif
 
     @if(isset($salesChart) && !empty($salesChart))
-    renderChart('sales-chart', @json($salesChart), '#8b5cf6');
+    createBarChart('sales-chart', @json($salesChart), '#8b5cf6');
     @endif
 
     @if(isset($earningsChart) && !empty($earningsChart))
-    renderChart('earnings-chart', @json($earningsChart), '#f59e0b');
+    createAreaChart('earnings-chart', @json($earningsChart), '#f59e0b', true);
+    @endif
+
+    @if(isset($byGateway) && $byGateway->count() > 0)
+    createDoughnut('gateway-doughnut',
+        @json($byGateway->map(fn($g) => ucfirst(str_replace('_', ' ', $g->gateway)))->values()),
+        @json($byGateway->pluck('total')->map(fn($v) => (float) $v)->values()),
+        ['#635BFF', '#003087', '#374151', '#e05a3a', '#10b981']
+    );
+    @endif
+
+    @if(isset($cohortRevenue, $productRevenue) && ($cohortRevenue > 0 || $productRevenue > 0))
+    createDoughnut('source-doughnut',
+        ['Cohorts', 'Products'],
+        [{{ $cohortRevenue ?? 0 }}, {{ $productRevenue ?? 0 }}],
+        ['#3b82f6', '#8b5cf6']
+    );
     @endif
 });
 </script>
