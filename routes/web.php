@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController
 use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\ProductPaymentController;
 use App\Http\Controllers\Admin\DigitalProductController as AdminDigitalProductController;
+use App\Http\Controllers\Admin\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,6 +168,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/withdrawals', [AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
         Route::post('/withdrawals/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
         Route::post('/withdrawals/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
+
+        // Reports
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
         // Settings
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
