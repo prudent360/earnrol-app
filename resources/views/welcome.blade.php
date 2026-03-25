@@ -48,125 +48,31 @@
                 </div>
             </div>
             <div class="relative hidden lg:block">
-                {{-- Glow effects --}}
+                {{-- Glow effects behind the image --}}
                 <div class="absolute -inset-4 bg-[#e05a3a]/20 rounded-3xl blur-3xl"></div>
                 <div class="absolute -top-8 -right-8 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl"></div>
                 <div class="absolute -bottom-8 -left-8 w-48 h-48 bg-[#e05a3a]/15 rounded-full blur-3xl"></div>
 
-                {{-- CSS Dashboard Mockup --}}
+                {{-- Dashboard image with glass frame --}}
                 <div class="relative">
                     <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-3 shadow-2xl">
-                        {{-- Browser top bar --}}
+                        {{-- Browser-style top bar --}}
                         <div class="flex items-center gap-2 px-3 py-2 mb-2">
                             <div class="flex gap-1.5">
-                                <div class="w-2.5 h-2.5 rounded-full bg-red-400/80"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-yellow-400/80"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-green-400/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-red-400/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-400/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-400/80"></div>
                             </div>
-                            <div class="flex-1 bg-white/10 rounded-lg px-3 py-1 text-[10px] text-gray-400 text-center">earnrol.co.uk/dashboard</div>
-                        </div>
-
-                        {{-- Dashboard body --}}
-                        <div class="bg-[#f5f6fa] rounded-xl overflow-hidden">
-                            <div class="flex">
-                                {{-- Sidebar --}}
-                                <div class="w-[52px] bg-[#1a2535] flex-shrink-0 py-3 flex flex-col items-center gap-3">
-                                    <div class="w-7 h-7 bg-[#e05a3a] rounded-lg flex items-center justify-center text-white text-[8px] font-extrabold">nr</div>
-                                    <div class="w-7 h-6 bg-[#e05a3a] rounded-md mt-2"></div>
-                                    <div class="w-7 h-6 bg-white/10 rounded-md"></div>
-                                    <div class="w-7 h-6 bg-white/10 rounded-md"></div>
-                                </div>
-
-                                {{-- Main content --}}
-                                <div class="flex-1 p-3 space-y-2.5 min-h-[280px]">
-                                    {{-- Welcome banner --}}
-                                    <div class="bg-[#1a2535] rounded-xl p-3.5 relative overflow-hidden">
-                                        <div class="absolute -right-6 -top-6 w-20 h-20 bg-[#e05a3a]/20 rounded-full blur-xl"></div>
-                                        <p class="text-[8px] text-gray-400">Good Morning,</p>
-                                        <p class="text-[11px] font-bold text-white">Ifiokobong Akpan</p>
-                                        <p class="text-[7px] text-gray-400 mt-0.5">Your class <span class="text-white font-semibold">Data Analytics 2026A</span> is live!</p>
-                                        <div class="mt-2 inline-flex items-center gap-1 bg-[#e05a3a] text-white rounded-md px-2 py-1">
-                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                            <span class="text-[7px] font-bold">Join Live Class</span>
-                                        </div>
-                                    </div>
-
-                                    {{-- Live class card --}}
-                                    <div class="bg-white rounded-xl border-l-[3px] border-green-400 p-3 flex items-center justify-between">
-                                        <div>
-                                            <div class="flex items-center gap-1.5 mb-1">
-                                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                                                <span class="text-[7px] font-bold text-green-600 uppercase">Live Now</span>
-                                            </div>
-                                            <p class="text-[10px] font-bold text-[#1a1a2e]">Data Analytics Cohort 2026A</p>
-                                            <p class="text-[7px] text-gray-400 mt-0.5">Started Apr 13, 2026</p>
-                                        </div>
-                                        <div class="bg-[#e05a3a] text-white rounded-lg px-2.5 py-1.5 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                            <span class="text-[7px] font-bold">Join Google Meet</span>
-                                        </div>
-                                    </div>
-
-                                    {{-- My Cohorts header --}}
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-[9px] font-bold text-[#1a1a2e]">My Cohorts</p>
-                                        <p class="text-[7px] text-[#e05a3a] font-semibold">View all</p>
-                                    </div>
-
-                                    {{-- Enrolled card --}}
-                                    <div class="bg-white rounded-xl p-2.5">
-                                        <div class="flex items-center gap-1.5 mb-1.5">
-                                            <span class="bg-green-100 text-green-700 text-[6px] font-bold px-1.5 py-0.5 rounded-full">Active</span>
-                                            <span class="bg-emerald-100 text-emerald-700 text-[6px] font-bold px-1.5 py-0.5 rounded-full">Enrolled</span>
-                                        </div>
-                                        <p class="text-[9px] font-bold text-[#1a1a2e]">Data Analytics Cohort 2026A</p>
-                                        <p class="text-[6px] text-gray-400 mt-0.5">Starts Apr 13, 2026</p>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <span class="text-[7px] font-bold text-[#1a2535]">Details</span>
-                                            <span class="text-[7px] font-bold text-blue-600">Materials</span>
-                                            <span class="text-[7px] font-bold text-[#e05a3a]">Join Class</span>
-                                        </div>
-                                    </div>
-
-                                    {{-- Available Cohorts header --}}
-                                    <p class="text-[9px] font-bold text-[#1a1a2e]">Available Cohorts</p>
-
-                                    {{-- Available cards --}}
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <div class="bg-white rounded-xl p-2.5">
-                                            <div class="flex items-center gap-1 mb-1.5">
-                                                <span class="bg-blue-100 text-blue-700 text-[6px] font-bold px-1.5 py-0.5 rounded-full">Upcoming</span>
-                                                <span class="bg-orange-100 text-orange-600 text-[6px] font-bold px-1.5 py-0.5 rounded-full">30 spots</span>
-                                            </div>
-                                            <p class="text-[8px] font-bold text-[#1a1a2e]">Dropshipping 2026A</p>
-                                            <p class="text-[6px] text-gray-400 mt-0.5">Starts Mar 31, 2026</p>
-                                            <div class="flex items-center justify-between mt-1.5">
-                                                <span class="text-[6px] text-gray-400">Mar 31</span>
-                                                <span class="text-[9px] font-bold text-[#1a1a2e]">£99.99</span>
-                                            </div>
-                                            <div class="mt-1.5 bg-[#1a2535] text-white text-[7px] font-bold text-center rounded-lg py-1.5">View Details</div>
-                                        </div>
-                                        <div class="bg-white rounded-xl p-2.5">
-                                            <div class="flex items-center gap-1 mb-1.5">
-                                                <span class="bg-blue-100 text-blue-700 text-[6px] font-bold px-1.5 py-0.5 rounded-full">Upcoming</span>
-                                                <span class="bg-orange-100 text-orange-600 text-[6px] font-bold px-1.5 py-0.5 rounded-full">50 spots</span>
-                                            </div>
-                                            <p class="text-[8px] font-bold text-[#1a1a2e]">Digital Marketing 2026A</p>
-                                            <p class="text-[6px] text-gray-400 mt-0.5">Starts Apr 24, 2026</p>
-                                            <div class="flex items-center justify-between mt-1.5">
-                                                <span class="text-[6px] text-gray-400">Apr 24</span>
-                                                <span class="text-[9px] font-bold text-[#1a1a2e]">£80.00</span>
-                                            </div>
-                                            <div class="mt-1.5 bg-[#1a2535] text-white text-[7px] font-bold text-center rounded-lg py-1.5">View Details</div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="flex-1 bg-white/10 rounded-lg px-3 py-1 text-xs text-gray-400 text-center">
+                                earnrol.co.uk/dashboard
                             </div>
                         </div>
+                        {{-- Dashboard screenshot --}}
+                        <img src="{{ asset('images/dashboard-preview.png') }}" alt="EarnRol Dashboard" class="rounded-xl w-full shadow-lg">
                     </div>
 
                     {{-- Floating accent cards --}}
-                    <div class="absolute -bottom-6 -left-6 bg-white/95 backdrop-blur-lg rounded-2xl p-3.5 shadow-xl border border-white/50 animate-float">
+                    <div class="absolute -bottom-6 -left-6 bg-white/95 backdrop-blur-lg rounded-2xl p-4 shadow-xl border border-white/50 animate-float">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -178,7 +84,7 @@
                         </div>
                     </div>
 
-                    <div class="absolute -top-4 -right-4 bg-white/95 backdrop-blur-lg rounded-2xl p-3.5 shadow-xl border border-white/50 animate-float-delayed">
+                    <div class="absolute -top-4 -right-4 bg-white/95 backdrop-blur-lg rounded-2xl p-4 shadow-xl border border-white/50 animate-float-delayed">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-[#e05a3a]/10 rounded-xl flex items-center justify-center">
                                 <svg class="w-5 h-5 text-[#e05a3a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
