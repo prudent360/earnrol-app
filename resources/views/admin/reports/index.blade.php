@@ -79,14 +79,14 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     <div class="card">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Trend</h3>
-        <canvas id="revenue-chart" height="180"></canvas>
+        <div style="position:relative;height:200px"><canvas id="revenue-chart"></canvas></div>
         @if(empty($revenueChart))
         <p class="text-sm text-gray-400 text-center py-8">No revenue data for this period.</p>
         @endif
     </div>
     <div class="card">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">User Signups</h3>
-        <canvas id="signups-chart" height="180"></canvas>
+        <div style="position:relative;height:200px"><canvas id="signups-chart"></canvas></div>
         @if(empty($signupsChart))
         <p class="text-sm text-gray-400 text-center py-8">No signup data for this period.</p>
         @endif
@@ -175,7 +175,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     <div class="card lg:col-span-2">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Over Time</h3>
-        <canvas id="revenue-chart" height="180"></canvas>
+        <div style="position:relative;height:200px"><canvas id="revenue-chart"></canvas></div>
         @if(empty($revenueChart))
         <p class="text-sm text-gray-400 text-center py-8">No revenue data for this period.</p>
         @endif
@@ -183,7 +183,7 @@
     <div class="card flex flex-col items-center justify-center">
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue Sources</h3>
         @if($cohortRevenue > 0 || $productRevenue > 0)
-        <canvas id="source-doughnut" height="200"></canvas>
+        <div style="position:relative;height:180px;width:180px"><canvas id="source-doughnut"></canvas></div>
         @else
         <p class="text-sm text-gray-400 text-center py-8">No revenue data yet.</p>
         @endif
@@ -196,7 +196,7 @@
         <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Revenue by Gateway</h3>
         @if($byGateway->count() > 0)
         <div class="flex items-center justify-center mb-5">
-            <div class="w-48 h-48">
+            <div style="position:relative;height:180px;width:180px">
                 <canvas id="gateway-doughnut"></canvas>
             </div>
         </div>
@@ -310,7 +310,7 @@
 {{-- Signups Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Signup Trend</h3>
-    <canvas id="signups-chart" height="180"></canvas>
+    <div style="position:relative;height:200px"><canvas id="signups-chart"></canvas></div>
     @if(empty($signupsChart))
     <p class="text-sm text-gray-400 text-center py-8">No signup data for this period.</p>
     @endif
@@ -389,7 +389,7 @@
 {{-- Enrollment Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Enrollment Trend</h3>
-    <canvas id="enrollment-chart" height="180"></canvas>
+    <div style="position:relative;height:200px"><canvas id="enrollment-chart"></canvas></div>
     @if(empty($enrollmentChart))
     <p class="text-sm text-gray-400 text-center py-8">No enrollment data for this period.</p>
     @endif
@@ -469,7 +469,7 @@
 {{-- Sales Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Sales Trend</h3>
-    <canvas id="sales-chart" height="180"></canvas>
+    <div style="position:relative;height:200px"><canvas id="sales-chart"></canvas></div>
     @if(empty($salesChart))
     <p class="text-sm text-gray-400 text-center py-8">No sales data for this period.</p>
     @endif
@@ -553,7 +553,7 @@
 {{-- Earnings Chart --}}
 <div class="card mb-8">
     <h3 class="text-lg font-bold text-[#1a1a2e] mb-4">Commission Earned Over Time</h3>
-    <canvas id="earnings-chart" height="180"></canvas>
+    <div style="position:relative;height:200px"><canvas id="earnings-chart"></canvas></div>
     @if(empty($earningsChart))
     <p class="text-sm text-gray-400 text-center py-8">No referral data for this period.</p>
     @endif
@@ -617,6 +617,9 @@ document.addEventListener('DOMContentLoaded', function() {
     Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
     Chart.defaults.font.size = 11;
     Chart.defaults.color = '#9ca3af';
+    Chart.defaults.responsive = true;
+    Chart.defaults.maintainAspectRatio = false;
+    Chart.defaults.animation.duration = 600;
 
     // Helper: create area/line chart
     function createAreaChart(canvasId, data, color, isCurrency) {
@@ -776,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 cutout: '65%',
                 plugins: {
                     legend: {
