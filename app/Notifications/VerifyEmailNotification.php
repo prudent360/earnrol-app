@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Mail\TemplateMail;
+use App\Services\Mail\TemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
@@ -15,16 +16,16 @@ class VerifyEmailNotification extends Notification
 
     public function via($notifiable): array
     {
-        return ['mail'];
+        return TemplateService::isEnabled('verify') ? ['mail'] : [];
     }
 
     public function toMail($notifiable)
     {
         $verificationUrl = $this->verificationUrl($notifiable);
 
-        return (new TemplateMail('welcome', [
-            'name'      => $notifiable->name,
-            'login_url' => $verificationUrl,
+        return (new TemplateMail('verify', [
+            'name'       => $notifiable->name,
+            'verify_url' => $verificationUrl,
         ]))->to($notifiable->email);
     }
 

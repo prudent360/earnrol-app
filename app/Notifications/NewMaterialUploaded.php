@@ -2,8 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Mail\TemplateMail;
 use App\Models\Cohort;
 use App\Models\CohortMaterial;
+use App\Services\Mail\TemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -15,7 +17,21 @@ class NewMaterialUploaded extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if (TemplateService::isEnabled('new_material')) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new TemplateMail('new_material', [
+            'name'           => $notifiable->name,
+            'material_title' => $this->material->title,
+            'cohort_name'    => $this->cohort->title,
+            'materials_url'  => route('cohorts.materials', $this->cohort),
+        ]))->to($notifiable->email);
     }
 
     public function toArray($notifiable): array

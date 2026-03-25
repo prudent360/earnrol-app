@@ -145,6 +145,8 @@ Route::middleware('auth')->group(function () {
 
         // Settings
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');
+        Route::post('/settings/templates/toggle', [SettingsController::class, 'toggleTemplate'])->name('settings.templates.toggle');
+        Route::post('/settings/templates/preview', [SettingsController::class, 'previewTemplate'])->name('settings.templates.preview');
         Route::get('/settings/{tab?}', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings/{tab}', [SettingsController::class, 'update'])->name('settings.update');
     });

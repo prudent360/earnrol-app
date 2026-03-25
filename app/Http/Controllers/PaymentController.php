@@ -254,11 +254,13 @@ class PaymentController extends Controller
 
             // Send enrollment confirmation email
             try {
-                Mail::to($user->email)->send(new TemplateMail('enroll', [
-                    'name' => $user->name,
-                    'cohort_name' => $cohort->title ?? 'the cohort',
-                    'dashboard_url' => route('dashboard'),
-                ]));
+                if (\App\Services\Mail\TemplateService::isEnabled('enroll')) {
+                    Mail::to($user->email)->send(new TemplateMail('enroll', [
+                        'name' => $user->name,
+                        'cohort_name' => $cohort->title ?? 'the cohort',
+                        'dashboard_url' => route('dashboard'),
+                    ]));
+                }
             } catch (\Exception $e) {}
 
             // Notify student + admins

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Mail\TemplateMail;
+use App\Services\Mail\TemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -14,7 +15,7 @@ class ResetPasswordNotification extends Notification
 
     public function via($notifiable): array
     {
-        return ['mail'];
+        return TemplateService::isEnabled('reset') ? ['mail'] : [];
     }
 
     public function toMail($notifiable)

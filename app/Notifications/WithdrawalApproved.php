@@ -2,8 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Mail\TemplateMail;
 use App\Models\Setting;
 use App\Models\Withdrawal;
+use App\Services\Mail\TemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -15,7 +17,21 @@ class WithdrawalApproved extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if (TemplateService::isEnabled('withdrawal_approved')) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable)
+    {
+        $symbol = Setting::get('currency_symbol', '£');
+
+        return (new TemplateMail('withdrawal_approved', [
+            'name'   => $notifiable->name,
+            'amount' => $symbol . number_format((float)$this->withdrawal->amount, 2),
+        ]))->to($notifiable->email);
     }
 
     public function toArray($notifiable): array
@@ -24,7 +40,7 @@ class WithdrawalApproved extends Notification
 
         return [
             'title' => 'Withdrawal Approved',
-            'message' => 'Your withdrawal of ' . $symbol . number_format($this->withdrawal->amount, 2) . ' has been approved.',
+            'message' => 'Your withdrawal of ' . $symbol . number_format((float)$this->withdrawal->amount, 2) . ' has been approved.',
             'icon' => 'check-circle',
             'color' => 'green',
             'url' => route('referrals.index'),

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TemplateMail;
 use App\Models\Setting;
+use App\Services\Mail\TemplateService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
@@ -12,6 +15,12 @@ class SettingsController extends Controller
     public function index(string $tab = 'general')
     {
         $settings = Setting::where('group', $tab)->get()->pluck('value', 'key')->toArray();
+
+        // Also load template-enabled flags if on templates tab
+        if ($tab === 'templates') {
+            $tplSettings = Setting::where('group', 'templates')->get()->pluck('value', 'key')->toArray();
+            $settings = array_merge($settings, $tplSettings);
+        }
 
         $defaults = match($tab) {
             'smtp' => [
@@ -45,14 +54,7 @@ class SettingsController extends Controller
                 'currency_symbol'       => '£',
                 'currency_position'     => 'before',
             ],
-            'templates' => [
-                'tpl_welcome_subject'    => 'Welcome to EarnRol, {{name}}!',
-                'tpl_welcome_body'       => "Hi {{name}},\n\nWelcome to EarnRol! We're thrilled to have you on board.\n\nYour account is ready. Browse available cohorts and enrol in a live class to start learning.\n\nGet started: {{login_url}}\n\nBest,\nThe EarnRol Team",
-                'tpl_reset_subject'     => 'Reset your EarnRol password',
-                'tpl_reset_body'        => "Hi {{name}},\n\nWe received a request to reset the password for your EarnRol account.\n\nClick the link below to reset your password (valid for 60 minutes):\n{{reset_url}}\n\nIf you did not request this, please ignore this email.\n\nBest,\nThe EarnRol Team",
-                'tpl_enroll_subject'    => 'You\'re enrolled in {{cohort_name}}!',
-                'tpl_enroll_body'       => "Hi {{name}},\n\nGreat news! You are now enrolled in **{{cohort_name}}**.\n\nHead to your dashboard to join your live class: {{dashboard_url}}\n\nBest,\nThe EarnRol Team",
-            ],
+            'templates' => [],  // defaults handled by TemplateService
             'branding' => [
                 'app_name'        => 'EarnRol',
                 'app_tagline'     => 'Learn. Build. Earn.',
@@ -84,7 +86,10 @@ class SettingsController extends Controller
 
         $settings = array_merge($defaults, $settings);
 
-        return view('admin.settings.index', compact('tab', 'settings'));
+        // Pass template definitions if on templates tab
+        $emailTemplates = ($tab === 'templates') ? TemplateService::all() : [];
+
+        return view('admin.settings.index', compact('tab', 'settings', 'emailTemplates'));
     }
 
     public function update(Request $request, string $tab)
@@ -120,38 +125,74 @@ class SettingsController extends Controller
             ->with('success', ucfirst($tab) . ' settings updated successfully.');
     }
 
+    /**
+     * Toggle a template enabled/disabled.
+     */
+    public function toggleTemplate(Request $request)
+    {
+        $request->validate(['key' => 'required|string']);
+        $key = $request->key;
+        $settingKey = "tpl_{$key}_enabled";
+        $current = Setting::get($settingKey, '1');
+        $new = $current === '1' ? '0' : '1';
+        Setting::set($settingKey, $new, 'string', 'templates');
+
+        return response()->json([
+            'success' => true,
+            'enabled' => $new === '1',
+            'message' => ($new === '1' ? 'Enabled' : 'Disabled') . ' successfully.',
+        ]);
+    }
+
+    /**
+     * Get preview data for a template.
+     */
+    public function previewTemplate(Request $request)
+    {
+        $request->validate(['key' => 'required|string']);
+        [$subject, $body] = TemplateService::preview($request->key);
+
+        return response()->json([
+            'subject' => $subject,
+            'body'    => nl2br(e($body)),
+        ]);
+    }
+
+    /**
+     * Send test email using a specific template.
+     */
     public function sendTestEmail(Request $request)
     {
         try {
-            $request->validate(['email' => 'required|email']);
-            
-            // Apply current DB settings (user should save before testing)
+            $request->validate([
+                'email'    => 'required|email',
+                'template' => 'nullable|string',
+            ]);
+
             \App\Services\Mail\MailConfigService::apply();
 
             $templateKey = $request->get('template');
-            $subject = 'Test Email from ' . config('app.name');
-            $body = 'This is a test email from ' . config('app.name') . '. If you received this, your SMTP settings are working correctly!';
 
-            if ($templateKey) {
-                // Parse the requested template with dummy data
-                [$subject, $body] = \App\Services\Mail\TemplateService::parse($templateKey, [
-                    'name'              => 'Test User',
-                    'course_name'       => 'Mastering Laravel',
-                    'course_url'        => url('/learning/1'),
-                    'job_title'         => 'Full Stack Developer',
-                    'company'           => 'EarnRol Tech',
-                    'application_url'   => url('/applications/1'),
-                    'mentor_name'       => 'John Doe',
-                    'session_datetime'  => now()->addDays(2)->format('M d, Y H:i A'),
-                    'meeting_url'       => 'https://meet.google.com/test-session',
-                    'reset_url'         => url('/password/reset/token'),
-                ]);
+            if ($templateKey && isset(TemplateService::all()[$templateKey])) {
+                Mail::to($request->email)->send(new TemplateMail($templateKey, [
+                    'name'            => 'Test User',
+                    'verify_url'      => url('/email/verify/1/sample-hash'),
+                    'reset_url'       => url('/reset-password/sample-token'),
+                    'cohort_name'     => 'Full-Stack Web Development',
+                    'dashboard_url'   => url('/dashboard'),
+                    'amount'          => Setting::get('currency_symbol', '£') . '5,000.00',
+                    'reason'          => 'Receipt image was unclear.',
+                    'referred_name'   => 'Jane Smith',
+                    'wallet_balance'  => Setting::get('currency_symbol', '£') . '12,500.00',
+                    'referrals_url'   => url('/referrals'),
+                    'material_title'  => 'Week 3: Building REST APIs',
+                    'materials_url'   => url('/cohorts/1/materials'),
+                ]));
+            } else {
+                Mail::to($request->email)->send(new TemplateMail('welcome', [
+                    'name' => 'Test User',
+                ]));
             }
-
-            \Illuminate\Support\Facades\Mail::raw($body, function ($message) use ($request, $subject) {
-                $message->to($request->email)
-                        ->subject($subject);
-            });
 
             return response()->json([
                 'success' => true,

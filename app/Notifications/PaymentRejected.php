@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Mail\TemplateMail;
 use App\Models\Payment;
+use App\Services\Mail\TemplateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -14,7 +16,22 @@ class PaymentRejected extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if (TemplateService::isEnabled('payment_rejected')) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable)
+    {
+        $cohortTitle = $this->payment->payable->title ?? 'a cohort';
+
+        return (new TemplateMail('payment_rejected', [
+            'name'        => $notifiable->name,
+            'cohort_name' => $cohortTitle,
+            'reason'      => $this->payment->admin_note ?? 'No reason provided.',
+        ]))->to($notifiable->email);
     }
 
     public function toArray($notifiable): array

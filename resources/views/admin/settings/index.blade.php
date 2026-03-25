@@ -547,90 +547,128 @@
          EMAIL TEMPLATES TAB
     ========================================================= --}}
     @elseif($tab === 'templates')
-    @php
-    $templates = [
-        'welcome'    => ['label' => 'Welcome Email',       'desc' => 'Sent when a new user registers', 'vars' => ['{{name}}', '{{login_url}}', '{{app_name}}']],
-        'reset'      => ['label' => 'Password Reset',      'desc' => 'Sent when a user requests a password reset', 'vars' => ['{{name}}', '{{reset_url}}', '{{app_name}}']],
-        'enroll'     => ['label' => 'Cohort Enrollment',   'desc' => 'Sent after successful cohort enrollment', 'vars' => ['{{name}}', '{{cohort_name}}', '{{dashboard_url}}', '{{app_name}}']],
-    ];
-    $activeTemplate = request('template', 'welcome');
-    @endphp
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {{-- Template List --}}
-        <div class="card p-0 overflow-hidden h-fit">
-            <div class="px-5 py-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-[#1a1a2e]">Templates</h3>
-                <p class="text-xs text-gray-400 mt-0.5">{{ count($templates) }} templates</p>
+    <div class="space-y-4" id="templates-section">
+        <div class="flex items-center gap-3 mb-2">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <div>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Email Templates</h3>
+                <p class="text-sm text-gray-400">Customize the emails sent to users. Use placeholders like <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">{{ '{{' }}name{{ '}}' }}</code> to insert dynamic content.</p>
             </div>
-            <nav class="divide-y divide-gray-50">
-                @foreach($templates as $key => $tpl)
-                <a href="{{ route('admin.settings.index', ['tab' => 'templates', 'template' => $key]) }}"
-                   class="flex items-start gap-3 px-5 py-4 transition-colors {{ $activeTemplate === $key ? 'bg-[#e05a3a]/5 border-l-4 border-[#e05a3a]' : 'hover:bg-gray-50 border-l-4 border-transparent' }}">
-                    <svg class="w-4 h-4 mt-0.5 flex-shrink-0 {{ $activeTemplate === $key ? 'text-[#e05a3a]' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    <div>
-                        <p class="text-sm font-medium {{ $activeTemplate === $key ? 'text-[#e05a3a]' : 'text-gray-700' }}">{{ $tpl['label'] }}</p>
-                        <p class="text-[11px] text-gray-400 mt-0.5">{{ $tpl['desc'] }}</p>
-                    </div>
-                </a>
-                @endforeach
-            </nav>
         </div>
 
-        {{-- Template Editor --}}
-        <div class="lg:col-span-3 space-y-6">
-            @if(isset($templates[$activeTemplate]))
-            @php $tpl = $templates[$activeTemplate]; @endphp
-            <input type="hidden" name="active_template" value="{{ $activeTemplate }}">
-
-            <div class="card space-y-5">
-                <div class="flex items-center justify-between border-b border-gray-100 pb-4">
-                    <div>
-                        <h3 class="text-base font-bold text-[#1a1a2e]">{{ $tpl['label'] }}</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">{{ $tpl['desc'] }}</p>
+        @foreach($emailTemplates as $key => $tpl)
+        @php
+            $isEnabled = \App\Services\Mail\TemplateService::isEnabled($key);
+            $savedSubject = $settings['tpl_' . $key . '_subject'] ?? $tpl['subject'];
+        @endphp
+        <div class="card" id="tpl-card-{{ $key }}">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2.5 mb-1">
+                        <h4 class="text-base font-bold text-[#1a1a2e]">{{ $tpl['label'] }}</h4>
+                        <span id="badge-{{ $key }}" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full {{ $isEnabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $isEnabled ? 'Active' : 'Disabled' }}
+                        </span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs bg-blue-100 text-blue-700 font-medium px-3 py-1 rounded-full">Editing</span>
-                        <button type="button" onclick="testCurrentTemplate('{{ $activeTemplate }}')" class="btn-primary !bg-gray-100 !text-gray-700 !border-none text-xs py-1 px-3 hover:!bg-gray-200 transition-all flex items-center gap-2">
-                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                             Test this Template
+                    <p class="text-xs text-gray-400 mb-2">{{ $tpl['desc'] }}</p>
+                    <p class="text-xs text-gray-500">Subject: <span class="font-medium text-[#1a1a2e]">{{ $savedSubject }}</span></p>
+                    <div class="flex flex-wrap gap-1.5 mt-3">
+                        @foreach($tpl['vars'] as $var)
+                        <span class="font-mono text-[10px] bg-gray-50 border border-gray-200 px-2 py-1 rounded-md text-gray-500">{{ $var }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button type="button" onclick="previewTemplate('{{ $key }}', '{{ addslashes($tpl['label']) }}')"
+                            class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Preview
+                    </button>
+                    <button type="button" onclick="editTemplate('{{ $key }}', '{{ addslashes($tpl['label']) }}')"
+                            class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-white transition-colors" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
+                        Edit
+                    </button>
+                    <button type="button" onclick="toggleTemplate('{{ $key }}')" id="toggle-btn-{{ $key }}"
+                            class="text-xs font-medium px-3 py-2 rounded-lg border transition-colors {{ $isEnabled ? 'border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200' : 'border-green-200 text-green-600 bg-green-50 hover:bg-green-100' }}">
+                        {{ $isEnabled ? 'Disable' : 'Enable' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    {{-- Preview Modal --}}
+    <div id="preview-modal" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,.45);">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-base font-bold text-[#1a1a2e]" id="preview-title">Preview</h3>
+                    <button onclick="closeModal('preview-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Subject:</p>
+                        <p class="text-sm font-medium text-[#1a1a2e]" id="preview-subject">Loading...</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="text-sm text-[#1a1a2e] leading-relaxed" id="preview-body">Loading...</div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                    <p class="text-xs font-bold text-gray-600 mb-2">Send Test Email</p>
+                    <div class="flex gap-2">
+                        <input type="email" id="preview-test-email" placeholder="test@example.com" class="form-input flex-1 text-sm">
+                        <button type="button" onclick="sendTestFromPreview()" id="preview-send-btn"
+                                class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            Send Test
                         </button>
                     </div>
-                </div>
-
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Subject Line</label>
-                    <input type="text" name="tpl_{{ $activeTemplate }}_subject"
-                           value="{{ $settings['tpl_' . $activeTemplate . '_subject'] ?? '' }}"
-                           class="form-input bg-gray-50 border-transparent focus:bg-white transition-all"
-                           placeholder="Email subject...">
-                </div>
-
-                <div>
-                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Body</label>
-                    <textarea name="tpl_{{ $activeTemplate }}_body" rows="14"
-                              class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm leading-relaxed resize-y"
-                              placeholder="Email body...">{{ $settings['tpl_' . $activeTemplate . '_body'] ?? '' }}</textarea>
-                    <p class="text-[10px] text-gray-400 mt-2">Plain text format. Use the variables below to personalise each email.</p>
+                    <p id="preview-test-result" class="text-xs mt-2 hidden"></p>
                 </div>
             </div>
+        </div>
+    </div>
 
-            {{-- Variables Reference --}}
-            <div class="bg-gray-50 rounded-xl p-5">
-                <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">Available Variables</h4>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($tpl['vars'] as $var)
-                    <button type="button" onclick="insertVar('{{ $var }}')"
-                            class="font-mono text-xs bg-white border border-gray-200 text-[#e05a3a] px-3 py-1.5 rounded-lg hover:bg-[#e05a3a] hover:text-white hover:border-[#e05a3a] transition-colors cursor-pointer">
-                        {{ $var }}
+    {{-- Edit Modal --}}
+    <div id="edit-modal" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,.45);">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-base font-bold text-[#1a1a2e]" id="edit-title">Edit Template</h3>
+                    <button onclick="closeModal('edit-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
-                    @endforeach
                 </div>
-                <p class="text-[10px] text-gray-400 mt-3">Click a variable to copy it, or type it directly into the body above.</p>
+                <form id="edit-form" method="POST" action="{{ route('admin.settings.update', ['tab' => 'templates']) }}">
+                    @csrf
+                    <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                        <div>
+                            <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Subject Line</label>
+                            <input type="text" name="" id="edit-subject" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="Email subject...">
+                        </div>
+                        <div>
+                            <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Body</label>
+                            <textarea name="" id="edit-body" rows="12" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm leading-relaxed resize-y" placeholder="Email body..."></textarea>
+                            <p class="text-[10px] text-gray-400 mt-2">Plain text format. Use the variables below to personalise each email.</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Available Variables</h4>
+                            <div class="flex flex-wrap gap-1.5" id="edit-vars"></div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+                        <button type="button" onclick="closeModal('edit-modal')" class="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button type="submit" class="px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
-            @endif
         </div>
     </div>
 
@@ -863,7 +901,7 @@ function previewFavicon(input) {
 }
 
 function insertVar(variable) {
-    const textarea = document.querySelector('textarea[name^="tpl_"]');
+    const textarea = document.getElementById('edit-body');
     if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -871,8 +909,6 @@ function insertVar(variable) {
     textarea.value = text.substring(0, start) + variable + text.substring(end);
     textarea.focus();
     textarea.setSelectionRange(start + variable.length, start + variable.length);
-    // Copy to clipboard as well
-    navigator.clipboard.writeText(variable).catch(() => {});
 }
 
 // Live color swatch updates
@@ -908,7 +944,6 @@ async function sendTestEmail() {
     resultDiv.classList.add('hidden');
     resultDiv.className = 'mt-3 text-xs';
     try {
-        console.log('Sending test email to:', email);
         const response = await fetch('{{ route("admin.settings.test-email") }}', {
             method: 'POST',
             headers: {
@@ -918,24 +953,13 @@ async function sendTestEmail() {
             },
             body: JSON.stringify({ email: email })
         });
-
-        console.log('Response status:', response.status);
-        
         let data;
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             data = await response.json();
         } else {
-            const text = await response.text();
-            console.error('Non-JSON response snippet:', text.substring(0, 500));
-            
-            // Try to extract title from HTML
-            const doc = new DOMParser().parseFromString(text, "text/html");
-            const title = doc.querySelector('title')?.innerText || 'Unknown Page';
-            
-            throw new Error('Server returned HTML: "' + title + '" (Status ' + response.status + '). This usually means a redirect to Login or Dashboard occurred.');
+            throw new Error('Server returned non-JSON response (Status ' + response.status + ')');
         }
-
         resultDiv.classList.remove('hidden');
         if (response.ok && data.success) {
             resultDiv.classList.add('text-green-600');
@@ -945,42 +969,142 @@ async function sendTestEmail() {
             resultDiv.innerText = '✗ ' + (data.message || 'Error ' + response.status);
         }
     } catch (error) {
-        console.error('Fetch error:', error);
         resultDiv.classList.remove('hidden');
         resultDiv.classList.add('text-red-600');
-        resultDiv.innerText = '✗ Connection Error: ' + error.message;
+        resultDiv.innerText = '✗ Error: ' + error.message;
     } finally {
         btn.disabled = false;
         spinner.classList.add('hidden');
     }
 }
 
-async function testCurrentTemplate(key) {
-    const email = prompt("Enter email address to send test template to:", "{{ Auth::user()->email }}");
-    if (!email) return;
+// ========= Template Modal Functions =========
+let currentPreviewKey = '';
+
+// Template data from server
+const templateData = @json($tab === 'templates' ? $emailTemplates : []);
+const savedSettings = @json($tab === 'templates' ? $settings : []);
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// Close modals on backdrop click
+document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
+});
+
+// Preview Template
+async function previewTemplate(key, label) {
+    currentPreviewKey = key;
+    document.getElementById('preview-title').textContent = 'Preview: ' + label;
+    document.getElementById('preview-subject').textContent = 'Loading...';
+    document.getElementById('preview-body').textContent = 'Loading...';
+    document.getElementById('preview-test-result').classList.add('hidden');
+    openModal('preview-modal');
 
     try {
-        const response = await fetch('{{ route("admin.settings.test-email") }}', {
+        const res = await fetch('{{ route("admin.settings.templates.preview") }}', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ 
-                email: email,
-                template: key
-            })
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ key })
         });
+        const data = await res.json();
+        document.getElementById('preview-subject').textContent = data.subject;
+        document.getElementById('preview-body').innerHTML = data.body;
+    } catch (e) {
+        document.getElementById('preview-body').textContent = 'Error loading preview.';
+    }
+}
 
-        const data = await response.json();
+// Send Test from Preview Modal
+async function sendTestFromPreview() {
+    const email = document.getElementById('preview-test-email').value;
+    const result = document.getElementById('preview-test-result');
+    if (!email) { alert('Please enter an email address.'); return; }
+
+    const btn = document.getElementById('preview-send-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    result.classList.add('hidden');
+
+    try {
+        const res = await fetch('{{ route("admin.settings.test-email") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ email, template: currentPreviewKey })
+        });
+        const data = await res.json();
+        result.classList.remove('hidden');
+        result.className = 'text-xs mt-2 ' + (data.success ? 'text-green-600' : 'text-red-600');
+        result.textContent = (data.success ? '✓ ' : '✗ ') + data.message;
+    } catch (e) {
+        result.classList.remove('hidden');
+        result.className = 'text-xs mt-2 text-red-600';
+        result.textContent = '✗ Error: ' + e.message;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send Test';
+    }
+}
+
+// Edit Template
+function editTemplate(key, label) {
+    const tpl = templateData[key];
+    if (!tpl) return;
+
+    document.getElementById('edit-title').textContent = 'Edit: ' + label;
+
+    const subjectInput = document.getElementById('edit-subject');
+    const bodyInput = document.getElementById('edit-body');
+
+    subjectInput.name = 'tpl_' + key + '_subject';
+    bodyInput.name = 'tpl_' + key + '_body';
+
+    subjectInput.value = savedSettings['tpl_' + key + '_subject'] || tpl.subject;
+    bodyInput.value = savedSettings['tpl_' + key + '_body'] || tpl.body;
+
+    // Populate variables
+    const varsDiv = document.getElementById('edit-vars');
+    varsDiv.innerHTML = '';
+    tpl.vars.forEach(v => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'font-mono text-xs bg-white border border-gray-200 px-2.5 py-1 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer';
+        btn.style.color = '{{ \App\Models\Setting::get("brand_color", "#e05a3a") }}';
+        btn.textContent = v;
+        btn.onclick = () => insertVar(v);
+        varsDiv.appendChild(btn);
+    });
+
+    openModal('edit-modal');
+}
+
+// Toggle Template
+async function toggleTemplate(key) {
+    try {
+        const res = await fetch('{{ route("admin.settings.templates.toggle") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ key })
+        });
+        const data = await res.json();
         if (data.success) {
-            alert("✓ Success: " + data.message);
-        } else {
-            alert("✗ Error: " + data.message);
+            const badge = document.getElementById('badge-' + key);
+            const btn = document.getElementById('toggle-btn-' + key);
+            if (data.enabled) {
+                badge.className = 'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-green-100 text-green-700';
+                badge.textContent = 'Active';
+                btn.className = 'text-xs font-medium px-3 py-2 rounded-lg border transition-colors border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200';
+                btn.textContent = 'Disable';
+            } else {
+                badge.className = 'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500';
+                badge.textContent = 'Disabled';
+                btn.className = 'text-xs font-medium px-3 py-2 rounded-lg border transition-colors border-green-200 text-green-600 bg-green-50 hover:bg-green-100';
+                btn.textContent = 'Enable';
+            }
         }
-    } catch (error) {
-        alert("✗ Connection Error: " + error.message);
+    } catch (e) {
+        alert('Error toggling template: ' + e.message);
     }
 }
 </script>

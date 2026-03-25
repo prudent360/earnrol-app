@@ -67,9 +67,11 @@ class AuthController extends Controller
 
         // Send welcome email
         try {
-            Mail::to($user->email)->send(new TemplateMail('welcome', [
-                'name' => $user->name,
-            ]));
+            if (\App\Services\Mail\TemplateService::isEnabled('welcome')) {
+                Mail::to($user->email)->send(new TemplateMail('welcome', [
+                    'name' => $user->name,
+                ]));
+            }
         } catch (\Exception $e) {
             // Don't block registration if email fails
         }
