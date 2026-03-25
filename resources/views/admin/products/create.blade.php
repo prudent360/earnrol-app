@@ -62,7 +62,7 @@
                 <label for="cover_image" class="form-label">Cover Image (optional)</label>
                 <input type="file" name="cover_image" id="cover_image" accept="image/*" class="form-input @error('cover_image') border-red-500 @enderror">
                 @error('cover_image') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                <p class="text-xs text-gray-400 mt-1">Recommended: 800x600px. Shown on the shop page.</p>
+                <p class="text-xs text-gray-400 mt-1">Recommended: 800x600px. Shown on the products page.</p>
             </div>
 
             <div>
