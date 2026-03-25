@@ -2,7 +2,7 @@
 
 @section('title', 'My Downloads')
 @section('page_title', 'My Downloads')
-@section('page_subtitle', 'Your purchased digital products')
+@section('page_subtitle', 'Your purchased digital resources')
 
 @section('content')
 
@@ -45,8 +45,8 @@
 @else
 <div class="bg-white rounded-2xl p-12 border border-dashed border-gray-300 text-center">
     <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-    <p class="text-gray-500 text-sm mb-2">You haven't purchased any products yet.</p>
-    <a href="{{ route('products.index') }}" class="text-[#e05a3a] text-sm font-bold hover:underline">Browse the Shop</a>
+    <p class="text-gray-500 text-sm mb-2">You haven't purchased any resources yet.</p>
+    <a href="{{ route('products.index') }}" class="text-[#e05a3a] text-sm font-bold hover:underline">Browse Products</a>
 </div>
 @endif
 

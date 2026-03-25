@@ -2,14 +2,14 @@
 
 @section('title', $product->title)
 @section('page_title', $product->title)
-@section('page_subtitle', 'Digital Product')
+@section('page_subtitle', 'Digital Resource')
 
 @section('content')
 
 <div class="mb-6">
     <a href="{{ route('products.index') }}" class="text-sm text-gray-500 hover:text-[#e05a3a] flex items-center gap-1 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        Back to Shop
+        Back to Products
     </a>
 </div>
 

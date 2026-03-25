@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Manage Products')
-@section('page_title', 'Digital Products')
-@section('page_subtitle', 'Create and manage downloadable products')
+@section('page_title', 'Products')
+@section('page_subtitle', 'Create and manage digital resources')
 
 @section('content')
 <div class="mb-6 flex justify-between items-center">
@@ -18,7 +18,7 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-[#f5f6fa] border-b border-[#e8eaf0]">
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Resource</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Purchases</th>

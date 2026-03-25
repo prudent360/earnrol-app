@@ -102,9 +102,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/referrals/bank-details', [ReferralController::class, 'updateBankDetails'])->name('referrals.bank-details');
     Route::post('/referrals/withdraw', [ReferralController::class, 'requestWithdrawal'])->name('referrals.withdraw');
 
-    // Digital Products — Shop
-    Route::get('/shop', [DigitalProductController::class, 'index'])->name('products.index');
-    Route::get('/shop/{product:slug}', [DigitalProductController::class, 'show'])->name('products.show');
+    // Digital Products
+    Route::get('/products', [DigitalProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product:slug}', [DigitalProductController::class, 'show'])->name('products.show');
     Route::get('/my-downloads', [DigitalProductController::class, 'myDownloads'])->name('products.downloads');
     Route::get('/products/{product}/download', [DigitalProductController::class, 'download'])->name('products.download');
     Route::post('/products/{product}/get-free', [DigitalProductController::class, 'getFree'])->name('products.get-free');
