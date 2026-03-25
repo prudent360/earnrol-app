@@ -30,14 +30,12 @@
                 @forelse($products as $product)
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4">
+                        @php $docType = \App\Models\DigitalProduct::DOCUMENT_TYPES[$product->document_type] ?? \App\Models\DigitalProduct::DOCUMENT_TYPES['pdf']; @endphp
                         <div class="flex items-center gap-3">
-                            @if($product->cover_image)
-                            <img src="{{ Storage::url($product->cover_image) }}" alt="" class="w-10 h-10 rounded-lg object-cover flex-shrink-0">
-                            @else
-                            <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br {{ $docType['icon'] }} flex flex-col items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                <span class="text-[6px] font-black text-white/80 uppercase tracking-wider">{{ $docType['label'] }}</span>
                             </div>
-                            @endif
                             <div>
                                 <p class="text-sm font-semibold text-[#1a1a2e]">{{ $product->title }}</p>
                                 <p class="text-xs text-gray-400 truncate max-w-xs">{{ Str::limit($product->description, 50) }}</p>

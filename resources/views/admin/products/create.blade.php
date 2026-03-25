@@ -34,12 +34,22 @@
                 @error('description') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <label for="price" class="form-label">Price ({{ \App\Models\Setting::get('currency_symbol', '£') }})</label>
                     <input type="number" name="price" id="price" step="0.01" min="0" class="form-input @error('price') border-red-500 @enderror" value="{{ old('price', '0.00') }}" required>
                     @error('price') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     <p class="text-xs text-gray-400 mt-1">Set to 0 for a free product.</p>
+                </div>
+
+                <div>
+                    <label for="document_type" class="form-label">Document Type</label>
+                    <select name="document_type" id="document_type" class="form-input @error('document_type') border-red-500 @enderror" required>
+                        @foreach(\App\Models\DigitalProduct::DOCUMENT_TYPES as $key => $type)
+                        <option value="{{ $key }}" {{ old('document_type', 'pdf') == $key ? 'selected' : '' }}>{{ $type['label'] }}</option>
+                        @endforeach
+                    </select>
+                    @error('document_type') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>

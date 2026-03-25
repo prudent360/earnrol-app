@@ -10,43 +10,11 @@
 <div class="space-y-4">
     @foreach($products as $product)
     @php
-        $ext = strtolower(pathinfo($product->file_name, PATHINFO_EXTENSION));
-        if (in_array($ext, ['pdf'])) {
-            $iconColor = 'from-red-500 to-rose-600';
-            $iconBg = 'bg-red-50';
-            $iconText = 'text-red-500';
-            $label = 'PDF';
-        } elseif (in_array($ext, ['doc', 'docx'])) {
-            $iconColor = 'from-blue-500 to-indigo-600';
-            $iconBg = 'bg-blue-50';
-            $iconText = 'text-blue-500';
-            $label = 'DOC';
-        } elseif (in_array($ext, ['xls', 'xlsx', 'csv'])) {
-            $iconColor = 'from-emerald-500 to-green-600';
-            $iconBg = 'bg-emerald-50';
-            $iconText = 'text-emerald-500';
-            $label = 'XLS';
-        } elseif (in_array($ext, ['zip', 'rar', '7z'])) {
-            $iconColor = 'from-amber-500 to-yellow-600';
-            $iconBg = 'bg-amber-50';
-            $iconText = 'text-amber-500';
-            $label = 'ZIP';
-        } elseif (in_array($ext, ['mp4', 'mov', 'avi'])) {
-            $iconColor = 'from-purple-500 to-violet-600';
-            $iconBg = 'bg-purple-50';
-            $iconText = 'text-purple-500';
-            $label = 'VIDEO';
-        } elseif (in_array($ext, ['ppt', 'pptx'])) {
-            $iconColor = 'from-orange-500 to-red-500';
-            $iconBg = 'bg-orange-50';
-            $iconText = 'text-orange-500';
-            $label = 'PPT';
-        } else {
-            $iconColor = 'from-gray-500 to-slate-600';
-            $iconBg = 'bg-gray-100';
-            $iconText = 'text-gray-500';
-            $label = strtoupper($ext) ?: 'FILE';
-        }
+        $docType = \App\Models\DigitalProduct::DOCUMENT_TYPES[$product->document_type] ?? \App\Models\DigitalProduct::DOCUMENT_TYPES['pdf'];
+        $iconColor = $docType['icon'];
+        $iconBg = $docType['bg'];
+        $iconText = $docType['text'];
+        $label = $docType['label'];
     @endphp
 
     <a href="{{ route('products.show', $product) }}" class="group block bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden">

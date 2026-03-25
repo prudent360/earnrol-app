@@ -20,8 +20,22 @@ class DigitalProduct extends Model
         'file_path',
         'file_name',
         'file_size',
+        'document_type',
         'status',
         'download_count',
+    ];
+
+    public const DOCUMENT_TYPES = [
+        'pdf'           => ['label' => 'PDF',           'icon' => 'from-red-500 to-rose-600',      'bg' => 'bg-red-50',      'text' => 'text-red-500'],
+        'document'      => ['label' => 'DOC',           'icon' => 'from-blue-500 to-indigo-600',   'bg' => 'bg-blue-50',     'text' => 'text-blue-500'],
+        'spreadsheet'   => ['label' => 'XLS',           'icon' => 'from-emerald-500 to-green-600', 'bg' => 'bg-emerald-50',  'text' => 'text-emerald-500'],
+        'presentation'  => ['label' => 'PPT',           'icon' => 'from-orange-500 to-red-500',    'bg' => 'bg-orange-50',   'text' => 'text-orange-500'],
+        'video'         => ['label' => 'VIDEO',         'icon' => 'from-purple-500 to-violet-600', 'bg' => 'bg-purple-50',   'text' => 'text-purple-500'],
+        'audio'         => ['label' => 'AUDIO',         'icon' => 'from-pink-500 to-rose-500',     'bg' => 'bg-pink-50',     'text' => 'text-pink-500'],
+        'image'         => ['label' => 'IMAGE',         'icon' => 'from-cyan-500 to-blue-500',     'bg' => 'bg-cyan-50',     'text' => 'text-cyan-500'],
+        'archive'       => ['label' => 'ZIP',           'icon' => 'from-amber-500 to-yellow-600',  'bg' => 'bg-amber-50',    'text' => 'text-amber-500'],
+        'code'          => ['label' => 'CODE',          'icon' => 'from-slate-600 to-gray-800',    'bg' => 'bg-slate-50',    'text' => 'text-slate-500'],
+        'ebook'         => ['label' => 'eBOOK',         'icon' => 'from-teal-500 to-emerald-600',  'bg' => 'bg-teal-50',     'text' => 'text-teal-500'],
     ];
 
     protected function casts(): array

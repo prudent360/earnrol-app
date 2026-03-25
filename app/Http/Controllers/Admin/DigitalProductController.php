@@ -26,15 +26,16 @@ class DigitalProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'status'      => 'required|in:draft,published,archived',
-            'cover_image' => 'nullable|image|max:4096',
-            'file'        => 'required|file|max:51200',
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'price'         => 'required|numeric|min:0',
+            'document_type' => 'required|in:' . implode(',', array_keys(\App\Models\DigitalProduct::DOCUMENT_TYPES)),
+            'status'        => 'required|in:draft,published,archived',
+            'cover_image'   => 'nullable|image|max:4096',
+            'file'          => 'required|file|max:51200',
         ]);
 
-        $data = $request->only(['title', 'description', 'price', 'status']);
+        $data = $request->only(['title', 'description', 'price', 'document_type', 'status']);
         $data['user_id'] = auth()->id();
         $data['slug'] = DigitalProduct::generateSlug($request->title);
 
@@ -65,15 +66,16 @@ class DigitalProductController extends Controller
     public function update(Request $request, DigitalProduct $product)
     {
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'status'      => 'required|in:draft,published,archived',
-            'cover_image' => 'nullable|image|max:4096',
-            'file'        => 'nullable|file|max:51200',
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'price'         => 'required|numeric|min:0',
+            'document_type' => 'required|in:' . implode(',', array_keys(\App\Models\DigitalProduct::DOCUMENT_TYPES)),
+            'status'        => 'required|in:draft,published,archived',
+            'cover_image'   => 'nullable|image|max:4096',
+            'file'          => 'nullable|file|max:51200',
         ]);
 
-        $data = $request->only(['title', 'description', 'price', 'status']);
+        $data = $request->only(['title', 'description', 'price', 'document_type', 'status']);
 
         if ($request->hasFile('cover_image')) {
             if ($product->cover_image) {
