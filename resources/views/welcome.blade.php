@@ -173,17 +173,5 @@
     </div>
 </section>
 
-{{-- CTA --}}
-<section class="bg-[#e05a3a] py-16">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Ready to start learning?</h2>
-        <p class="text-white/80 text-lg mb-8">Sign up today and join the next available live cohort</p>
-        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-white text-[#e05a3a] font-bold px-10 py-4 rounded-lg hover:bg-gray-100 transition-colors text-lg">
-            Create Your Account
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-        </a>
-        <p class="text-white/60 text-sm mt-4">Sign up is free — pay only when you enrol in a cohort</p>
-    </div>
-</section>
 
 @endsection
