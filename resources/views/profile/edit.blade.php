@@ -10,21 +10,21 @@
 
     {{-- Email Verification Banner --}}
     @if(!$user->hasVerifiedEmail())
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+    <div class="bg-orange-50 border border-orange-200 rounded-2xl p-5">
         <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }}20;">
+                <svg class="w-5 h-5" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             </div>
             <div class="flex-1">
-                <h4 class="text-sm font-bold text-amber-800">Email Not Verified</h4>
-                <p class="text-xs text-amber-700 mt-1">Please verify your email address to access all features. Check your inbox for the verification link.</p>
+                <h4 class="text-sm font-bold text-[#1a1a2e]">Email Not Verified</h4>
+                <p class="text-xs text-[#6b7280] mt-1">Please verify your email address to access all features. Check your inbox for the verification link.</p>
                 @if(session('status') === 'verification-link-sent')
-                <p class="text-xs text-green-700 font-semibold mt-2">A new verification link has been sent to your email!</p>
+                <p class="text-xs font-semibold mt-2" style="color: #22c55e;">A new verification link has been sent to your email!</p>
                 @endif
             </div>
             <form method="POST" action="{{ route('verification.send') }}">
                 @csrf
-                <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-shrink-0">
+                <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-shrink-0" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }}; color: #fff;">
                     Resend Link
                 </button>
             </form>
