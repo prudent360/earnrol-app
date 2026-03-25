@@ -51,8 +51,13 @@
                         {{ $user->created_at->format('M d, Y') }}
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
+                        <a href="{{ route('admin.users.show', $user) }}" class="text-gray-600 hover:text-gray-800 text-sm font-medium">View</a>
                         <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
                         @if($user->id !== auth()->id())
+                        <form action="{{ route('admin.users.impersonate', $user) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="text-purple-600 hover:text-purple-800 text-sm font-medium" onclick="return confirm('Impersonate {{ $user->name }}? You will be logged in as this user.')">Impersonate</button>
+                        </form>
                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')

@@ -21,8 +21,11 @@
         <h4 class="font-bold text-[#1a1a2e] mb-1">{{ $product->title }}</h4>
         <p class="text-xs text-gray-400 mb-3">Purchased {{ $purchase->purchased_at->format('M d, Y') }}</p>
 
+        @php $docType = \App\Models\DigitalProduct::DOCUMENT_TYPES[$product->document_type] ?? \App\Models\DigitalProduct::DOCUMENT_TYPES['pdf']; @endphp
         <div class="bg-gray-50 rounded-xl p-3 mb-4 flex items-center gap-3">
-            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br {{ $docType['icon'] }} flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $docType['svg'] }}"/></svg>
+            </div>
             <div>
                 <p class="text-xs font-medium text-[#1a1a2e]">{{ $product->file_name }}</p>
                 <p class="text-[10px] text-gray-400">{{ $product->file_size_formatted }} &middot; Downloaded {{ $purchase->download_count }} {{ Str::plural('time', $purchase->download_count) }}</p>

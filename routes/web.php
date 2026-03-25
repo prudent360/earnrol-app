@@ -134,16 +134,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferForm'])->name('payments.bank-transfer');
     Route::post('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferSubmit'])->name('payments.bank-transfer.submit');
 
+    // Stop Impersonation (outside admin middleware — impersonated user isn't admin)
+    Route::post('/impersonate/stop', [AdminUserController::class, 'stopImpersonating'])->name('impersonate.stop');
+
     // Admin Routes
     Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
         // User Management
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
         Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
         Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{user}/credit-wallet', [AdminUserController::class, 'creditWallet'])->name('users.credit-wallet');
+        Route::post('/users/{user}/impersonate', [AdminUserController::class, 'impersonate'])->name('users.impersonate');
 
         // Cohort Management
         Route::resource('cohorts', AdminCohortController::class);

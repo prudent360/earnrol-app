@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReferralEarning;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
@@ -49,6 +51,61 @@ class AdminUserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');
+    }
+
+    /**
+     * Display the specified user's profile.
+     */
+    public function show(User $user)
+    {
+        $currencySymbol = Setting::get('currency_symbol', '£');
+
+        $user->loadCount(['payments', 'referrals', 'productPurchases']);
+
+        $enrolledCohorts = $user->enrolledCohorts()->withPivot('enrolled_at')->latest('cohort_enrollments.created_at')->get();
+        $payments = $user->payments()->with('payable')->latest()->take(10)->get();
+        $purchases = $user->productPurchases()->with('product')->latest()->take(10)->get();
+        $referrals = $user->referrals()->select('id', 'name', 'email', 'created_at')->latest()->take(10)->get();
+        $earnings = $user->referralEarnings()->latest()->take(10)->get();
+
+        $totalSpent = $user->payments()->where('status', 'completed')->sum('amount');
+        $totalEarnings = $user->referralEarnings()->sum('amount');
+
+        return view('admin.users.show', compact(
+            'user', 'currencySymbol', 'enrolledCohorts', 'payments',
+            'purchases', 'referrals', 'earnings', 'totalSpent', 'totalEarnings'
+        ));
+    }
+
+    /**
+     * Impersonate the specified user.
+     */
+    public function impersonate(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot impersonate yourself.');
+        }
+
+        session()->put('impersonator_id', auth()->id());
+        Auth::login($user);
+
+        return redirect()->route('dashboard')->with('success', 'You are now impersonating ' . $user->name);
+    }
+
+    /**
+     * Stop impersonating and return to admin account.
+     */
+    public function stopImpersonating()
+    {
+        $adminId = session()->pull('impersonator_id');
+
+        if (!$adminId) {
+            return redirect()->route('dashboard');
+        }
+
+        Auth::login(User::findOrFail($adminId));
+
+        return redirect()->route('admin.users.index')->with('success', 'Impersonation ended. Welcome back!');
     }
 
     /**

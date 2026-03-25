@@ -165,6 +165,21 @@
 
         {{-- Main content area --}}
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden lg:ml-0">
+            {{-- Impersonation Banner --}}
+            @if(session('impersonator_id'))
+            <div class="bg-purple-600 text-white px-4 py-2 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <span>You are impersonating <strong>{{ auth()->user()->name }}</strong> ({{ auth()->user()->email }})</span>
+                </div>
+                <form method="POST" action="{{ route('impersonate.stop') }}">
+                    @csrf
+                    <button type="submit" class="bg-white text-purple-700 px-3 py-1 rounded-lg text-xs font-bold hover:bg-purple-50 transition-colors">
+                        Stop Impersonating
+                    </button>
+                </form>
+            </div>
+            @endif
             {{-- Top navbar --}}
             <header class="bg-white border-b border-[#e8eaf0] flex-shrink-0">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
