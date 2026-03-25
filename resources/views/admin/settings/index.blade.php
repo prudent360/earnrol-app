@@ -553,7 +553,7 @@
             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             <div>
                 <h3 class="text-lg font-bold text-[#1a1a2e]">Email Templates</h3>
-                <p class="text-sm text-gray-400">Customize the emails sent to users. Use placeholders like <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">{{ '{{' }}name{{ '}}' }}</code> to insert dynamic content.</p>
+                <p class="text-sm text-gray-400">Customize the emails sent to users. Use placeholders like <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono" style="color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">@{{ name }}</code> to insert dynamic content.</p>
             </div>
         </div>
 
@@ -599,78 +599,7 @@
         @endforeach
     </div>
 
-    {{-- Preview Modal --}}
-    <div id="preview-modal" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,.45);">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
-                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h3 class="text-base font-bold text-[#1a1a2e]" id="preview-title">Preview</h3>
-                    <button onclick="closeModal('preview-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Subject:</p>
-                        <p class="text-sm font-medium text-[#1a1a2e]" id="preview-subject">Loading...</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-xl p-4">
-                        <div class="text-sm text-[#1a1a2e] leading-relaxed" id="preview-body">Loading...</div>
-                    </div>
-                </div>
-                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                    <p class="text-xs font-bold text-gray-600 mb-2">Send Test Email</p>
-                    <div class="flex gap-2">
-                        <input type="email" id="preview-test-email" placeholder="test@example.com" class="form-input flex-1 text-sm">
-                        <button type="button" onclick="sendTestFromPreview()" id="preview-send-btn"
-                                class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                            Send Test
-                        </button>
-                    </div>
-                    <p id="preview-test-result" class="text-xs mt-2 hidden"></p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- Edit Modal --}}
-    <div id="edit-modal" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,.45);">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h3 class="text-base font-bold text-[#1a1a2e]" id="edit-title">Edit Template</h3>
-                    <button onclick="closeModal('edit-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <form id="edit-form" method="POST" action="{{ route('admin.settings.update', ['tab' => 'templates']) }}">
-                    @csrf
-                    <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-                        <div>
-                            <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Subject Line</label>
-                            <input type="text" name="" id="edit-subject" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="Email subject...">
-                        </div>
-                        <div>
-                            <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Body</label>
-                            <textarea name="" id="edit-body" rows="12" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm leading-relaxed resize-y" placeholder="Email body..."></textarea>
-                            <p class="text-[10px] text-gray-400 mt-2">Plain text format. Use the variables below to personalise each email.</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Available Variables</h4>
-                            <div class="flex flex-wrap gap-1.5" id="edit-vars"></div>
-                        </div>
-                    </div>
-                    <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-                        <button type="button" onclick="closeModal('edit-modal')" class="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
-                        <button type="submit" class="px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
-                            Save Changes
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
 
     {{-- =========================================================
@@ -865,6 +794,81 @@
         <button type="submit" class="btn-primary px-8">Save Settings</button>
     </div>
 </form>
+
+
+{{-- Preview Modal --}}
+<div id="preview-modal" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,.45);">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h3 class="text-base font-bold text-[#1a1a2e]" id="preview-title">Preview</h3>
+                <button onclick="closeModal('preview-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Subject:</p>
+                    <p class="text-sm font-medium text-[#1a1a2e]" id="preview-subject">Loading...</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="text-sm text-[#1a1a2e] leading-relaxed" id="preview-body">Loading...</div>
+                </div>
+            </div>
+            <div class="px-6 py-5 border-t border-gray-100 bg-gray-50">
+                <p class="text-xs font-bold text-gray-600 mb-3 uppercase tracking-wider">Send Test Email</p>
+                <div class="flex gap-2">
+                    <input type="email" id="preview-test-email" placeholder="test@example.com" class="form-input flex-1 text-sm bg-white border-transparent focus:border-gray-200 focus:bg-white transition-all">
+                    <button type="button" onclick="sendTestFromPreview()" id="preview-send-btn"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:opacity-90 active:scale-95" 
+                            style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        Send Test
+                    </button>
+                </div>
+                <p id="preview-test-result" class="text-xs mt-2 hidden"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Edit Modal --}}
+<div id="edit-modal" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,.45);">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h3 class="text-base font-bold text-[#1a1a2e]" id="edit-title">Edit Template</h3>
+                <button onclick="closeModal('edit-modal')" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form id="edit-form" method="POST" action="{{ route('admin.settings.update', ['tab' => 'templates']) }}">
+                @csrf
+                <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                    <div>
+                        <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Subject Line</label>
+                        <input type="text" name="" id="edit-subject" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="Email subject...">
+                    </div>
+                    <div>
+                        <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Body</label>
+                        <textarea name="" id="edit-body" rows="12" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm leading-relaxed resize-y" placeholder="Email body..."></textarea>
+                        <p class="text-[10px] text-gray-400 mt-2">Plain text format. Use the variables below to personalise each email.</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Available Variables</h4>
+                        <div class="flex flex-wrap gap-1.5" id="edit-vars"></div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('edit-modal')" class="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-sm font-bold text-white transition-colors" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
 function togglePassword(id) {
