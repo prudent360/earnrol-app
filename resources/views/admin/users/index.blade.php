@@ -20,6 +20,7 @@
                 <tr class="bg-[#f5f6fa] border-b border-[#e8eaf0]">
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Wallet</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
                 </tr>
@@ -42,6 +43,9 @@
                         <span class="badge {{ $user->isSuperAdmin() ? 'bg-purple-100 text-purple-700' : ($user->isAdmin() ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700') }}">
                             {{ ucfirst($user->role) }}
                         </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm font-bold text-[#1a1a2e]">{{ \App\Models\Setting::get('currency_symbol', '£') }}{{ number_format($user->wallet_balance, 2) }}</span>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
                         {{ $user->created_at->format('M d, Y') }}

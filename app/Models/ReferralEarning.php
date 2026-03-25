@@ -9,7 +9,7 @@ class ReferralEarning extends Model
 {
     protected $fillable = [
         'user_id', 'referred_user_id', 'payment_id',
-        'amount', 'commission_rate',
+        'amount', 'commission_rate', 'note',
     ];
 
     protected $casts = [

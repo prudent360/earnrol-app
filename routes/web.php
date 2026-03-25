@@ -120,6 +120,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/users/{user}/credit-wallet', [AdminUserController::class, 'creditWallet'])->name('users.credit-wallet');
 
         // Cohort Management
         Route::resource('cohorts', AdminCohortController::class);

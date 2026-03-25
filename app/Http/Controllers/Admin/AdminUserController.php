@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ReferralEarning;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -101,5 +102,32 @@ class AdminUserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Manually credit commission to a user's wallet.
+     */
+    public function creditWallet(Request $request, User $user)
+    {
+        $request->validate([
+            'amount' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
+            'note'   => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $amount = round((float) $request->amount, 2);
+
+        // Create a referral_earnings record for audit trail (payment_id = null = manual)
+        ReferralEarning::create([
+            'user_id'          => $user->id,
+            'referred_user_id' => $user->id, // self-reference for manual credits
+            'payment_id'       => null,
+            'amount'           => $amount,
+            'commission_rate'  => 0, // manual — not percentage-based
+            'note'             => $request->note ?? 'Manual credit by admin',
+        ]);
+
+        $user->increment('wallet_balance', $amount);
+
+        return back()->with('success', \App\Models\Setting::get('currency_symbol', '£') . number_format($amount, 2) . ' credited to ' . $user->name . "'s wallet.");
     }
 }
