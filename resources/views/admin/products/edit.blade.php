@@ -61,8 +61,12 @@
             <div>
                 <label for="cover_image" class="form-label">Cover Image</label>
                 @if($product->cover_image)
-                <div class="mb-2">
+                <div class="mb-3 flex items-start gap-4">
                     <img src="{{ Storage::url($product->cover_image) }}" alt="" class="w-32 h-24 object-cover rounded-lg">
+                    <label class="flex items-center gap-2 cursor-pointer mt-2 group">
+                        <input type="checkbox" name="remove_cover_image" value="1" class="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-400">
+                        <span class="text-sm text-gray-500 group-hover:text-red-600 transition-colors">Remove cover image</span>
+                    </label>
                 </div>
                 @endif
                 <input type="file" name="cover_image" id="cover_image" accept="image/*" class="form-input @error('cover_image') border-red-500 @enderror">

@@ -56,7 +56,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">General Settings</h3>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">General Settings</h3>
             </div>
             <div class="space-y-4">
                 <div>
@@ -99,7 +99,7 @@
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">Referral Program</h3>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Referral Program</h3>
             </div>
             <div class="space-y-4">
                 <div class="flex items-center justify-between pt-1">
@@ -132,7 +132,7 @@
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">Announcement</h3>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Announcement</h3>
             </div>
             <div class="space-y-4">
                 <div class="flex items-center justify-between pt-1">
@@ -170,7 +170,7 @@
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">VAT / Tax Settings</h3>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">VAT / Tax Settings</h3>
             </div>
             <div class="space-y-4">
                 <div class="flex items-center justify-between pt-1">
@@ -212,7 +212,7 @@
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">Currency</h3>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Currency</h3>
             </div>
             <div class="space-y-4">
                 <div>
@@ -243,7 +243,7 @@
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <h3 class="text-base font-bold text-[#1a1a2e]">Gateway Status</h3>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Gateway Status</h3>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="flex items-center justify-between p-4 rounded-xl border {{ ($settings['stripe_enabled'] ?? '0') === '1' ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200' }}">
@@ -285,7 +285,7 @@
             <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-8 bg-[#635BFF] rounded flex items-center justify-center text-white text-[10px] font-black tracking-wider">STRIPE</div>
-                    <h3 class="text-base font-bold text-[#1a1a2e]">Stripe</h3>
+                    <h3 class="text-lg font-bold text-[#1a1a2e]">Stripe</h3>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="hidden" name="stripe_enabled" value="0">
@@ -340,7 +340,7 @@
             <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-8 bg-[#003087] rounded flex items-center justify-center text-white text-[10px] font-black tracking-wider">PAYPAL</div>
-                    <h3 class="text-base font-bold text-[#1a1a2e]">PayPal</h3>
+                    <h3 class="text-lg font-bold text-[#1a1a2e]">PayPal</h3>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="hidden" name="paypal_enabled" value="0">
@@ -390,7 +390,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-12 h-8 bg-gray-700 rounded flex items-center justify-center text-white text-[10px] font-black tracking-wider">BANK</div>
                 <div>
-                    <h3 class="text-base font-bold text-[#1a1a2e]">Bank Transfer</h3>
+                    <h3 class="text-lg font-bold text-[#1a1a2e]">Bank Transfer</h3>
                     <p class="text-[11px] text-gray-400">Students pay via bank transfer and upload receipt for admin approval</p>
                 </div>
             </div>

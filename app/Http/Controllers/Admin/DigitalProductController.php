@@ -80,6 +80,11 @@ class DigitalProductController extends Controller
                 Storage::disk('public')->delete($product->cover_image);
             }
             $data['cover_image'] = $request->file('cover_image')->store('products/covers', 'public');
+        } elseif ($request->boolean('remove_cover_image')) {
+            if ($product->cover_image) {
+                Storage::disk('public')->delete($product->cover_image);
+            }
+            $data['cover_image'] = null;
         }
 
         if ($request->hasFile('file')) {
