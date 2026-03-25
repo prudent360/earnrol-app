@@ -19,6 +19,9 @@ use App\Http\Controllers\Admin\CohortController as AdminCohortController;
 use App\Http\Controllers\Admin\CohortMaterialController as AdminCohortMaterialController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\WithdrawalController as AdminWithdrawalController;
+use App\Http\Controllers\DigitalProductController;
+use App\Http\Controllers\ProductPaymentController;
+use App\Http\Controllers\Admin\DigitalProductController as AdminDigitalProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +102,25 @@ Route::middleware('auth')->group(function () {
     Route::put('/referrals/bank-details', [ReferralController::class, 'updateBankDetails'])->name('referrals.bank-details');
     Route::post('/referrals/withdraw', [ReferralController::class, 'requestWithdrawal'])->name('referrals.withdraw');
 
+    // Digital Products — Shop
+    Route::get('/shop', [DigitalProductController::class, 'index'])->name('products.index');
+    Route::get('/shop/{product:slug}', [DigitalProductController::class, 'show'])->name('products.show');
+    Route::get('/my-downloads', [DigitalProductController::class, 'myDownloads'])->name('products.downloads');
+    Route::get('/products/{product}/download', [DigitalProductController::class, 'download'])->name('products.download');
+    Route::post('/products/{product}/get-free', [DigitalProductController::class, 'getFree'])->name('products.get-free');
+
+    // Product Payments — Stripe
+    Route::post('/products/{product}/checkout/stripe', [ProductPaymentController::class, 'stripeCheckout'])->name('products.stripe.checkout');
+    Route::get('/products/stripe/callback', [ProductPaymentController::class, 'stripeCallback'])->name('products.stripe.callback');
+
+    // Product Payments — PayPal
+    Route::post('/products/{product}/checkout/paypal', [ProductPaymentController::class, 'paypalCheckout'])->name('products.paypal.checkout');
+    Route::get('/products/paypal/callback', [ProductPaymentController::class, 'paypalCallback'])->name('products.paypal.callback');
+
+    // Product Payments — Bank Transfer
+    Route::get('/products/{product}/bank-transfer', [ProductPaymentController::class, 'bankTransferForm'])->name('products.bank-transfer');
+    Route::post('/products/{product}/bank-transfer', [ProductPaymentController::class, 'bankTransferSubmit'])->name('products.bank-transfer.submit');
+
     // Payments — Stripe
     Route::post('/cohorts/{cohort}/checkout/stripe', [PaymentController::class, 'stripeCheckout'])->name('payments.stripe.checkout');
     Route::get('/payments/stripe/callback', [PaymentController::class, 'stripeCallback'])->name('payments.callback');
@@ -124,6 +146,9 @@ Route::middleware('auth')->group(function () {
 
         // Cohort Management
         Route::resource('cohorts', AdminCohortController::class);
+
+        // Digital Product Management
+        Route::resource('products', AdminDigitalProductController::class)->except(['show']);
 
         // Cohort Materials (admin)
         Route::get('/cohorts/{cohort}/materials', [AdminCohortMaterialController::class, 'index'])->name('cohorts.materials.index');

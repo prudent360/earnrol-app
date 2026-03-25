@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Mail\TemplateMail;
 use App\Models\Cohort;
 use App\Models\CohortEnrollment;
+use App\Models\DigitalProduct;
 use App\Models\Payment;
+use App\Models\ProductPurchase;
 use App\Models\User;
 use App\Notifications\EnrollmentConfirmed;
 use App\Notifications\NewEnrollmentAdmin;
 use App\Notifications\PaymentApproved;
 use App\Notifications\PaymentRejected;
+use App\Notifications\ProductPurchaseConfirmed;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -46,7 +49,32 @@ class PaymentController extends Controller
 
         $payment->update(['status' => 'completed']);
 
-        // Create enrollment
+        $user = $payment->user;
+
+        // Credit referral commission if eligible
+        ReferralService::creditCommissionIfEligible($payment);
+
+        // Notify student of payment approval
+        $user->notify(new PaymentApproved($payment));
+
+        // Handle based on payable type
+        if ($payment->payable_type === DigitalProduct::class) {
+            // Digital product purchase
+            ProductPurchase::firstOrCreate([
+                'user_id' => $payment->user_id,
+                'digital_product_id' => $payment->payable_id,
+            ], [
+                'payment_id' => $payment->id,
+                'purchased_at' => now(),
+            ]);
+
+            $product = DigitalProduct::find($payment->payable_id);
+            $user->notify(new ProductPurchaseConfirmed($product));
+
+            return back()->with('success', $user->name . ' now has access to ' . ($product->title ?? 'the product') . '.');
+        }
+
+        // Cohort enrollment (default)
         CohortEnrollment::firstOrCreate([
             'user_id'   => $payment->user_id,
             'cohort_id' => $payment->payable_id,
@@ -55,9 +83,7 @@ class PaymentController extends Controller
             'enrolled_at' => now(),
         ]);
 
-        // Send enrollment email
         $cohort = Cohort::find($payment->payable_id);
-        $user = $payment->user;
 
         try {
             if (\App\Services\Mail\TemplateService::isEnabled('enroll')) {
@@ -67,15 +93,8 @@ class PaymentController extends Controller
                     'dashboard_url' => route('dashboard'),
                 ]));
             }
-        } catch (\Exception $e) {
-            // Don't block approval if email fails
-        }
+        } catch (\Exception $e) {}
 
-        // Credit referral commission if eligible
-        ReferralService::creditCommissionIfEligible($payment);
-
-        // Notify student + admins
-        $user->notify(new PaymentApproved($payment));
         $user->notify(new EnrollmentConfirmed($cohort));
         $admins = User::whereIn('role', ['admin', 'superadmin'])->where('id', '!=', auth()->id())->get();
         Notification::send($admins, new NewEnrollmentAdmin($user, $cohort, $payment->gateway));

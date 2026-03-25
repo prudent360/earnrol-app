@@ -110,6 +110,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Withdrawal::class);
     }
 
+    public function productPurchases(): HasMany
+    {
+        return $this->hasMany(ProductPurchase::class);
+    }
+
+    public function digitalProducts(): HasMany
+    {
+        return $this->hasMany(DigitalProduct::class);
+    }
+
     public function generateReferralCode(): void
     {
         do {
