@@ -13,7 +13,9 @@ use App\Notifications\NewBankTransferAdmin;
 use App\Notifications\NewEnrollmentAdmin;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
+use App\Services\CouponService;
 use App\Services\ReferralService;
+use App\Models\CouponUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -23,35 +25,49 @@ class PaymentController extends Controller
 {
     protected StripeService $stripe;
     protected PayPalService $paypal;
+    protected CouponService $couponService;
 
-    public function __construct(StripeService $stripe, PayPalService $paypal)
+    public function __construct(StripeService $stripe, PayPalService $paypal, CouponService $couponService)
     {
         $this->stripe = $stripe;
         $this->paypal = $paypal;
+        $this->couponService = $couponService;
     }
 
     /**
      * Stripe checkout
      */
-    public function stripeCheckout(Cohort $cohort)
+    public function stripeCheckout(Request $request, Cohort $cohort)
     {
         $user = Auth::user();
 
         $check = $this->preCheck($cohort, $user);
         if ($check) return $check;
 
+        // Apply coupon if provided
+        $couponData = $this->applyCoupon($request, $cohort->price, 'cohort', $cohort->id);
+        $finalAmount = $couponData['final_amount'];
+
+        // If coupon covers full amount, skip payment gateway
+        if ($finalAmount <= 0) {
+            return $this->handleFreeByCoupon($user, $cohort, $couponData);
+        }
+
         if (!Setting::get('stripe_enabled')) {
             return back()->with('error', 'Stripe payments are not enabled.');
         }
 
-        $session = $this->stripe->createCheckoutSession($cohort, $user);
+        $session = $this->stripe->createCheckoutSession($cohort, $user, $finalAmount);
 
         if ($session) {
             Payment::create([
                 'user_id' => $user->id,
                 'payable_type' => Cohort::class,
                 'payable_id' => $cohort->id,
-                'amount' => $cohort->price,
+                'amount' => $finalAmount,
+                'original_amount' => $couponData['coupon'] ? $cohort->price : null,
+                'discount_amount' => $couponData['discount'],
+                'coupon_id' => $couponData['coupon']?->id,
                 'reference' => $session->id,
                 'gateway' => 'stripe',
                 'status' => 'pending',
@@ -87,25 +103,36 @@ class PaymentController extends Controller
     /**
      * PayPal checkout
      */
-    public function paypalCheckout(Cohort $cohort)
+    public function paypalCheckout(Request $request, Cohort $cohort)
     {
         $user = Auth::user();
 
         $check = $this->preCheck($cohort, $user);
         if ($check) return $check;
 
+        // Apply coupon if provided
+        $couponData = $this->applyCoupon($request, $cohort->price, 'cohort', $cohort->id);
+        $finalAmount = $couponData['final_amount'];
+
+        if ($finalAmount <= 0) {
+            return $this->handleFreeByCoupon($user, $cohort, $couponData);
+        }
+
         if (!Setting::get('paypal_enabled')) {
             return back()->with('error', 'PayPal payments are not enabled.');
         }
 
-        $order = $this->paypal->createOrder($cohort, $user);
+        $order = $this->paypal->createOrder($cohort, $user, $finalAmount);
 
         if ($order && $order['approve_url']) {
             Payment::create([
                 'user_id' => $user->id,
                 'payable_type' => Cohort::class,
                 'payable_id' => $cohort->id,
-                'amount' => $cohort->price,
+                'amount' => $finalAmount,
+                'original_amount' => $couponData['coupon'] ? $cohort->price : null,
+                'discount_amount' => $couponData['discount'],
+                'coupon_id' => $couponData['coupon']?->id,
                 'reference' => $order['id'],
                 'gateway' => 'paypal',
                 'status' => 'pending',
@@ -184,6 +211,14 @@ class PaymentController extends Controller
         $check = $this->preCheck($cohort, $user);
         if ($check) return $check;
 
+        // Apply coupon if provided
+        $couponData = $this->applyCoupon($request, $cohort->price, 'cohort', $cohort->id);
+        $finalAmount = $couponData['final_amount'];
+
+        if ($finalAmount <= 0) {
+            return $this->handleFreeByCoupon($user, $cohort, $couponData);
+        }
+
         if (!Setting::get('bank_transfer_enabled')) {
             return back()->with('error', 'Bank transfer is not enabled.');
         }
@@ -195,15 +230,18 @@ class PaymentController extends Controller
         $receiptPath = $request->file('receipt')->store('receipts', 'public');
 
         $payment = Payment::create([
-            'user_id'       => $user->id,
-            'payable_type'  => Cohort::class,
-            'payable_id'    => $cohort->id,
-            'amount'        => $cohort->price,
-            'reference'     => 'BT-' . strtoupper(uniqid()),
-            'gateway'       => 'bank_transfer',
-            'status'        => 'pending',
-            'currency'      => Setting::get('currency', 'GBP'),
-            'receipt_path'  => $receiptPath,
+            'user_id'        => $user->id,
+            'payable_type'   => Cohort::class,
+            'payable_id'     => $cohort->id,
+            'amount'         => $finalAmount,
+            'original_amount' => $couponData['coupon'] ? $cohort->price : null,
+            'discount_amount' => $couponData['discount'],
+            'coupon_id'      => $couponData['coupon']?->id,
+            'reference'      => 'BT-' . strtoupper(uniqid()),
+            'gateway'        => 'bank_transfer',
+            'status'         => 'pending',
+            'currency'       => Setting::get('currency', 'GBP'),
+            'receipt_path'   => $receiptPath,
         ]);
 
         // Notify all admins
@@ -271,10 +309,61 @@ class PaymentController extends Controller
             // Credit referral commission if eligible
             ReferralService::creditCommissionIfEligible($payment);
 
+            // Record coupon usage
+            if ($payment->coupon_id) {
+                CouponUsage::create([
+                    'coupon_id'       => $payment->coupon_id,
+                    'user_id'         => $payment->user_id,
+                    'payment_id'      => $payment->id,
+                    'discount_amount' => $payment->discount_amount,
+                ]);
+                $payment->coupon?->increment('used_count');
+            }
+
             return redirect()->route('dashboard')
                 ->with('success', 'Payment successful! You are now enrolled in ' . ($cohort->title ?? 'the cohort') . '.');
         }
 
         return redirect()->route('dashboard')->with('error', 'Payment already processed or not found.');
+    }
+
+    /**
+     * Apply coupon from request
+     */
+    protected function applyCoupon(Request $request, float $price, string $type, int $itemId): array
+    {
+        $code = $request->input('coupon_code');
+        if (! $code) {
+            return ['coupon' => null, 'discount' => 0, 'final_amount' => $price, 'message' => ''];
+        }
+
+        $result = $this->couponService->validate($code, $price, $type, $itemId);
+        if (! $result['valid']) {
+            return ['coupon' => null, 'discount' => 0, 'final_amount' => $price, 'message' => $result['message']];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Handle 100% discount — enroll without payment gateway
+     */
+    protected function handleFreeByCoupon($user, Cohort $cohort, array $couponData)
+    {
+        $payment = Payment::create([
+            'user_id'         => $user->id,
+            'payable_type'    => Cohort::class,
+            'payable_id'      => $cohort->id,
+            'amount'          => 0,
+            'original_amount' => $cohort->price,
+            'discount_amount' => $couponData['discount'],
+            'coupon_id'       => $couponData['coupon']->id,
+            'reference'       => 'COUPON-' . strtoupper(uniqid()),
+            'gateway'         => 'coupon',
+            'status'          => 'completed',
+            'currency'        => Setting::get('currency', 'GBP'),
+        ]);
+
+        return $this->finalizePayment($payment, ['coupon' => $couponData['coupon']->code]);
     }
 }

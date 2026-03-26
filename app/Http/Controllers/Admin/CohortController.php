@@ -50,6 +50,8 @@ class CohortController extends Controller
             'what_you_will_learn', 'prerequisites',
         ]);
 
+        $data['certificate_enabled'] = $request->boolean('certificate_enabled');
+
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request->file('cover_image')->store('cohorts', 'public');
         }
@@ -99,6 +101,8 @@ class CohortController extends Controller
             'facilitator_name', 'facilitator_bio', 'schedule',
             'what_you_will_learn', 'prerequisites',
         ]);
+
+        $data['certificate_enabled'] = $request->boolean('certificate_enabled');
 
         if ($request->hasFile('cover_image')) {
             if ($cohort->cover_image) {

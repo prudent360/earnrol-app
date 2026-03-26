@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DigitalProduct;
 use App\Models\ProductPurchase;
+use App\Models\Review;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,9 +39,17 @@ class DigitalProductController extends Controller
         $bankTransferEnabled = Setting::get('bank_transfer_enabled') === '1';
         $paymentEnabled = $stripeEnabled || $paypalEnabled || $bankTransferEnabled;
 
+        $reviews = $product->approvedReviews()->with('user')->latest()->get();
+        $averageRating = $product->averageRating();
+        $reviewCount = $reviews->count();
+        $userReview = auth()->check()
+            ? $product->reviews()->where('user_id', auth()->id())->first()
+            : null;
+
         return view('products.show', compact(
             'product', 'purchased', 'currencySymbol',
-            'stripeEnabled', 'paypalEnabled', 'bankTransferEnabled', 'paymentEnabled'
+            'stripeEnabled', 'paypalEnabled', 'bankTransferEnabled', 'paymentEnabled',
+            'reviews', 'averageRating', 'reviewCount', 'userReview'
         ));
     }
 

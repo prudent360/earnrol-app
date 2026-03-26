@@ -23,6 +23,13 @@ use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\ProductPaymentController;
 use App\Http\Controllers\Admin\DigitalProductController as AdminDigitalProductController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\CertificateVerificationController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +39,9 @@ use App\Http\Controllers\Admin\ReportController;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Public Certificate Verification
+Route::get('/verify/{certificate_number}', [CertificateVerificationController::class, 'verify'])->name('certificates.verify');
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +103,17 @@ Route::middleware('auth')->group(function () {
     // Cohort Materials (student view)
     Route::get('/cohorts/{cohort}/materials', [CohortMaterialController::class, 'show'])->name('cohorts.materials');
     Route::post('/cohorts/{cohort}/assignments/{material}/submit', [CohortMaterialController::class, 'submit'])->name('cohorts.submit');
+
+    // Reviews
+    Route::post('/cohorts/{cohort}/reviews', [ReviewController::class, 'storeCohortReview'])->name('cohorts.reviews.store');
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'storeProductReview'])->name('products.reviews.store');
+
+    // Certificates
+    Route::get('/my-certificates', [CertificateController::class, 'index'])->name('certificates.index');
+    Route::get('/certificates/{certificate:certificate_number}/download', [CertificateController::class, 'download'])->name('certificates.download');
+
+    // Coupon Validation (AJAX)
+    Route::post('/coupons/validate', [CouponController::class, 'validate'])->name('coupons.validate');
 
     // Payment History
     Route::get('/my-payments', [PaymentHistoryController::class, 'index'])->name('payments.history');
@@ -173,6 +194,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/withdrawals', [AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
         Route::post('/withdrawals/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
         Route::post('/withdrawals/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
+
+        // Certificates
+        Route::get('/cohorts/{cohort}/certificates', [AdminCertificateController::class, 'index'])->name('cohorts.certificates.index');
+        Route::post('/cohorts/{cohort}/certificates/issue', [AdminCertificateController::class, 'issue'])->name('cohorts.certificates.issue');
+
+        // Reviews Moderation
+        Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::post('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+        Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+
+        // Coupons
+        Route::resource('coupons', AdminCouponController::class)->except(['show']);
 
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

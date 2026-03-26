@@ -98,6 +98,25 @@
                 @error('schedule') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
+            <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                <div>
+                    <p class="text-sm font-medium text-[#1a1a2e]">Enable Certificates</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Issue certificates when this cohort is completed</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="certificate_enabled" value="0">
+                    <input type="checkbox" name="certificate_enabled" value="1" class="sr-only peer" {{ old('certificate_enabled', $cohort->certificate_enabled) ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#e05a3a]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e05a3a]"></div>
+                </label>
+            </div>
+
+            @if($cohort->certificate_enabled)
+            <a href="{{ route('admin.cohorts.certificates.index', $cohort) }}" class="flex items-center gap-2 text-sm text-[#e05a3a] hover:underline font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                Manage Certificates ({{ $cohort->certificates()->count() }} issued)
+            </a>
+            @endif
+
             {{-- Facilitator --}}
             <div class="border-b border-gray-100 pb-4 pt-2">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Facilitator / Instructor</h3>

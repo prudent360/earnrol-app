@@ -92,6 +92,21 @@ class DigitalProduct extends Model
         return $this->price <= 0;
     }
 
+    public function reviews(): MorphMany
+    {
+        return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    public function approvedReviews(): MorphMany
+    {
+        return $this->reviews()->where('is_approved', true);
+    }
+
+    public function averageRating(): ?float
+    {
+        return $this->approvedReviews()->avg('rating');
+    }
+
     public static function generateSlug(string $title): string
     {
         $slug = Str::slug($title);

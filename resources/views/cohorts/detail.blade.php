@@ -166,25 +166,109 @@
             @elseif($cohort->isFull())
                 <button disabled class="w-full py-3 rounded-xl bg-gray-200 text-gray-500 text-sm font-bold cursor-not-allowed">Cohort Full</button>
             @elseif($paymentEnabled && $cohort->price > 0)
-                <div class="space-y-3">
-                    @if($stripeEnabled)
-                    <form method="POST" action="{{ route('payments.stripe.checkout', $cohort) }}">
-                        @csrf
-                        <button type="submit" class="btn-primary w-full justify-center py-3 text-base inline-flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                            {{ $paypalEnabled ? 'Pay with Card' : 'Enrol Now' }}
+                <div x-data="{
+                    code: '',
+                    validCode: '',
+                    loading: false,
+                    message: '',
+                    valid: false,
+                    discount: 0,
+                    finalAmount: {{ $cohort->price }},
+                    originalPrice: {{ $cohort->price }},
+                    async applyCoupon() {
+                        if (!this.code.trim()) return;
+                        this.loading = true;
+                        this.message = '';
+                        try {
+                            const res = await fetch('{{ route('coupons.validate') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    code: this.code,
+                                    amount: this.originalPrice,
+                                    type: 'cohort',
+                                    item_id: {{ $cohort->id }}
+                                })
+                            });
+                            const data = await res.json();
+                            this.valid = data.valid;
+                            this.message = data.message;
+                            if (data.valid) {
+                                this.discount = data.discount;
+                                this.finalAmount = data.final_amount;
+                                this.validCode = this.code;
+                            } else {
+                                this.discount = 0;
+                                this.finalAmount = this.originalPrice;
+                                this.validCode = '';
+                            }
+                        } catch (e) {
+                            this.message = 'Unable to validate coupon.';
+                            this.valid = false;
+                        }
+                        this.loading = false;
+                    },
+                    removeCoupon() {
+                        this.code = '';
+                        this.validCode = '';
+                        this.valid = false;
+                        this.message = '';
+                        this.discount = 0;
+                        this.finalAmount = this.originalPrice;
+                    }
+                }">
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" x-model="code" placeholder="Coupon code" class="form-input text-sm flex-1" :disabled="valid" @keydown.enter.prevent="applyCoupon()">
+                        <button type="button" x-show="!valid" @click="applyCoupon()" :disabled="loading || !code.trim()" class="px-3 py-2 text-xs font-bold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50">
+                            <span x-show="!loading">Apply</span>
+                            <span x-show="loading">...</span>
                         </button>
-                    </form>
-                    @endif
-                    @if($paypalEnabled)
-                    <form method="POST" action="{{ route('payments.paypal.checkout', $cohort) }}">
-                        @csrf
-                        <button type="submit" class="w-full py-3 rounded-xl text-base font-bold bg-[#003087] text-white hover:bg-[#002060] transition-colors inline-flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/></svg>
-                            Pay with PayPal
+                        <button type="button" x-show="valid" @click="removeCoupon()" class="px-3 py-2 text-xs font-bold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+                            Remove
                         </button>
-                    </form>
-                    @endif
+                    </div>
+                    <p x-show="message" x-text="message" class="text-xs mb-2" :class="valid ? 'text-green-600' : 'text-red-500'"></p>
+                    <div x-show="valid" x-transition class="mb-3 bg-green-50 rounded-lg p-2.5 text-xs space-y-1">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Original price</span>
+                            <span>{{ \App\Models\Setting::get('currency_symbol', '£') }}<span x-text="originalPrice.toFixed(2)"></span></span>
+                        </div>
+                        <div class="flex justify-between text-green-600 font-semibold">
+                            <span>Discount</span>
+                            <span>-{{ \App\Models\Setting::get('currency_symbol', '£') }}<span x-text="discount.toFixed(2)"></span></span>
+                        </div>
+                        <div class="flex justify-between text-[#1a1a2e] font-bold border-t border-green-200 pt-1">
+                            <span>Total</span>
+                            <span>{{ \App\Models\Setting::get('currency_symbol', '£') }}<span x-text="finalAmount.toFixed(2)"></span></span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        @if($stripeEnabled)
+                        <form method="POST" action="{{ route('payments.stripe.checkout', $cohort) }}">
+                            @csrf
+                            <input type="hidden" name="coupon_code" :value="validCode">
+                            <button type="submit" class="btn-primary w-full justify-center py-3 text-base inline-flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                                {{ $paypalEnabled ? 'Pay with Card' : 'Enrol Now' }}
+                            </button>
+                        </form>
+                        @endif
+                        @if($paypalEnabled)
+                        <form method="POST" action="{{ route('payments.paypal.checkout', $cohort) }}">
+                            @csrf
+                            <input type="hidden" name="coupon_code" :value="validCode">
+                            <button type="submit" class="w-full py-3 rounded-xl text-base font-bold bg-[#003087] text-white hover:bg-[#002060] transition-colors inline-flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/></svg>
+                                Pay with PayPal
+                            </button>
+                        </form>
+                        @endif
+                    </div>
                 </div>
             @else
                 <form method="POST" action="{{ route('cohorts.enrol-free', $cohort) }}">

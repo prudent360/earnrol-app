@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Cohort extends Model
 {
@@ -14,12 +15,14 @@ class Cohort extends Model
         'status', 'max_students',
         'facilitator_name', 'facilitator_bio', 'facilitator_image',
         'schedule', 'what_you_will_learn', 'prerequisites', 'cover_image',
+        'certificate_enabled',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'start_date' => 'date',
         'end_date' => 'date',
+        'certificate_enabled' => 'boolean',
     ];
 
     public function enrollments(): HasMany
@@ -79,5 +82,25 @@ class Cohort extends Model
             return null;
         }
         return max(0, $this->max_students - $this->enrollments()->count());
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    public function reviews(): MorphMany
+    {
+        return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    public function approvedReviews(): MorphMany
+    {
+        return $this->reviews()->where('is_approved', true);
+    }
+
+    public function averageRating(): ?float
+    {
+        return $this->approvedReviews()->avg('rating');
     }
 }

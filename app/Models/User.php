@@ -120,6 +120,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(DigitalProduct::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
     public function generateReferralCode(): void
     {
         do {

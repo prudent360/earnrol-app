@@ -45,13 +45,14 @@ class PayPalService
         }
     }
 
-    public function createOrder(Cohort $cohort, User $user): ?array
+    public function createOrder(Cohort $cohort, User $user, ?float $amount = null): ?array
     {
         $token = $this->getAccessToken();
         if (!$token) return null;
 
         try {
             $currency = strtoupper(Setting::get('currency', 'GBP'));
+            $chargeAmount = $amount ?? $cohort->price;
 
             $response = Http::withToken($token)
                 ->post("{$this->baseUrl}/v2/checkout/orders", [
@@ -61,7 +62,7 @@ class PayPalService
                         'description' => $cohort->title,
                         'amount' => [
                             'currency_code' => $currency,
-                            'value' => number_format($cohort->price, 2, '.', ''),
+                            'value' => number_format($chargeAmount, 2, '.', ''),
                         ],
                     ]],
                     'application_context' => [

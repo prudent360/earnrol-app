@@ -92,6 +92,18 @@
                 @error('schedule') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
+            <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                <div>
+                    <p class="text-sm font-medium text-[#1a1a2e]">Enable Certificates</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Issue certificates when this cohort is completed</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="certificate_enabled" value="0">
+                    <input type="checkbox" name="certificate_enabled" value="1" class="sr-only peer" {{ old('certificate_enabled') ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#e05a3a]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e05a3a]"></div>
+                </label>
+            </div>
+
             {{-- Facilitator --}}
             <div class="border-b border-gray-100 pb-4 pt-2">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Facilitator / Instructor</h3>

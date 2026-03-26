@@ -13,11 +13,14 @@ class Payment extends Model
         'amount', 'currency', 'status',
         'reference', 'gateway', 'gateway_response',
         'receipt_path', 'admin_note',
+        'coupon_id', 'original_amount', 'discount_amount',
     ];
 
     protected $casts = [
         'gateway_response' => 'json',
         'amount'           => 'decimal:2',
+        'original_amount'  => 'decimal:2',
+        'discount_amount'  => 'decimal:2',
     ];
 
     public function user(): BelongsTo
@@ -28,5 +31,10 @@ class Payment extends Model
     public function payable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 }

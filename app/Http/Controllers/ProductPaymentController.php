@@ -10,7 +10,9 @@ use App\Models\User;
 use App\Notifications\ProductPurchaseConfirmed;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
+use App\Services\CouponService;
 use App\Services\ReferralService;
+use App\Models\CouponUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
@@ -24,12 +26,20 @@ class ProductPaymentController extends Controller
     /**
      * Stripe checkout for product
      */
-    public function stripeCheckout(DigitalProduct $product)
+    public function stripeCheckout(Request $request, DigitalProduct $product)
     {
         $user = Auth::user();
 
         $check = $this->preCheck($product, $user);
         if ($check) return $check;
+
+        // Apply coupon if provided
+        $couponData = $this->applyCoupon($request, $product->price, 'product', $product->id);
+        $finalAmount = $couponData['final_amount'];
+
+        if ($finalAmount <= 0) {
+            return $this->handleFreeByCoupon($user, $product, $couponData);
+        }
 
         if (!Setting::get('stripe_enabled')) {
             return back()->with('error', 'Stripe payments are not enabled.');
@@ -48,7 +58,7 @@ class ProductPaymentController extends Controller
                             'name' => $product->title,
                             'description' => $product->description ?? 'Digital product purchase',
                         ],
-                        'unit_amount' => intval($product->price * 100),
+                        'unit_amount' => intval($finalAmount * 100),
                     ],
                     'quantity' => 1,
                 ]],
@@ -66,7 +76,10 @@ class ProductPaymentController extends Controller
                 'user_id' => $user->id,
                 'payable_type' => DigitalProduct::class,
                 'payable_id' => $product->id,
-                'amount' => $product->price,
+                'amount' => $finalAmount,
+                'original_amount' => $couponData['coupon'] ? $product->price : null,
+                'discount_amount' => $couponData['discount'],
+                'coupon_id' => $couponData['coupon']?->id,
                 'reference' => $session->id,
                 'gateway' => 'stripe',
                 'status' => 'pending',
@@ -109,12 +122,20 @@ class ProductPaymentController extends Controller
     /**
      * PayPal checkout for product
      */
-    public function paypalCheckout(DigitalProduct $product)
+    public function paypalCheckout(Request $request, DigitalProduct $product)
     {
         $user = Auth::user();
 
         $check = $this->preCheck($product, $user);
         if ($check) return $check;
+
+        // Apply coupon if provided
+        $couponData = $this->applyCoupon($request, $product->price, 'product', $product->id);
+        $finalAmount = $couponData['final_amount'];
+
+        if ($finalAmount <= 0) {
+            return $this->handleFreeByCoupon($user, $product, $couponData);
+        }
 
         if (!Setting::get('paypal_enabled')) {
             return back()->with('error', 'PayPal payments are not enabled.');
@@ -145,7 +166,7 @@ class ProductPaymentController extends Controller
                         'description' => $product->title,
                         'amount' => [
                             'currency_code' => $currency,
-                            'value' => number_format($product->price, 2, '.', ''),
+                            'value' => number_format($finalAmount, 2, '.', ''),
                         ],
                     ]],
                     'application_context' => [
@@ -165,7 +186,10 @@ class ProductPaymentController extends Controller
                         'user_id' => $user->id,
                         'payable_type' => DigitalProduct::class,
                         'payable_id' => $product->id,
-                        'amount' => $product->price,
+                        'amount' => $finalAmount,
+                        'original_amount' => $couponData['coupon'] ? $product->price : null,
+                        'discount_amount' => $couponData['discount'],
+                        'coupon_id' => $couponData['coupon']?->id,
                         'reference' => $data['id'],
                         'gateway' => 'paypal',
                         'status' => 'pending',
@@ -264,6 +288,14 @@ class ProductPaymentController extends Controller
         $check = $this->preCheck($product, $user);
         if ($check) return $check;
 
+        // Apply coupon if provided
+        $couponData = $this->applyCoupon($request, $product->price, 'product', $product->id);
+        $finalAmount = $couponData['final_amount'];
+
+        if ($finalAmount <= 0) {
+            return $this->handleFreeByCoupon($user, $product, $couponData);
+        }
+
         if (!Setting::get('bank_transfer_enabled')) {
             return back()->with('error', 'Bank transfer is not enabled.');
         }
@@ -275,15 +307,18 @@ class ProductPaymentController extends Controller
         $receiptPath = $request->file('receipt')->store('receipts', 'public');
 
         $payment = Payment::create([
-            'user_id'      => $user->id,
-            'payable_type' => DigitalProduct::class,
-            'payable_id'   => $product->id,
-            'amount'       => $product->price,
-            'reference'    => 'BT-' . strtoupper(uniqid()),
-            'gateway'      => 'bank_transfer',
-            'status'       => 'pending',
-            'currency'     => Setting::get('currency', 'GBP'),
-            'receipt_path' => $receiptPath,
+            'user_id'         => $user->id,
+            'payable_type'    => DigitalProduct::class,
+            'payable_id'      => $product->id,
+            'amount'          => $finalAmount,
+            'original_amount' => $couponData['coupon'] ? $product->price : null,
+            'discount_amount' => $couponData['discount'],
+            'coupon_id'       => $couponData['coupon']?->id,
+            'reference'       => 'BT-' . strtoupper(uniqid()),
+            'gateway'         => 'bank_transfer',
+            'status'          => 'pending',
+            'currency'        => Setting::get('currency', 'GBP'),
+            'receipt_path'    => $receiptPath,
         ]);
 
         $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
@@ -335,10 +370,62 @@ class ProductPaymentController extends Controller
 
             ReferralService::creditCommissionIfEligible($payment);
 
+            // Record coupon usage
+            if ($payment->coupon_id) {
+                CouponUsage::create([
+                    'coupon_id'       => $payment->coupon_id,
+                    'user_id'         => $payment->user_id,
+                    'payment_id'      => $payment->id,
+                    'discount_amount' => $payment->discount_amount,
+                ]);
+                $payment->coupon?->increment('used_count');
+            }
+
             return redirect()->route('products.show', $product)
                 ->with('success', 'Payment successful! You can now download ' . $product->title . '.');
         }
 
         return redirect()->route('products.index')->with('error', 'Payment already processed or not found.');
+    }
+
+    /**
+     * Apply coupon from request
+     */
+    protected function applyCoupon(Request $request, float $price, string $type, int $itemId): array
+    {
+        $code = $request->input('coupon_code');
+        if (! $code) {
+            return ['coupon' => null, 'discount' => 0, 'final_amount' => $price, 'message' => ''];
+        }
+
+        $couponService = app(CouponService::class);
+        $result = $couponService->validate($code, $price, $type, $itemId);
+        if (! $result['valid']) {
+            return ['coupon' => null, 'discount' => 0, 'final_amount' => $price, 'message' => $result['message']];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Handle 100% discount — grant access without payment gateway
+     */
+    protected function handleFreeByCoupon($user, DigitalProduct $product, array $couponData)
+    {
+        $payment = Payment::create([
+            'user_id'         => $user->id,
+            'payable_type'    => DigitalProduct::class,
+            'payable_id'      => $product->id,
+            'amount'          => 0,
+            'original_amount' => $product->price,
+            'discount_amount' => $couponData['discount'],
+            'coupon_id'       => $couponData['coupon']->id,
+            'reference'       => 'COUPON-' . strtoupper(uniqid()),
+            'gateway'         => 'coupon',
+            'status'          => 'completed',
+            'currency'        => Setting::get('currency', 'GBP'),
+        ]);
+
+        return $this->finalizePayment($payment, ['coupon' => $couponData['coupon']->code]);
     }
 }

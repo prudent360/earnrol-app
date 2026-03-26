@@ -19,10 +19,11 @@ class StripeService
         Stripe::setApiKey($this->secretKey);
     }
 
-    public function createCheckoutSession(Cohort $cohort, User $user): ?Session
+    public function createCheckoutSession(Cohort $cohort, User $user, ?float $amount = null): ?Session
     {
         try {
             $currency = Setting::get('currency', 'GBP');
+            $chargeAmount = $amount ?? $cohort->price;
 
             return Session::create([
                 'payment_method_types' => ['card'],
@@ -33,7 +34,7 @@ class StripeService
                             'name' => $cohort->title,
                             'description' => $cohort->description ?? 'Cohort enrolment',
                         ],
-                        'unit_amount' => intval($cohort->price * 100),
+                        'unit_amount' => intval($chargeAmount * 100),
                     ],
                     'quantity' => 1,
                 ]],
