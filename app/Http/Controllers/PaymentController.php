@@ -169,7 +169,7 @@ class PaymentController extends Controller
     /**
      * Show bank transfer details page
      */
-    public function bankTransferForm(Cohort $cohort)
+    public function bankTransferForm(Request $request, Cohort $cohort)
     {
         $user = Auth::user();
 
@@ -188,6 +188,9 @@ class PaymentController extends Controller
             ->where('status', 'pending')
             ->first();
 
+        // Validate coupon if provided
+        $couponData = $this->applyCoupon($request, $cohort->price, 'cohort', $cohort->id);
+
         $bankDetails = [
             'bank_name'        => Setting::get('bank_name', ''),
             'account_name'     => Setting::get('bank_account_name', ''),
@@ -198,7 +201,7 @@ class PaymentController extends Controller
             'currency_symbol'  => Setting::get('currency_symbol', '£'),
         ];
 
-        return view('payments.bank-transfer', compact('cohort', 'bankDetails', 'pendingPayment'));
+        return view('payments.bank-transfer', compact('cohort', 'bankDetails', 'pendingPayment', 'couponData'));
     }
 
     /**

@@ -24,6 +24,63 @@
     </div>
     @else
 
+    <div x-data="{
+        code: '{{ $couponData['coupon']?->code ?? '' }}',
+        validCode: '{{ $couponData['coupon']?->code ?? '' }}',
+        loading: false,
+        message: '',
+        valid: {{ $couponData['coupon'] ? 'true' : 'false' }},
+        discount: {{ $couponData['discount'] ?? 0 }},
+        finalAmount: {{ $couponData['final_amount'] ?? $product->price }},
+        originalPrice: {{ $product->price }},
+        currencySymbol: '{{ $bankDetails['currency_symbol'] }}',
+        async applyCoupon() {
+            if (!this.code.trim()) return;
+            this.loading = true;
+            this.message = '';
+            try {
+                const res = await fetch('{{ route('coupons.validate') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: this.code,
+                        amount: this.originalPrice,
+                        type: 'product',
+                        item_id: {{ $product->id }}
+                    })
+                });
+                const data = await res.json();
+                this.valid = data.valid;
+                this.message = data.message;
+                if (data.valid) {
+                    this.discount = data.discount;
+                    this.finalAmount = data.final_amount;
+                    this.validCode = this.code;
+                } else {
+                    this.discount = 0;
+                    this.finalAmount = this.originalPrice;
+                    this.validCode = '';
+                }
+            } catch (e) {
+                this.message = 'Unable to validate coupon.';
+                this.valid = false;
+            }
+            this.loading = false;
+        },
+        removeCoupon() {
+            this.code = '';
+            this.validCode = '';
+            this.valid = false;
+            this.message = '';
+            this.discount = 0;
+            this.finalAmount = this.originalPrice;
+        }
+    }">
+
     {{-- Product Summary --}}
     <div class="card mb-6">
         <div class="flex items-center justify-between">
@@ -32,7 +89,15 @@
                 <p class="text-xs text-gray-400 mt-1">Digital Product</p>
             </div>
             <div class="text-right">
-                <p class="text-2xl font-bold text-[#1a1a2e]">{{ $bankDetails['currency_symbol'] }}{{ number_format($product->price, 2) }}</p>
+                <template x-if="valid">
+                    <div>
+                        <p class="text-sm text-gray-400 line-through" x-text="currencySymbol + originalPrice.toFixed(2)"></p>
+                        <p class="text-2xl font-bold text-green-600" x-text="currencySymbol + finalAmount.toFixed(2)"></p>
+                    </div>
+                </template>
+                <template x-if="!valid">
+                    <p class="text-2xl font-bold text-[#1a1a2e]" x-text="currencySymbol + originalPrice.toFixed(2)"></p>
+                </template>
                 <p class="text-[10px] text-gray-400 uppercase tracking-wider">Amount to pay</p>
             </div>
         </div>
@@ -90,6 +155,39 @@
         @endif
     </div>
 
+    {{-- Coupon Code --}}
+    <div class="card mb-6">
+        <h3 class="text-sm font-bold text-[#1a1a2e] mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+            Have a coupon code?
+        </h3>
+        <div class="flex gap-2">
+            <input type="text" x-model="code" placeholder="Enter coupon code" class="form-input text-sm flex-1" :disabled="valid" @keydown.enter.prevent="applyCoupon()">
+            <button type="button" x-show="!valid" @click="applyCoupon()" :disabled="loading || !code.trim()" class="px-4 py-2 text-xs font-bold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50">
+                <span x-show="!loading">Apply</span>
+                <span x-show="loading">...</span>
+            </button>
+            <button type="button" x-show="valid" @click="removeCoupon()" class="px-4 py-2 text-xs font-bold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+                Remove
+            </button>
+        </div>
+        <p x-show="message" x-text="message" class="text-xs mt-1.5" :class="valid ? 'text-green-600' : 'text-red-500'"></p>
+        <div x-show="valid" x-transition class="mt-3 bg-green-50 border border-green-200 rounded-xl p-4 space-y-1.5 text-sm">
+            <div class="flex justify-between text-gray-500">
+                <span>Original price</span>
+                <span x-text="currencySymbol + originalPrice.toFixed(2)"></span>
+            </div>
+            <div class="flex justify-between text-green-600 font-semibold">
+                <span>Discount</span>
+                <span x-text="'-' + currencySymbol + discount.toFixed(2)"></span>
+            </div>
+            <div class="flex justify-between text-[#1a1a2e] font-bold border-t border-green-200 pt-1.5">
+                <span>Amount to transfer</span>
+                <span x-text="currencySymbol + finalAmount.toFixed(2)"></span>
+            </div>
+        </div>
+    </div>
+
     {{-- Upload Receipt --}}
     <div class="card">
         <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-5">
@@ -104,6 +202,7 @@
 
         <form action="{{ route('products.bank-transfer.submit', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
+            <input type="hidden" name="coupon_code" :value="validCode">
             <div>
                 <label class="form-label">Payment Receipt</label>
                 <div class="mt-1 border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#e05a3a] transition-colors cursor-pointer" onclick="document.getElementById('receipt_input').click()">
@@ -120,6 +219,8 @@
             </button>
         </form>
     </div>
+
+    </div>{{-- close x-data --}}
     @endif
 </div>
 @endsection

@@ -247,7 +247,7 @@ class ProductPaymentController extends Controller
     /**
      * Bank transfer form for product
      */
-    public function bankTransferForm(DigitalProduct $product)
+    public function bankTransferForm(Request $request, DigitalProduct $product)
     {
         $user = Auth::user();
 
@@ -265,6 +265,9 @@ class ProductPaymentController extends Controller
             ->where('status', 'pending')
             ->first();
 
+        // Validate coupon if provided
+        $couponData = $this->applyCoupon($request, $product->price, 'product', $product->id);
+
         $bankDetails = [
             'bank_name'       => Setting::get('bank_name', ''),
             'account_name'    => Setting::get('bank_account_name', ''),
@@ -275,7 +278,7 @@ class ProductPaymentController extends Controller
             'currency_symbol' => Setting::get('currency_symbol', '£'),
         ];
 
-        return view('products.bank-transfer', compact('product', 'bankDetails', 'pendingPayment'));
+        return view('products.bank-transfer', compact('product', 'bankDetails', 'pendingPayment', 'couponData'));
     }
 
     /**
