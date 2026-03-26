@@ -373,6 +373,9 @@ class ProductPaymentController extends Controller
 
             ReferralService::creditCommissionIfEligible($payment);
 
+            // Credit creator commission if eligible
+            \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);
+
             // Record coupon usage
             if ($payment->coupon_id) {
                 CouponUsage::create([

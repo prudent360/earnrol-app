@@ -22,6 +22,8 @@ class DigitalProduct extends Model
         'file_size',
         'document_type',
         'status',
+        'approval_status',
+        'rejection_reason',
         'download_count',
     ];
 
@@ -69,7 +71,12 @@ class DigitalProduct extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('status', 'published')->where('approval_status', 'approved');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
     }
 
     public function getFileSizeFormattedAttribute(): string

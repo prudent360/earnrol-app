@@ -30,6 +30,11 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\CreatorToggleController;
+use App\Http\Controllers\Creator\DashboardController as CreatorDashboardController;
+use App\Http\Controllers\Creator\ProductController as CreatorProductController;
+use App\Http\Controllers\Creator\CohortController as CreatorCohortController;
+use App\Http\Controllers\Creator\EarningController as CreatorEarningController;
 
 /*
 |--------------------------------------------------------------------------
@@ -155,6 +160,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferForm'])->name('payments.bank-transfer');
     Route::post('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferSubmit'])->name('payments.bank-transfer.submit');
 
+    // Become a Creator
+    Route::post('/become-creator', [CreatorToggleController::class, 'toggle'])->name('creator.toggle');
+
+    // Creator Routes
+    Route::middleware(\App\Http\Middleware\CreatorMiddleware::class)->prefix('creator')->name('creator.')->group(function () {
+        Route::get('/dashboard', [CreatorDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('products', CreatorProductController::class);
+        Route::resource('cohorts', CreatorCohortController::class);
+        Route::get('/earnings', [CreatorEarningController::class, 'index'])->name('earnings.index');
+    });
+
     // Stop Impersonation (outside admin middleware — impersonated user isn't admin)
     Route::post('/impersonate/stop', [AdminUserController::class, 'stopImpersonating'])->name('impersonate.stop');
 
@@ -176,6 +192,11 @@ Route::middleware('auth')->group(function () {
 
         // Digital Product Management
         Route::resource('products', AdminDigitalProductController::class)->except(['show']);
+        Route::post('/products/{product}/approve', [AdminDigitalProductController::class, 'approve'])->name('products.approve');
+        Route::post('/products/{product}/reject', [AdminDigitalProductController::class, 'reject'])->name('products.reject');
+
+        Route::post('/cohorts/{cohort}/approve', [AdminCohortController::class, 'approve'])->name('cohorts.approve');
+        Route::post('/cohorts/{cohort}/reject', [AdminCohortController::class, 'reject'])->name('cohorts.reject');
 
         // Cohort Materials (admin)
         Route::get('/cohorts/{cohort}/materials', [AdminCohortMaterialController::class, 'index'])->name('cohorts.materials.index');

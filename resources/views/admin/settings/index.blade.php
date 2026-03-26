@@ -126,6 +126,39 @@
             </div>
         </div>
 
+        {{-- Creator Program --}}
+        <div class="card space-y-5">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Creator Program</h3>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Enable Creator Signups</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Allow users to become creators and sell products/cohorts</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="creator_enabled" value="0">
+                        <input type="checkbox" name="creator_enabled" value="1" class="sr-only peer" {{ ($settings['creator_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Creator Commission (%)</label>
+                    <input type="number" name="creator_commission" value="{{ $settings['creator_commission'] ?? '80' }}" min="0" max="100" step="0.1" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="80">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Percentage of the sale amount the creator takes home (e.g. 80 means creator gets 80%, platform keeps 20%)</p>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Min Withdrawal ({{ \App\Models\Setting::get('currency_symbol', '£') }})</label>
+                    <input type="number" name="creator_min_withdrawal" value="{{ $settings['creator_min_withdrawal'] ?? '1000' }}" min="0" step="100" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="1000">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Minimum wallet balance required before a creator can request a withdrawal</p>
+                </div>
+            </div>
+        </div>
+
         {{-- Announcement --}}
         <div class="card space-y-5">
             <div class="flex items-center gap-3 border-b border-gray-100 pb-4">

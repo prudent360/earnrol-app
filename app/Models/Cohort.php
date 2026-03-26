@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -16,6 +17,7 @@ class Cohort extends Model
         'facilitator_name', 'facilitator_bio', 'facilitator_image',
         'schedule', 'what_you_will_learn', 'prerequisites', 'cover_image',
         'certificate_enabled',
+        'creator_id', 'approval_status', 'rejection_reason',
     ];
 
     protected $casts = [
@@ -24,6 +26,16 @@ class Cohort extends Model
         'end_date' => 'date',
         'certificate_enabled' => 'boolean',
     ];
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
 
     public function enrollments(): HasMany
     {

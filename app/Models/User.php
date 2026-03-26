@@ -36,6 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'bank_account_name',
         'bank_account_number',
         'bank_sort_code',
+        'is_creator',
     ];
 
     protected $hidden = [
@@ -50,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'wallet_balance' => 'decimal:2',
             'date_of_birth' => 'date',
+            'is_creator' => 'boolean',
         ];
     }
 
@@ -71,6 +73,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isStudent(): bool
     {
         return $this->role === 'learner' || $this->role === null || $this->role === '';
+    }
+
+    public function isCreator(): bool
+    {
+        return (bool) $this->is_creator;
     }
 
     public function cohortEnrollments(): HasMany
@@ -118,6 +125,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function digitalProducts(): HasMany
     {
         return $this->hasMany(DigitalProduct::class);
+    }
+
+    public function createdCohorts(): HasMany
+    {
+        return $this->hasMany(Cohort::class, 'creator_id');
+    }
+
+    public function creatorEarnings(): HasMany
+    {
+        return $this->hasMany(CreatorEarning::class, 'creator_id');
     }
 
     public function reviews(): HasMany

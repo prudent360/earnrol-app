@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DigitalProduct;
+use App\Notifications\CreatorItemApproved;
+use App\Notifications\CreatorItemRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -102,6 +104,38 @@ class DigitalProductController extends Controller
         $product->update($data);
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+    }
+
+    public function approve(DigitalProduct $product)
+    {
+        $product->update([
+            'approval_status' => 'approved',
+            'rejection_reason' => null,
+        ]);
+
+        if ($product->user && $product->user->isCreator()) {
+            $product->user->notify(new CreatorItemApproved('product', $product->title));
+        }
+
+        return back()->with('success', "Product \"{$product->title}\" has been approved.");
+    }
+
+    public function reject(Request $request, DigitalProduct $product)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $product->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        if ($product->user && $product->user->isCreator()) {
+            $product->user->notify(new CreatorItemRejected('product', $product->title, $request->rejection_reason));
+        }
+
+        return back()->with('success', "Product \"{$product->title}\" has been rejected.");
     }
 
     public function destroy(DigitalProduct $product)

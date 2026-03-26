@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cohort;
+use App\Notifications\CreatorItemApproved;
+use App\Notifications\CreatorItemRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -121,6 +123,38 @@ class CohortController extends Controller
         $cohort->update($data);
 
         return redirect()->route('admin.cohorts.index')->with('success', 'Cohort updated successfully.');
+    }
+
+    public function approve(Cohort $cohort)
+    {
+        $cohort->update([
+            'approval_status' => 'approved',
+            'rejection_reason' => null,
+        ]);
+
+        if ($cohort->creator && $cohort->creator->isCreator()) {
+            $cohort->creator->notify(new CreatorItemApproved('cohort', $cohort->title));
+        }
+
+        return back()->with('success', "Cohort \"{$cohort->title}\" has been approved.");
+    }
+
+    public function reject(Request $request, Cohort $cohort)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $cohort->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        if ($cohort->creator && $cohort->creator->isCreator()) {
+            $cohort->creator->notify(new CreatorItemRejected('cohort', $cohort->title, $request->rejection_reason));
+        }
+
+        return back()->with('success', "Cohort \"{$cohort->title}\" has been rejected.");
     }
 
     public function destroy(Cohort $cohort)

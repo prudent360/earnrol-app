@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Products')
-@section('page_title', 'Products')
-@section('page_subtitle', 'Create and manage digital resources')
+@section('title', 'My Products')
+@section('page_title', 'My Products')
+@section('page_subtitle', 'Manage your digital products')
 
 @section('content')
 <div class="mb-6 flex justify-between items-center">
-    <h3 class="text-xl font-bold text-[#1a1a2e]">All Products</h3>
-    <a href="{{ route('admin.products.create') }}" class="btn-primary text-sm py-2">
+    <h3 class="text-xl font-bold text-[#1a1a2e]">Your Products</h3>
+    <a href="{{ route('creator.products.create') }}" class="btn-primary text-sm py-2">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Product
     </a>
@@ -18,11 +18,9 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-[#f5f6fa] border-b border-[#e8eaf0]">
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Resource</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Approval</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Purchases</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">File</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
                 </tr>
@@ -44,20 +42,15 @@
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="badge {{ $product->status === 'published' ? 'bg-green-100 text-green-700' : ($product->status === 'draft' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500') }}">
-                            {{ ucfirst($product->status) }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4">
                         @if($product->approval_status === 'approved')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Approved</span>
                         @elseif($product->approval_status === 'pending')
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending Review</span>
                         @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span>
+                        @if($product->rejection_reason)
+                        <p class="text-[10px] text-red-500 mt-1 max-w-xs">{{ $product->rejection_reason }}</p>
                         @endif
-                        @if($product->user && !$product->user->isAdmin())
-                        <p class="text-[10px] text-gray-400 mt-1">by {{ $product->user->name }}</p>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-700 font-medium">
@@ -67,30 +60,13 @@
                         <span class="text-green-600 font-bold">Free</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ $product->purchases_count }}</td>
                     <td class="px-6 py-4">
                         <p class="text-xs text-gray-500">{{ $product->file_name }}</p>
                         <p class="text-[10px] text-gray-400">{{ $product->file_size_formatted }}</p>
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
-                        @if($product->approval_status === 'pending')
-                        <form action="{{ route('admin.products.approve', $product) }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="text-green-600 hover:text-green-800 text-sm font-medium">Approve</button>
-                        </form>
-                        <div x-data="{ open: false }" class="inline relative">
-                            <button @click="open = !open" class="text-orange-600 hover:text-orange-800 text-sm font-medium">Reject</button>
-                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 p-4 z-50">
-                                <form action="{{ route('admin.products.reject', $product) }}" method="POST">
-                                    @csrf
-                                    <textarea name="rejection_reason" rows="3" class="form-input text-sm w-full" placeholder="Reason for rejection..." required></textarea>
-                                    <button type="submit" class="btn-primary text-xs py-1.5 mt-2 w-full justify-center">Confirm Reject</button>
-                                </form>
-                            </div>
-                        </div>
-                        @endif
-                        <a href="{{ route('admin.products.edit', $product) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
-                        <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline">
+                        <a href="{{ route('creator.products.edit', $product) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
+                        <form action="{{ route('creator.products.destroy', $product) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium" onclick="return confirm('Delete this product?')">Delete</button>
@@ -99,8 +75,8 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center text-gray-400">
-                        No products yet. <a href="{{ route('admin.products.create') }}" class="text-[#e05a3a] hover:underline">Create your first product</a>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                        No products yet. <a href="{{ route('creator.products.create') }}" class="text-[#e05a3a] hover:underline">Create your first product</a>
                     </td>
                 </tr>
                 @endforelse

@@ -80,6 +80,9 @@ class SettingsController extends Controller
                 'vat_enabled'             => '0',
                 'vat_percentage'          => '7.5',
                 'vat_label'               => 'VAT',
+                'creator_enabled'         => '0',
+                'creator_commission'      => '80',
+                'creator_min_withdrawal'  => '1000',
             ],
             default => [],
         };

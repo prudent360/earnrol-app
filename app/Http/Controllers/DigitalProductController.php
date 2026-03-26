@@ -23,7 +23,7 @@ class DigitalProductController extends Controller
 
     public function show(DigitalProduct $product)
     {
-        if ($product->status !== 'published') {
+        if ($product->status !== 'published' || $product->approval_status !== 'approved') {
             abort(404);
         }
 

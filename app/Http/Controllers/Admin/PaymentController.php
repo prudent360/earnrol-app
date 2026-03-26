@@ -54,6 +54,9 @@ class PaymentController extends Controller
         // Credit referral commission if eligible
         ReferralService::creditCommissionIfEligible($payment);
 
+        // Credit creator commission if eligible
+        \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);
+
         // Notify student of payment approval
         $user->notify(new PaymentApproved($payment));
 

@@ -25,6 +25,7 @@ class DashboardController extends Controller
         $enrolledCohortIds = $enrolledCohorts->pluck('cohort_id');
 
         $availableCohorts = Cohort::whereIn('status', ['upcoming', 'active'])
+            ->where('approval_status', 'approved')
             ->whereNotIn('id', $enrolledCohortIds)
             ->orderBy('start_date')
             ->get();
