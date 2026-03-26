@@ -29,6 +29,27 @@
     </div>
 </div>
 
+{{-- Announcement Banner --}}
+@if(\App\Models\Setting::get('announcement_enabled') && \App\Models\Setting::get('announcement_message'))
+<div x-data="{ dismissed: localStorage.getItem('announcement_dismissed_{{ md5(\App\Models\Setting::get('announcement_message')) }}') === 'true' }"
+     x-show="!dismissed" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+     class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6 relative">
+    <div class="flex items-start gap-3">
+        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-bold text-amber-800">Announcement</h4>
+            <p class="text-sm text-amber-700 mt-1 leading-relaxed">{{ \App\Models\Setting::get('announcement_message') }}</p>
+        </div>
+        <button @click="dismissed = true; localStorage.setItem('announcement_dismissed_{{ md5(\App\Models\Setting::get('announcement_message')) }}', 'true')"
+                class="text-amber-400 hover:text-amber-600 transition-colors flex-shrink-0 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+</div>
+@endif
+
 {{-- Referral Banner --}}
 @if(\App\Models\Setting::get('referral_enabled') && auth()->user()->referral_code)
 <div class="rounded-2xl p-5 mb-6 relative overflow-hidden" style="background: linear-gradient(135deg, #1a2535 0%, #2a3f55 40%, #e05a3a 100%);">
