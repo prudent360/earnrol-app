@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Available Cohort')
-@section('page_title', 'Available Cohort')
+@section('title', 'Available Cohorts')
+@section('page_title', 'Available Cohorts')
 @section('page_subtitle', 'Explore and join our upcoming training cohorts')
 
 @section('content')
@@ -16,76 +16,52 @@
     <a href="{{ route('cohorts.index') }}" class="btn-primary text-sm">View My Classes</a>
 </div>
 @else
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     @foreach($cohorts as $cohort)
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
-        @if($cohort->cover_image)
-        <div class="h-40 overflow-hidden relative">
-            <img src="{{ Storage::url($cohort->cover_image) }}" alt="{{ $cohort->title }}" class="w-full h-full object-cover">
-            <div class="absolute top-3 right-3">
-                <span class="badge {{ $cohort->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' }}">
-                    {{ ucfirst($cohort->status) }}
-                </span>
-            </div>
+    <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm transition-all hover:shadow-md flex flex-col h-full ring-1 ring-gray-50">
+        {{-- Badges Header --}}
+        <div class="flex items-center gap-3 mb-6">
+            <span class="px-4 py-1.5 rounded-full text-xs font-bold {{ $cohort->status === 'active' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600' }}">
+                {{ ucfirst($cohort->status) }}
+            </span>
+            @if($cohort->max_students)
+            <span class="px-4 py-1.5 rounded-full text-xs font-bold bg-orange-50 text-orange-600">
+                {{ $cohort->spotsLeft() }} spots left
+            </span>
+            @endif
         </div>
-        @else
-        <div class="h-40 bg-gradient-to-br from-[#1a2535] to-[#2c3e50] flex items-center justify-center p-6 relative">
-            <span class="text-white/20 text-4xl font-black uppercase tracking-tighter">{{ Str::limit($cohort->title, 10) }}</span>
-            <div class="absolute top-3 right-3">
-                <span class="badge {{ $cohort->status === 'active' ? 'bg-green-100/10 text-green-400 border border-green-500/20' : 'bg-blue-100/10 text-blue-400 border border-blue-500/20' }}">
-                    {{ ucfirst($cohort->status) }}
-                </span>
-            </div>
+
+        {{-- Content --}}
+        <div class="flex-1">
+            <h3 class="text-[1.35rem] font-extrabold text-[#1a2535] leading-tight mb-3">{{ $cohort->title }}</h3>
+            <p class="text-[0.925rem] text-gray-400 leading-relaxed line-clamp-2">
+                {{ $cohort->description ?? 'A hands-on cohort designed to teach you how to build and launch fully functional...' }}
+            </p>
         </div>
-        @endif
 
-        <div class="p-5 flex-1 flex flex-col">
-            <div class="mb-4">
-                <h3 class="text-lg font-bold text-[#1a1a2e] line-clamp-1 mb-2">{{ $cohort->title }}</h3>
-                <p class="text-xs text-gray-500 line-clamp-2">{{ $cohort->description }}</p>
+        {{-- Info Footer --}}
+        <div class="mt-8 flex items-center justify-between">
+            <div class="text-[0.9rem] text-gray-300 font-medium">
+                Starts {{ $cohort->start_date->format('M d, Y') }}
             </div>
-
-            <div class="space-y-3 mb-6 flex-1">
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Starts {{ $cohort->start_date->format('M d, Y') }}
-                </div>
-                @if($cohort->duration)
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    {{ $cohort->duration }}
-                </div>
-                @endif
-                <div class="flex items-center gap-2 text-xs text-gray-500 font-bold">
-                    <span class="text-[#e05a3a] text-sm">
-                        @if($cohort->price == 0) Free @else {{ $cohort->currency ?? '$' }}{{ number_format($cohort->price, 2) }} @endif
-                    </span>
-                    @if($cohort->max_students)
-                    <span class="text-gray-300">|</span>
-                    <span class="{{ $cohort->spotsLeft() < 5 ? 'text-red-500' : '' }}">
-                        {{ $cohort->spotsLeft() }} spots left
-                    </span>
-                    @endif
-                </div>
-            </div>
-
-            <div class="pt-4 border-t border-gray-50 flex items-center gap-3">
-                <button type="button" onclick="openCohortModal('{{ $cohort->id }}')" class="flex-1 text-xs font-bold text-gray-500 hover:text-[#1a1a2e] transition-colors">
-                    View Details
-                </button>
-                @if($cohort->isFull())
-                    <button disabled class="flex-1 btn-secondary text-[10px] py-2 px-4 opacity-50 cursor-not-allowed">Full</button>
-                @elseif($cohort->price == 0)
-                    <form action="{{ route('cohorts.enrol-free', $cohort) }}" method="POST" class="flex-1">
-                        @csrf
-                        <button type="submit" class="w-full btn-primary text-[10px] py-2 px-4 shadow-sm">Join Free</button>
-                    </form>
-                @else
-                    <button onclick="openCohortModal('{{ $cohort->id }}')" class="flex-1 btn-primary text-[10px] py-2 px-4 shadow-sm">Enroll Now</button>
+            <div class="text-[1.25rem] font-black text-[#1a2535]">
+                @if($cohort->price == 0) 
+                    Free 
+                @else 
+                    {{ $cohort->currency ?? '$' }}{{ number_format($cohort->price, 2) }} 
                 @endif
             </div>
+        </div>
+
+        {{-- Action Button --}}
+        <div class="mt-8">
+            <button type="button" onclick="openCohortModal('{{ $cohort->id }}')" 
+                    class="w-full bg-[#1a2535] text-white py-4 rounded-2xl font-bold text-[1.1rem] hover:bg-[#2c3e50] transition-colors shadow-lg shadow-gray-200">
+                View Details
+            </button>
         </div>
     </div>
+
 
     {{-- Modal (Same as in index.blade.php but with enroll button) --}}
     <div id="cohort-modal-{{ $cohort->id }}" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
