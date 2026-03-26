@@ -27,6 +27,23 @@ class CohortController extends Controller
         return view('cohorts.index', compact('enrollments'));
     }
 
+    public function available()
+    {
+        $user = Auth::user();
+        
+        // Get cohort IDs the user is already enrolled in
+        $enrolledCohortIds = $user->cohortEnrollments()->pluck('cohort_id')->toArray();
+
+        // Get available cohorts (active/upcoming and not enrolled)
+        $cohorts = Cohort::whereNotIn('id', $enrolledCohortIds)
+            ->whereIn('status', ['active', 'upcoming'])
+            ->where('approval_status', 'approved')
+            ->latest('start_date')
+            ->get();
+
+        return view('cohorts.available', compact('cohorts'));
+    }
+
     public function enrollFree(Cohort $cohort)
     {
         $user = Auth::user();

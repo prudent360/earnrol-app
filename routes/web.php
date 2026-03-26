@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
 
     // Cohorts
     Route::get('/my-classes', [CohortController::class, 'index'])->name('cohorts.index');
+    Route::get('/available-cohorts', [CohortController::class, 'available'])->name('cohorts.available');
     Route::post('/cohorts/{cohort}/enrol', [CohortController::class, 'enrollFree'])->name('cohorts.enrol-free');
 
     // Cohort Materials (student view)
