@@ -13,6 +13,7 @@ use App\Http\Controllers\PasswordResetController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 use App\Http\Controllers\CohortMaterialController;
+use App\Http\Controllers\CohortDiscussionController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\CohortController as AdminCohortController;
@@ -139,6 +140,11 @@ Route::middleware('auth')->group(function () {
     // Cohort Materials (student view)
     Route::get('/cohorts/{cohort}/materials', [CohortMaterialController::class, 'show'])->name('cohorts.materials');
     Route::post('/cohorts/{cohort}/assignments/{material}/submit', [CohortMaterialController::class, 'submit'])->name('cohorts.submit');
+
+    // Cohort Discussions
+    Route::get('/cohorts/{cohort}/discussions', [CohortDiscussionController::class, 'index'])->name('cohorts.discussions');
+    Route::post('/cohorts/{cohort}/discussions', [CohortDiscussionController::class, 'store'])->name('cohorts.discussions.store');
+    Route::delete('/cohorts/{cohort}/discussions/{discussion}', [CohortDiscussionController::class, 'destroy'])->name('cohorts.discussions.destroy');
 
     // Reviews
     Route::post('/cohorts/{cohort}/reviews', [ReviewController::class, 'storeCohortReview'])->name('cohorts.reviews.store');

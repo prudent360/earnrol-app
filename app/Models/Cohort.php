@@ -54,6 +54,11 @@ class Cohort extends Model
         return $this->hasMany(CohortMaterial::class);
     }
 
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(CohortDiscussion::class);
+    }
+
     public function getDurationAttribute(): ?string
     {
         if (!$this->start_date || !$this->end_date) {
