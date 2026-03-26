@@ -17,6 +17,13 @@
     @if($favicon = \App\Models\Setting::get('favicon_path'))
         <link rel="icon" type="image/x-icon" href="{{ Storage::url($favicon) }}">
     @endif
+    {{-- PWA --}}
+    <link rel="manifest" href="{{ route('manifest') }}">
+    <meta name="theme-color" content="{{ \App\Models\Setting::get('brand_color', '#e05a3a') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="{{ \App\Models\Setting::get('app_name', 'EarnRol') }}">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     @stack('head')
 </head>
 <body class="bg-[#f5f6fa] font-sans">
@@ -149,5 +156,10 @@
         });
     </script>
     @stack('scripts')
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
 </body>
 </html>

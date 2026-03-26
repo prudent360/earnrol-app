@@ -45,6 +45,32 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// PWA
+Route::get('/manifest.webmanifest', function () {
+    $appName = \App\Models\Setting::get('app_name', 'EarnRol');
+    $brandColor = \App\Models\Setting::get('brand_color', '#e05a3a');
+
+    return response()->json([
+        'name' => $appName,
+        'short_name' => $appName,
+        'description' => \App\Models\Setting::get('meta_description', 'Live tech training cohorts with expert instructors.'),
+        'start_url' => '/',
+        'display' => 'standalone',
+        'background_color' => '#f5f6fa',
+        'theme_color' => $brandColor,
+        'orientation' => 'portrait-primary',
+        'icons' => [
+            ['src' => '/icons/icon.svg', 'sizes' => 'any', 'type' => 'image/svg+xml', 'purpose' => 'any'],
+            ['src' => '/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png'],
+            ['src' => '/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png'],
+        ],
+    ])->header('Content-Type', 'application/manifest+json');
+})->name('manifest');
+
+Route::get('/offline', function () {
+    return view('offline');
+});
+
 // Public Certificate Verification
 Route::get('/verify/{certificate_number}', [CertificateVerificationController::class, 'verify'])->name('certificates.verify');
 
