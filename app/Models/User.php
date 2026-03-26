@@ -19,10 +19,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'role',
         'phone',
+        'bio',
         'date_of_birth',
         'address',
         'city',
@@ -154,6 +156,21 @@ class User extends Authenticatable implements MustVerifyEmail
         } while (static::where('referral_code', $code)->exists());
 
         $this->update(['referral_code' => $code]);
+    }
+
+    public static function generateUsername(string $name): string
+    {
+        $base = Str::slug($name);
+        if (empty($base)) {
+            $base = 'user';
+        }
+        $username = $base;
+        $counter = 1;
+        while (static::where('username', $username)->exists()) {
+            $username = $base . '-' . $counter;
+            $counter++;
+        }
+        return $username;
     }
 
     public function referralLink(): string

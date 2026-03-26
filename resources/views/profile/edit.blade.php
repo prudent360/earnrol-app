@@ -53,6 +53,20 @@
                     <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required class="form-input @error('name') border-red-400 @enderror">
                     @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
+                <div class="sm:col-span-2">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-400">{{ url('/c/') }}/</span>
+                        <input type="text" id="username" name="username" value="{{ old('username', $user->username) }}" required class="form-input flex-1 @error('username') border-red-400 @enderror" placeholder="your-username" pattern="[a-z0-9\-]+">
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Lowercase letters, numbers, and hyphens only. This is your public profile URL.</p>
+                    @error('username')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="bio" class="form-label">Bio</label>
+                    <textarea id="bio" name="bio" rows="3" maxlength="500" class="form-input @error('bio') border-red-400 @enderror" placeholder="Tell people a bit about yourself...">{{ old('bio', $user->bio) }}</textarea>
+                    @error('bio')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
                 <div>
                     <label for="email" class="form-label">Email Address</label>
                     <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required class="form-input @error('email') border-red-400 @enderror">

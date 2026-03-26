@@ -26,8 +26,10 @@ class ProfileController extends Controller
 
         $data = $request->validate([
             'name'          => ['required', 'string', 'max:255'],
+            'username'      => ['required', 'string', 'max:50', 'regex:/^[a-z0-9\-]+$/', 'unique:users,username,' . $user->id],
             'email'         => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'phone'         => ['nullable', 'string', 'max:20'],
+            'bio'           => ['nullable', 'string', 'max:500'],
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'address'       => ['nullable', 'string', 'max:255'],
             'city'          => ['nullable', 'string', 'max:100'],

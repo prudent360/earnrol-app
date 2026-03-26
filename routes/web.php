@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\CertificateController as AdminCertificateControll
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\CreatorToggleController;
+use App\Http\Controllers\CreatorProfileController;
 use App\Http\Controllers\Creator\DashboardController as CreatorDashboardController;
 use App\Http\Controllers\Creator\ProductController as CreatorProductController;
 use App\Http\Controllers\Creator\CohortController as CreatorCohortController;
@@ -73,6 +74,9 @@ Route::get('/offline', function () {
 
 // Public Certificate Verification
 Route::get('/verify/{certificate_number}', [CertificateVerificationController::class, 'verify'])->name('certificates.verify');
+
+// Creator Public Storefront
+Route::get('/c/{username}', [CreatorProfileController::class, 'show'])->name('creator.profile');
 
 /*
 |--------------------------------------------------------------------------
