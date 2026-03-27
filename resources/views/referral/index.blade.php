@@ -41,17 +41,30 @@
     </div>
 
     {{-- Wallet Balance --}}
-    <div class="bg-white rounded-2xl border border-gray-100 p-6">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Wallet Balance</p>
-        <p class="text-3xl font-extrabold text-[#1a1a2e]">{{ $currencySymbol }}{{ number_format($user->wallet_balance, 2) }}</p>
-        <div class="mt-4 grid grid-cols-2 gap-3">
-            <div class="bg-gray-50 rounded-xl p-3 text-center">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Referrals</p>
-                <p class="text-xl font-bold text-[#1a1a2e]">{{ $referrals->count() }}</p>
+    <div class="rounded-2xl p-6 text-white relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);">
+        {{-- Decorative elements --}}
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/15 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-emerald-400/10 rounded-full blur-xl"></div>
+        <div class="absolute top-1/2 right-8 w-16 h-16 bg-white/5 rounded-full blur-lg"></div>
+
+        <div class="relative">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Wallet Balance</p>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3 text-center">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Earned</p>
-                <p class="text-xl font-bold text-green-600">{{ $currencySymbol }}{{ number_format($earnings->sum('amount'), 2) }}</p>
+            <p class="text-4xl font-extrabold tracking-tight">{{ $currencySymbol }}{{ number_format($user->wallet_balance, 2) }}</p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center border border-white/10">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Referrals</p>
+                    <p class="text-xl font-extrabold text-white mt-0.5">{{ $referrals->count() }}</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center border border-white/10">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Earned</p>
+                    <p class="text-xl font-extrabold text-emerald-400 mt-0.5">{{ $currencySymbol }}{{ number_format($earnings->sum('amount'), 2) }}</p>
+                </div>
             </div>
         </div>
     </div>
