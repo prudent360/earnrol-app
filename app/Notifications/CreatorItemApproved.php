@@ -21,6 +21,16 @@ class CreatorItemApproved extends Notification
 
     public function toArray($notifiable): array
     {
+        if ($this->itemTitle === 'creator_application') {
+            return [
+                'title' => 'Creator Application Approved',
+                'message' => 'Congratulations! Your creator application has been approved. You can now create cohorts and sell products.',
+                'icon' => 'check-circle',
+                'color' => 'green',
+                'url' => route('creator.dashboard'),
+            ];
+        }
+
         $route = $this->itemType === 'product'
             ? route('creator.products.index')
             : route('creator.cohorts.index');

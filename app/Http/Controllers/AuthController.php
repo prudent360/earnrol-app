@@ -42,10 +42,10 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role'     => ['nullable', 'string', 'in:learner,employer,mentor'],
+            'name'         => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'     => ['required', 'string', 'min:8', 'confirmed'],
+            'account_type' => ['nullable', 'string', 'in:student,creator'],
         ]);
 
         $referrer = null;
@@ -53,12 +53,14 @@ class AuthController extends Controller
             $referrer = User::where('referral_code', $request->ref)->first();
         }
 
+        $wantsCreator = ($data['account_type'] ?? 'student') === 'creator';
+
         $user = User::create([
             'name'        => $data['name'],
             'username'    => User::generateUsername($data['name']),
             'email'       => $data['email'],
             'password'    => Hash::make($data['password']),
-            'role'        => $data['role'] ?? 'learner',
+            'role'        => 'learner',
             'referred_by' => $referrer?->id,
         ]);
 
@@ -80,6 +82,11 @@ class AuthController extends Controller
 
         // Send email verification
         $user->sendEmailVerificationNotification();
+
+        if ($wantsCreator && \App\Models\Setting::get('creator_enabled')) {
+            return redirect()->route('creator.apply')
+                ->with('success', 'Welcome to EarnRol! Complete your creator application to get started.');
+        }
 
         return redirect()->route('verification.notice')
             ->with('success', 'Welcome to EarnRol! Please verify your email.');

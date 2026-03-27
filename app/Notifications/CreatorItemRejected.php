@@ -22,6 +22,16 @@ class CreatorItemRejected extends Notification
 
     public function toArray($notifiable): array
     {
+        if ($this->itemTitle === 'creator_application') {
+            return [
+                'title' => 'Creator Application Rejected',
+                'message' => "Your creator application was not approved. Reason: {$this->reason}",
+                'icon' => 'x-circle',
+                'color' => 'red',
+                'url' => route('creator.apply'),
+            ];
+        }
+
         $route = $this->itemType === 'product'
             ? route('creator.products.index')
             : route('creator.cohorts.index');

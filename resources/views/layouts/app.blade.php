@@ -114,17 +114,26 @@
                 @endif
 
                 @if(!auth()->user()->isCreator() && \App\Models\Setting::get('creator_enabled'))
-                <a href="{{ route('creator.toggle') }}" class="sidebar-link" onclick="event.preventDefault(); document.getElementById('become-creator-form').submit();">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                    Become a Creator
-                </a>
-                <form id="become-creator-form" action="{{ route('creator.toggle') }}" method="POST" class="hidden">@csrf</form>
+                    @php $creatorApp = auth()->user()->creatorApplication; @endphp
+                    @if($creatorApp && $creatorApp->isPending())
+                    <span class="sidebar-link opacity-60 cursor-default">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Application Pending
+                    </span>
+                    @else
+                    <a href="{{ route('creator.apply') }}" class="sidebar-link {{ request()->routeIs('creator.apply') ? 'active' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                        Become a Creator
+                    </a>
+                    @endif
                 @endif
 
                 {{-- Creator Section --}}
-                @if(auth()->user()->isCreator())
+                @if(auth()->user()->inCreatorMode())
                 <div class="pt-4">
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-3">Creator</p>
                 </div>
@@ -170,6 +179,13 @@
                 <div class="pt-4">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Admin</p>
                     <nav class="space-y-1 px-2">
+                        <a href="{{ route('admin.creator-applications.index') }}" class="sidebar-link {{ request()->routeIs('admin.creator-applications.*') ? 'active' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Creator Applications
+                            @if(($pendingApps = \App\Models\CreatorApplication::where('status', 'pending')->count()) > 0)
+                            <span class="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-white">{{ $pendingApps }}</span>
+                            @endif
+                        </a>
                         <a href="{{ route('admin.users.index') }}" class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             User Management
@@ -321,8 +337,62 @@
                             </div>
                         </div>
 
-                        <div class="w-9 h-9 rounded-full bg-[#e05a3a] flex items-center justify-center text-white font-bold text-sm cursor-pointer">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                        {{-- Profile / Mode Switcher --}}
+                        <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                            <button @click="open = !open" class="w-9 h-9 rounded-full bg-[#e05a3a] flex items-center justify-center text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#e05a3a]/50 focus:ring-offset-2 transition-all">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                            </button>
+
+                            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">
+
+                                {{-- User info --}}
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <p class="text-sm font-bold text-[#1a1a2e] truncate">{{ auth()->user()->name }}</p>
+                                    <p class="text-xs text-gray-400 truncate">{{ auth()->user()->email }}</p>
+                                </div>
+
+                                {{-- Mode switcher for approved creators --}}
+                                @if(auth()->user()->isCreator())
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Active Mode</p>
+                                    <form method="POST" action="{{ route('creator.switch-mode') }}">
+                                        @csrf
+                                        <button type="submit" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors {{ auth()->user()->inCreatorMode() ? 'bg-purple-50 hover:bg-purple-100' : 'bg-blue-50 hover:bg-blue-100' }}">
+                                            <div class="flex items-center gap-2">
+                                                @if(auth()->user()->inCreatorMode())
+                                                <div class="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-purple-700">Creator Mode</span>
+                                                @else
+                                                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-blue-700">Student Mode</span>
+                                                @endif
+                                            </div>
+                                            <span class="text-[10px] font-medium text-gray-400">Switch to {{ auth()->user()->inCreatorMode() ? 'Student' : 'Creator' }}</span>
+                                        </button>
+                                    </form>
+                                </div>
+                                @endif
+
+                                {{-- Links --}}
+                                <div class="py-1">
+                                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        Profile Settings
+                                    </a>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                            Sign Out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

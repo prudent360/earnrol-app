@@ -39,6 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'bank_account_number',
         'bank_sort_code',
         'is_creator',
+        'active_mode',
     ];
 
     protected $hidden = [
@@ -80,6 +81,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isCreator(): bool
     {
         return (bool) $this->is_creator;
+    }
+
+    public function inCreatorMode(): bool
+    {
+        return $this->isCreator() && $this->active_mode === 'creator';
+    }
+
+    public function creatorApplication(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CreatorApplication::class)->latest();
     }
 
     public function cohortEnrollments(): HasMany

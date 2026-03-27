@@ -197,8 +197,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferForm'])->name('payments.bank-transfer');
     Route::post('/cohorts/{cohort}/bank-transfer', [PaymentController::class, 'bankTransferSubmit'])->name('payments.bank-transfer.submit');
 
-    // Become a Creator
-    Route::post('/become-creator', [CreatorToggleController::class, 'toggle'])->name('creator.toggle');
+    // Creator Application
+    Route::get('/become-creator', [CreatorToggleController::class, 'showApplicationForm'])->name('creator.apply');
+    Route::post('/become-creator', [CreatorToggleController::class, 'apply'])->name('creator.apply.submit');
+    Route::post('/creator/switch-mode', [CreatorToggleController::class, 'switchMode'])->name('creator.switch-mode');
 
     // Creator Routes
     Route::middleware(\App\Http\Middleware\CreatorMiddleware::class)->prefix('creator')->name('creator.')->group(function () {
@@ -213,6 +215,11 @@ Route::middleware('auth')->group(function () {
 
     // Admin Routes
     Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+        // Creator Applications
+        Route::get('/creator-applications', [\App\Http\Controllers\Admin\CreatorApplicationController::class, 'index'])->name('creator-applications.index');
+        Route::post('/creator-applications/{application}/approve', [\App\Http\Controllers\Admin\CreatorApplicationController::class, 'approve'])->name('creator-applications.approve');
+        Route::post('/creator-applications/{application}/reject', [\App\Http\Controllers\Admin\CreatorApplicationController::class, 'reject'])->name('creator-applications.reject');
+
         // User Management
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
