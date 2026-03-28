@@ -160,6 +160,28 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Certificate::class);
     }
 
+    public function membershipPlans(): HasMany
+    {
+        return $this->hasMany(MembershipPlan::class);
+    }
+
+    public function membershipSubscriptions(): HasMany
+    {
+        return $this->hasMany(MembershipSubscription::class);
+    }
+
+    public function hasActiveSubscription(MembershipPlan $plan): bool
+    {
+        return $this->membershipSubscriptions()
+            ->where('membership_plan_id', $plan->id)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('current_period_end')
+                  ->orWhere('current_period_end', '>', now());
+            })
+            ->exists();
+    }
+
     public function generateReferralCode(): void
     {
         do {

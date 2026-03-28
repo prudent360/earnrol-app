@@ -37,6 +37,12 @@ use App\Http\Controllers\Creator\DashboardController as CreatorDashboardControll
 use App\Http\Controllers\Creator\ProductController as CreatorProductController;
 use App\Http\Controllers\Creator\CohortController as CreatorCohortController;
 use App\Http\Controllers\Creator\EarningController as CreatorEarningController;
+use App\Http\Controllers\Creator\MembershipController as CreatorMembershipController;
+use App\Http\Controllers\Creator\MembershipContentController as CreatorMembershipContentController;
+use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\MembershipPaymentController;
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\Admin\MembershipController as AdminMembershipController;
 use App\Http\Controllers\UserReportController;
 
 /*
@@ -54,6 +60,9 @@ Route::get('/verify/{certificate_number}', [CertificateVerificationController::c
 
 // Creator Public Storefront
 Route::get('/c/{username}', [CreatorProfileController::class, 'show'])->name('creator.profile');
+
+// Stripe Webhook (no auth)
+Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])->name('webhooks.stripe');
 
 /*
 |--------------------------------------------------------------------------
@@ -145,6 +154,21 @@ Route::middleware('auth')->group(function () {
     // User Report
     Route::get('/my-report', [UserReportController::class, 'index'])->name('user.report');
 
+    // Memberships
+    Route::get('/memberships', [MembershipController::class, 'index'])->name('memberships.index');
+    Route::get('/memberships/mine', [MembershipController::class, 'myMemberships'])->name('memberships.mine');
+    Route::get('/memberships/{membership:slug}', [MembershipController::class, 'show'])->name('memberships.show');
+    Route::get('/memberships/{membership:slug}/content', [MembershipController::class, 'content'])->name('memberships.content');
+    Route::post('/memberships/{membership:slug}/cancel', [MembershipController::class, 'cancel'])->name('memberships.cancel');
+
+    // Membership Payments — Stripe
+    Route::post('/memberships/{membership:slug}/checkout/stripe', [MembershipPaymentController::class, 'stripeCheckout'])->name('memberships.stripe.checkout');
+    Route::get('/memberships/stripe/callback', [MembershipPaymentController::class, 'stripeCallback'])->name('memberships.stripe.callback');
+
+    // Membership Payments — Bank Transfer
+    Route::get('/memberships/{membership:slug}/bank-transfer', [MembershipPaymentController::class, 'bankTransferForm'])->name('memberships.bank-transfer');
+    Route::post('/memberships/{membership:slug}/bank-transfer', [MembershipPaymentController::class, 'bankTransferSubmit'])->name('memberships.bank-transfer.submit');
+
     // Digital Products
     Route::get('/products', [DigitalProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [DigitalProductController::class, 'show'])->name('products.show');
@@ -186,6 +210,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [CreatorDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', CreatorProductController::class);
         Route::resource('cohorts', CreatorCohortController::class);
+        Route::resource('memberships', CreatorMembershipController::class);
+        Route::get('/memberships/{membership:slug}/subscribers', [CreatorMembershipController::class, 'subscribers'])->name('memberships.subscribers');
+        Route::get('/memberships/{membership:slug}/contents', [CreatorMembershipContentController::class, 'index'])->name('memberships.contents.index');
+        Route::get('/memberships/{membership:slug}/contents/create', [CreatorMembershipContentController::class, 'create'])->name('memberships.contents.create');
+        Route::post('/memberships/{membership:slug}/contents', [CreatorMembershipContentController::class, 'store'])->name('memberships.contents.store');
+        Route::delete('/memberships/{membership:slug}/contents/{content}', [CreatorMembershipContentController::class, 'destroy'])->name('memberships.contents.destroy');
         Route::get('/earnings', [CreatorEarningController::class, 'index'])->name('earnings.index');
     });
 
@@ -250,6 +280,12 @@ Route::middleware('auth')->group(function () {
 
         // Coupons
         Route::resource('coupons', AdminCouponController::class)->except(['show']);
+
+        // Memberships
+        Route::get('/memberships', [AdminMembershipController::class, 'index'])->name('memberships.index');
+        Route::get('/memberships/{membership:slug}', [AdminMembershipController::class, 'show'])->name('memberships.show');
+        Route::post('/memberships/{membership:slug}/approve', [AdminMembershipController::class, 'approve'])->name('memberships.approve');
+        Route::post('/memberships/{membership:slug}/reject', [AdminMembershipController::class, 'reject'])->name('memberships.reject');
 
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

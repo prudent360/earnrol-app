@@ -48,8 +48,7 @@ class Coupon extends Model
     {
         if ($this->applies_to === 'all') return true;
 
-        $expectedType = $this->applies_to === 'cohort' ? 'cohort' : 'product';
-        return $expectedType === $type && $this->applicable_id == $id;
+        return $this->applies_to === $type && $this->applicable_id == $id;
     }
 
     public function calculateDiscount(float $amount): float
