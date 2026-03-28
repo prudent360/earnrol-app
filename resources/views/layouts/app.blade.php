@@ -453,39 +453,61 @@
 
                             {{-- Dropdown --}}
                             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">
-                                <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                                    <h3 class="text-sm font-bold text-[#1a1a2e]">Notifications</h3>
+                                 class="fixed sm:absolute right-4 sm:right-0 left-4 sm:left-auto mt-2 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden" style="display: none;">
+                                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                                    <h3 class="text-base font-bold text-[#1a1a2e]">Notifications</h3>
                                     @if($unreadCount > 0)
                                     <form method="POST" action="{{ route('notifications.markAllRead') }}">
                                         @csrf
-                                        <button type="submit" class="text-[11px] font-medium text-[#e05a3a] hover:underline">Mark all read</button>
+                                        <button type="submit" class="text-xs font-semibold text-[#e05a3a] hover:underline">Mark all read</button>
                                     </form>
                                     @endif
                                 </div>
-                                <div class="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                                <div class="max-h-[400px] overflow-y-auto">
                                     @forelse(auth()->user()->notifications()->take(8)->get() as $notification)
-                                    @php $nd = $notification->data; @endphp
+                                    @php
+                                        $nd = $notification->data;
+                                        $iconColor = match($nd['color'] ?? 'blue') {
+                                            'green' => 'bg-emerald-100 text-emerald-600',
+                                            'red' => 'bg-red-100 text-red-600',
+                                            'yellow', 'amber' => 'bg-amber-100 text-amber-600',
+                                            default => 'bg-blue-100 text-blue-600',
+                                        };
+                                        $iconSvg = match($nd['icon'] ?? 'bell') {
+                                            'download' => 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
+                                            'cash', 'money' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                                            'star' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z',
+                                            'calendar' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+                                            'check' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+                                            default => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+                                        };
+                                    @endphp
                                     <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
                                         @csrf
-                                        <button type="submit" class="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-start gap-3 {{ is_null($notification->read_at) ? 'bg-[#e05a3a]/5' : '' }}">
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-xs font-bold text-[#1a1a2e]">{{ $nd['title'] ?? 'Notification' }}</p>
-                                                <p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{{ $nd['message'] ?? '' }}</p>
-                                                <p class="text-[10px] text-gray-400 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                                        <button type="submit" class="w-full text-left px-5 py-4 hover:bg-gray-50 transition-colors flex items-start gap-3 border-b border-gray-50 {{ is_null($notification->read_at) ? 'bg-[#e05a3a]/5' : '' }}">
+                                            <div class="w-9 h-9 rounded-lg {{ $iconColor }} flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $iconSvg }}"/></svg>
                                             </div>
-                                            @if(is_null($notification->read_at))
-                                            <div class="w-2 h-2 bg-[#e05a3a] rounded-full flex-shrink-0 mt-1.5"></div>
-                                            @endif
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-start justify-between gap-2">
+                                                    <p class="text-sm font-semibold text-[#1a1a2e]">{{ $nd['title'] ?? 'Notification' }}</p>
+                                                    @if(is_null($notification->read_at))
+                                                    <div class="w-2 h-2 bg-[#e05a3a] rounded-full flex-shrink-0 mt-1.5"></div>
+                                                    @endif
+                                                </div>
+                                                <p class="text-xs text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">{{ $nd['message'] ?? '' }}</p>
+                                                <p class="text-[11px] text-gray-400 mt-1.5">{{ $notification->created_at->diffForHumans() }}</p>
+                                            </div>
                                         </button>
                                     </form>
                                     @empty
-                                    <div class="px-4 py-6 text-center">
-                                        <p class="text-xs text-gray-400">No notifications yet</p>
+                                    <div class="px-5 py-10 text-center">
+                                        <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                        <p class="text-sm text-gray-400">No notifications yet</p>
                                     </div>
                                     @endforelse
                                 </div>
-                                <a href="{{ route('notifications.index') }}" class="block text-center px-4 py-3 text-xs font-bold text-[#e05a3a] hover:bg-gray-50 border-t border-gray-100">
+                                <a href="{{ route('notifications.index') }}" class="block text-center px-5 py-3.5 text-sm font-semibold text-[#e05a3a] hover:bg-gray-50 border-t border-gray-100 transition-colors">
                                     View All Notifications
                                 </a>
                             </div>
