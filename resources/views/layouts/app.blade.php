@@ -453,9 +453,9 @@
 
                             {{-- Dropdown --}}
                             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto mt-2 sm:w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden" style="display: none;">
-                                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                                    <h3 class="text-lg font-bold text-[#1a1a2e]">Notifications</h3>
+                                 class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden" style="display: none;">
+                                <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                                    <h3 class="text-sm font-bold text-[#1a1a2e]">Notifications</h3>
                                     @if($unreadCount > 0)
                                     <form method="POST" action="{{ route('notifications.markAllRead') }}">
                                         @csrf
@@ -463,7 +463,7 @@
                                     </form>
                                     @endif
                                 </div>
-                                <div class="max-h-[420px] overflow-y-auto">
+                                <div class="max-h-80 overflow-y-auto">
                                     @forelse(auth()->user()->notifications()->take(8)->get() as $notification)
                                     @php
                                         $nd = $notification->data;
@@ -476,25 +476,24 @@
                                     @endphp
                                     <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
                                         @csrf
-                                        <button type="submit" class="w-full text-left px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 {{ is_null($notification->read_at) ? 'bg-orange-50/40' : '' }}">
-                                            <div class="flex items-center justify-between gap-3 mb-1">
+                                        <button type="submit" class="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 {{ is_null($notification->read_at) ? 'bg-orange-50/40' : '' }}">
+                                            <div class="flex items-center justify-between gap-2 mb-0.5">
                                                 <div class="flex items-center gap-2 min-w-0">
-                                                    <div class="w-2 h-2 rounded-full {{ $dotColor }} flex-shrink-0"></div>
-                                                    <p class="text-sm font-semibold text-[#1a1a2e] truncate">{{ $nd['title'] ?? 'Notification' }}</p>
+                                                    <div class="w-1.5 h-1.5 rounded-full {{ $dotColor }} flex-shrink-0"></div>
+                                                    <p class="text-xs font-bold text-[#1a1a2e] truncate">{{ $nd['title'] ?? 'Notification' }}</p>
                                                 </div>
-                                                <span class="text-[11px] text-gray-400 flex-shrink-0">{{ $notification->created_at->diffForHumans(short: true) }}</span>
+                                                <span class="text-[10px] text-gray-400 flex-shrink-0">{{ $notification->created_at->diffForHumans(short: true) }}</span>
                                             </div>
-                                            <p class="text-sm text-gray-500 leading-relaxed pl-4">{{ $nd['message'] ?? '' }}</p>
+                                            <p class="text-[11px] text-gray-500 leading-relaxed pl-3.5 line-clamp-2">{{ $nd['message'] ?? '' }}</p>
                                         </button>
                                     </form>
                                     @empty
-                                    <div class="px-5 py-12 text-center">
-                                        <svg class="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                                        <p class="text-sm text-gray-400">No notifications yet</p>
+                                    <div class="px-4 py-8 text-center">
+                                        <p class="text-xs text-gray-400">No notifications yet</p>
                                     </div>
                                     @endforelse
                                 </div>
-                                <a href="{{ route('notifications.index') }}" class="block text-center px-5 py-3.5 text-sm font-medium text-gray-500 hover:text-[#e05a3a] hover:bg-gray-50 border-t border-gray-100 transition-colors">
+                                <a href="{{ route('notifications.index') }}" class="block text-center px-4 py-2.5 text-xs font-semibold text-[#e05a3a] hover:bg-gray-50 border-t border-gray-100 transition-colors">
                                     View all activity
                                 </a>
                             </div>
