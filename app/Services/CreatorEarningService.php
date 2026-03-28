@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Cohort;
 use App\Models\CreatorEarning;
 use App\Models\DigitalProduct;
+use App\Models\CoachingService;
 use App\Models\MembershipPlan;
 use App\Models\Payment;
 use App\Models\Setting;
@@ -33,6 +34,8 @@ class CreatorEarningService
         } elseif ($payable instanceof Cohort) {
             $creator = $payable->creator_id ? User::find($payable->creator_id) : null;
         } elseif ($payable instanceof MembershipPlan) {
+            $creator = User::find($payable->user_id);
+        } elseif ($payable instanceof CoachingService) {
             $creator = User::find($payable->user_id);
         }
 

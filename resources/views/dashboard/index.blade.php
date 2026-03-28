@@ -7,8 +7,8 @@
 @section('content')
 
 {{-- Welcome banner --}}
-<div class="bg-[#1a2535] rounded-2xl p-6 mb-6 relative overflow-hidden">
-    <div class="absolute right-0 top-0 bottom-0 w-1/3 opacity-10">
+<div class="bg-[#1a2535] rounded-2xl p-4 sm:p-6 mb-6 relative overflow-hidden">
+    <div class="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 hidden sm:block">
         <div class="w-64 h-64 rounded-full absolute -right-10 -top-10" style="background-color: {{ \App\Models\Setting::get('brand_color', '#e05a3a') }};"></div>
     </div>
     <div class="relative">

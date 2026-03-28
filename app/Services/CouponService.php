@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Cohort;
 use App\Models\Coupon;
+use App\Models\DigitalProduct;
+use App\Models\MembershipPlan;
 
 class CouponService
 {
@@ -33,6 +36,13 @@ class CouponService
             return $this->fail('This coupon does not apply to this item.');
         }
 
+        // Verify creator coupon ownership
+        if ($coupon->creator_id && $itemId) {
+            if (! $this->verifyCreatorOwnership($coupon, $type, $itemId)) {
+                return $this->fail('This coupon does not apply to this item.');
+            }
+        }
+
         $discount = $coupon->calculateDiscount($amount);
 
         if ($discount <= 0) {
@@ -55,6 +65,16 @@ class CouponService
             'final_amount' => $finalAmount,
             'message'      => $message,
         ];
+    }
+
+    private function verifyCreatorOwnership(Coupon $coupon, string $type, int $itemId): bool
+    {
+        return match ($type) {
+            'cohort' => Cohort::where('id', $itemId)->where('creator_id', $coupon->creator_id)->exists(),
+            'product' => DigitalProduct::where('id', $itemId)->where('user_id', $coupon->creator_id)->exists(),
+            'membership' => MembershipPlan::where('id', $itemId)->where('user_id', $coupon->creator_id)->exists(),
+            default => false,
+        };
     }
 
     private function fail(string $message): array

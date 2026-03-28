@@ -13,7 +13,7 @@ class CouponController extends Controller
         $request->validate([
             'code'   => 'required|string',
             'amount' => 'required|numeric|min:0',
-            'type'   => 'required|in:all,cohort,product',
+            'type'   => 'required|in:all,cohort,product,membership',
             'item_id' => 'nullable|integer',
         ]);
 

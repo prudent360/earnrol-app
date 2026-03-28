@@ -36,20 +36,25 @@
 
 @layer components {
     .btn-primary {
-        @apply bg-[#e05a3a] hover:bg-[#c74e30] text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2;
+        @apply bg-[#e05a3a] hover:bg-[#c74e30] text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2 text-sm sm:text-base;
     }
     .btn-outline {
-        @apply border-2 border-[#e05a3a] text-[#e05a3a] hover:bg-[#e05a3a] hover:text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2;
+        @apply border-2 border-[#e05a3a] text-[#e05a3a] hover:bg-[#e05a3a] hover:text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2 text-sm sm:text-base;
     }
     .btn-dark {
-        @apply bg-[#1a2535] hover:bg-[#141d2b] text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2;
+        @apply bg-[#1a2535] hover:bg-[#141d2b] text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg transition-all duration-200 inline-flex items-center gap-2 text-sm sm:text-base;
     }
     .card {
         background: #ffffff;
         border-radius: 12px;
         border: 1px solid #e5e7eb;
         box-shadow: none;
-        padding: 1.5rem;
+        padding: 1rem;
+    }
+    @media (min-width: 640px) {
+        .card {
+            padding: 1.5rem;
+        }
     }
     .sidebar-link {
         @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200 text-sm font-medium;
@@ -61,7 +66,7 @@
         @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
     }
     .form-input {
-        @apply w-full px-4 py-3 border border-[#e8eaf0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e05a3a] focus:border-transparent bg-white text-[#1a1a2e] placeholder-gray-400 transition;
+        @apply w-full px-3 py-2.5 sm:px-4 sm:py-3 border border-[#e8eaf0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e05a3a] focus:border-transparent bg-white text-[#1a1a2e] placeholder-gray-400 transition text-sm sm:text-base;
     }
     .form-label {
         @apply block text-sm font-medium text-[#1a1a2e] mb-1.5;
@@ -97,4 +102,24 @@
     .progress-fill {
         @apply h-full bg-[#e05a3a] rounded-full transition-all duration-500;
     }
+}
+
+/* Responsive table cell padding */
+@layer utilities {
+    .table-responsive th,
+    .table-responsive td {
+        @apply px-3 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm;
+    }
+}
+
+/* Hide scrollbar for cleaner horizontal scroll on mobile tables */
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
+.overflow-x-auto::-webkit-scrollbar {
+    height: 4px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 2px;
 }

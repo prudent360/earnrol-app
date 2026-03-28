@@ -36,6 +36,11 @@ use App\Http\Controllers\CreatorProfileController;
 use App\Http\Controllers\Creator\DashboardController as CreatorDashboardController;
 use App\Http\Controllers\Creator\ProductController as CreatorProductController;
 use App\Http\Controllers\Creator\CohortController as CreatorCohortController;
+use App\Http\Controllers\Creator\CoachingController as CreatorCoachingController;
+use App\Http\Controllers\Creator\CouponController as CreatorCouponController;
+use App\Http\Controllers\CoachingController;
+use App\Http\Controllers\CoachingPaymentController;
+use App\Http\Controllers\Admin\CoachingController as AdminCoachingController;
 use App\Http\Controllers\Creator\EarningController as CreatorEarningController;
 use App\Http\Controllers\Creator\MembershipController as CreatorMembershipController;
 use App\Http\Controllers\Creator\MembershipContentController as CreatorMembershipContentController;
@@ -169,6 +174,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/memberships/{membership:slug}/bank-transfer', [MembershipPaymentController::class, 'bankTransferForm'])->name('memberships.bank-transfer');
     Route::post('/memberships/{membership:slug}/bank-transfer', [MembershipPaymentController::class, 'bankTransferSubmit'])->name('memberships.bank-transfer.submit');
 
+    // Coaching
+    Route::get('/coaching', [CoachingController::class, 'index'])->name('coaching.index');
+    Route::get('/coaching/my-sessions', [CoachingController::class, 'myBookings'])->name('coaching.my-bookings');
+    Route::get('/coaching/{coaching:slug}', [CoachingController::class, 'show'])->name('coaching.show');
+
+    // Coaching Payments — Stripe
+    Route::post('/coaching/{coaching:slug}/checkout/stripe', [CoachingPaymentController::class, 'stripeCheckout'])->name('coaching.stripe.checkout');
+    Route::get('/coaching/stripe/callback', [CoachingPaymentController::class, 'stripeCallback'])->name('coaching.stripe.callback');
+
+    // Coaching Payments — Bank Transfer
+    Route::get('/coaching/{coaching:slug}/bank-transfer', [CoachingPaymentController::class, 'bankTransferForm'])->name('coaching.bank-transfer');
+    Route::post('/coaching/{coaching:slug}/bank-transfer', [CoachingPaymentController::class, 'bankTransferSubmit'])->name('coaching.bank-transfer.submit');
+
     // Digital Products
     Route::get('/products', [DigitalProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [DigitalProductController::class, 'show'])->name('products.show');
@@ -211,11 +229,20 @@ Route::middleware('auth')->group(function () {
         Route::resource('products', CreatorProductController::class);
         Route::resource('cohorts', CreatorCohortController::class);
         Route::resource('memberships', CreatorMembershipController::class);
+        Route::resource('coupons', CreatorCouponController::class);
         Route::get('/memberships/{membership:slug}/subscribers', [CreatorMembershipController::class, 'subscribers'])->name('memberships.subscribers');
         Route::get('/memberships/{membership:slug}/contents', [CreatorMembershipContentController::class, 'index'])->name('memberships.contents.index');
         Route::get('/memberships/{membership:slug}/contents/create', [CreatorMembershipContentController::class, 'create'])->name('memberships.contents.create');
         Route::post('/memberships/{membership:slug}/contents', [CreatorMembershipContentController::class, 'store'])->name('memberships.contents.store');
         Route::delete('/memberships/{membership:slug}/contents/{content}', [CreatorMembershipContentController::class, 'destroy'])->name('memberships.contents.destroy');
+        Route::resource('coaching', CreatorCoachingController::class);
+        Route::get('/coaching/{coaching:slug}/slots', [CreatorCoachingController::class, 'slots'])->name('coaching.slots.index');
+        Route::get('/coaching/{coaching:slug}/slots/create', [CreatorCoachingController::class, 'createSlot'])->name('coaching.slots.create');
+        Route::post('/coaching/{coaching:slug}/slots', [CreatorCoachingController::class, 'storeSlot'])->name('coaching.slots.store');
+        Route::delete('/coaching/{coaching:slug}/slots/{slot}', [CreatorCoachingController::class, 'destroySlot'])->name('coaching.slots.destroy');
+        Route::get('/coaching/{coaching:slug}/bookings', [CreatorCoachingController::class, 'bookings'])->name('coaching.bookings');
+        Route::put('/coaching/bookings/{booking}/meeting-link', [CreatorCoachingController::class, 'updateMeetingLink'])->name('coaching.bookings.meeting-link');
+        Route::post('/coaching/bookings/{booking}/complete', [CreatorCoachingController::class, 'markCompleted'])->name('coaching.bookings.complete');
         Route::get('/earnings', [CreatorEarningController::class, 'index'])->name('earnings.index');
     });
 
@@ -280,6 +307,11 @@ Route::middleware('auth')->group(function () {
 
         // Coupons
         Route::resource('coupons', AdminCouponController::class)->except(['show']);
+
+        // Coaching
+        Route::get('/coaching', [AdminCoachingController::class, 'index'])->name('coaching.index');
+        Route::post('/coaching/{coaching:slug}/approve', [AdminCoachingController::class, 'approve'])->name('coaching.approve');
+        Route::post('/coaching/{coaching:slug}/reject', [AdminCoachingController::class, 'reject'])->name('coaching.reject');
 
         // Memberships
         Route::get('/memberships', [AdminMembershipController::class, 'index'])->name('memberships.index');

@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Coupon extends Model
 {
     protected $fillable = [
-        'code', 'description', 'discount_type', 'discount_value',
+        'creator_id', 'code', 'description', 'discount_type', 'discount_value',
         'min_purchase', 'max_discount', 'usage_limit', 'used_count',
         'applies_to', 'applicable_id', 'starts_at', 'expires_at', 'is_active',
     ];
@@ -23,6 +24,11 @@ class Coupon extends Model
         'starts_at'      => 'datetime',
         'expires_at'     => 'datetime',
     ];
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
 
     public function usages(): HasMany
     {

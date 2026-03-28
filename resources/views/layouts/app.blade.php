@@ -70,6 +70,20 @@
                     Membership Plans
                 </a>
 
+                <a href="{{ route('creator.coupons.index') }}" class="sidebar-link {{ request()->routeIs('creator.coupons.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    Discount Codes
+                </a>
+
+                <a href="{{ route('creator.coaching.index') }}" class="sidebar-link {{ request()->routeIs('creator.coaching.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Coaching
+                </a>
+
                 <a href="{{ route('creator.earnings.index') }}" class="sidebar-link {{ request()->routeIs('creator.earnings.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -158,6 +172,13 @@
                     Memberships
                 </a>
 
+                <a href="{{ route('coaching.index') }}" class="sidebar-link {{ request()->routeIs('coaching.index', 'coaching.show') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Coaching
+                </a>
+
                 {{-- Learner Account --}}
                 <div class="pt-4">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Account</p>
@@ -182,6 +203,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                     </svg>
                     My Subscriptions
+                </a>
+
+                <a href="{{ route('coaching.my-bookings') }}" class="sidebar-link {{ request()->routeIs('coaching.my-bookings') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    My Sessions
                 </a>
 
                 <a href="{{ route('products.downloads') }}" class="sidebar-link {{ request()->routeIs('products.downloads') ? 'active' : '' }}">
@@ -267,6 +295,10 @@
                 <a href="{{ route('admin.memberships.index') }}" class="sidebar-link {{ request()->routeIs('admin.memberships.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                     Memberships
+                </a>
+                <a href="{{ route('admin.coaching.index') }}" class="sidebar-link {{ request()->routeIs('admin.coaching.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Coaching
                 </a>
                 <a href="{{ route('admin.reviews.index') }}" class="sidebar-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
@@ -357,7 +389,7 @@
             @endif
             {{-- Top navbar --}}
             <header class="bg-white border-b border-[#e8eaf0] flex-shrink-0">
-                <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-gray-700">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,8 +397,8 @@
                             </svg>
                         </button>
                         <div>
-                            <h1 class="text-lg font-semibold text-[#1a1a2e]">@yield('page_title', 'Dashboard')</h1>
-                            <p class="text-xs text-gray-400">@yield('page_subtitle', '')</p>
+                            <h1 class="text-base sm:text-lg font-semibold text-[#1a1a2e]">@yield('page_title', 'Dashboard')</h1>
+                            <p class="text-xs text-gray-400 hidden sm:block">@yield('page_subtitle', '')</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
@@ -384,7 +416,7 @@
 
                             {{-- Dropdown --}}
                             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">
+                                 class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">
                                 <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                                     <h3 class="text-sm font-bold text-[#1a1a2e]">Notifications</h3>
                                     @if($unreadCount > 0)
@@ -429,7 +461,7 @@
                             </button>
 
                             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
-                                 class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">
+                                 class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-64 max-w-xs bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">
 
                                 {{-- User info --}}
                                 <div class="px-4 py-3 border-b border-gray-100">
@@ -485,7 +517,7 @@
 
             {{-- Page content --}}
             <main class="flex-1 overflow-y-auto">
-                <div class="max-w-7xl mx-auto p-6">
+                <div class="max-w-7xl mx-auto px-4 py-4 sm:p-6">
                     @if(session('success'))
                         <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
