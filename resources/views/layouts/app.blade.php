@@ -380,9 +380,13 @@
             {{-- User info --}}
             <div class="px-4 py-4 border-t border-white/10">
                 <div class="flex items-center gap-3">
+                    @if(auth()->user()->avatar)
+                    <img src="{{ Storage::url(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 rounded-full object-cover flex-shrink-0">
+                    @else
                     <div class="w-9 h-9 rounded-full bg-[#e05a3a] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                         {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                     </div>
+                    @endif
                     <div class="flex-1 min-w-0">
                         <p class="text-white text-sm font-semibold truncate">{{ auth()->user()->name ?? 'Guest' }}</p>
                         <p class="text-gray-400 text-xs truncate">{{ auth()->user()->email ?? '' }}</p>
@@ -489,9 +493,15 @@
 
                         {{-- Profile / Mode Switcher --}}
                         <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                            @if(auth()->user()->avatar)
+                            <button @click="open = !open" class="focus:outline-none focus:ring-2 focus:ring-[#e05a3a]/50 focus:ring-offset-2 transition-all rounded-full">
+                                <img src="{{ Storage::url(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 rounded-full object-cover">
+                            </button>
+                            @else
                             <button @click="open = !open" class="w-9 h-9 rounded-full bg-[#e05a3a] flex items-center justify-center text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#e05a3a]/50 focus:ring-offset-2 transition-all">
                                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                             </button>
+                            @endif
 
                             <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
                                  class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-64 max-w-xs bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden" style="display: none;">

@@ -44,9 +44,27 @@
             </div>
         </div>
 
-        <form action="{{ route('profile.update') }}" method="POST" class="space-y-5">
+        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             @method('PUT')
+
+            {{-- Avatar --}}
+            <div class="flex items-center gap-4">
+                @if($user->avatar)
+                <img src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover border-2 border-gray-100">
+                @else
+                <div class="w-16 h-16 rounded-full bg-[#e05a3a] flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                </div>
+                @endif
+                <div>
+                    <label for="avatar" class="form-label mb-0">Profile Photo</label>
+                    <input type="file" name="avatar" id="avatar" accept="image/*" class="form-input mt-1 text-sm @error('avatar') border-red-500 @enderror">
+                    @error('avatar')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    <p class="text-xs text-gray-400 mt-1">Max 2MB. This photo will appear as your facilitator image on cohorts.</p>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
                     <label for="name" class="form-label">Full Name</label>

@@ -105,34 +105,10 @@
                 @error('schedule') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
-            {{-- Facilitator --}}
-            <div class="border-b border-gray-100 pb-4 pt-2">
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Facilitator / Instructor</h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="facilitator_name" class="form-label">Facilitator Name</label>
-                    <input type="text" name="facilitator_name" id="facilitator_name" class="form-input @error('facilitator_name') border-red-500 @enderror" value="{{ old('facilitator_name', $cohort->facilitator_name) }}" placeholder="e.g. John Doe">
-                    @error('facilitator_name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label for="facilitator_image" class="form-label">Facilitator Photo</label>
-                    @if($cohort->facilitator_image)
-                    <div class="mb-2">
-                        <img src="{{ Storage::url($cohort->facilitator_image) }}" alt="Facilitator" class="h-16 w-16 rounded-full object-cover">
-                    </div>
-                    @endif
-                    <input type="file" name="facilitator_image" id="facilitator_image" accept="image/*" class="form-input @error('facilitator_image') border-red-500 @enderror">
-                    @error('facilitator_image') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
-
-            <div>
-                <label for="facilitator_bio" class="form-label">Facilitator Bio (optional)</label>
-                <textarea name="facilitator_bio" id="facilitator_bio" rows="2" class="form-input @error('facilitator_bio') border-red-500 @enderror">{{ old('facilitator_bio', $cohort->facilitator_bio) }}</textarea>
-                @error('facilitator_bio') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            {{-- Facilitator Info --}}
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-sm text-blue-700">Your profile name, bio, and photo will be used as the facilitator information for this cohort. <a href="{{ route('profile.edit') }}" class="font-bold underline">Update your profile</a> to change how you appear.</p>
             </div>
 
             {{-- Curriculum Details --}}

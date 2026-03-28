@@ -106,22 +106,30 @@
         </div>
         @endif
 
-        {{-- Facilitator --}}
-        @if($cohort->facilitator_name)
+        {{-- Facilitator / Creator --}}
+        @php
+            $facilitator = $cohort->creator_id ? \App\Models\User::find($cohort->creator_id) : null;
+            // Fall back to manual facilitator fields for admin-created cohorts
+            $facName = $facilitator ? $facilitator->name : $cohort->facilitator_name;
+            $facBio = $facilitator ? $facilitator->bio : $cohort->facilitator_bio;
+            $facAvatar = $facilitator?->avatar;
+            $facImage = $facAvatar ? Storage::url($facAvatar) : ($cohort->facilitator_image ? Storage::url($cohort->facilitator_image) : null);
+        @endphp
+        @if($facName)
         <div class="card">
             <h2 class="text-lg font-bold text-[#1a1a2e] mb-4">Meet Your Facilitator</h2>
             <div class="flex items-start gap-4">
-                @if($cohort->facilitator_image)
-                <img src="{{ Storage::url($cohort->facilitator_image) }}" alt="{{ $cohort->facilitator_name }}" class="w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 border-gray-100">
+                @if($facImage)
+                <img src="{{ $facImage }}" alt="{{ $facName }}" class="w-20 h-20 rounded-full object-cover flex-shrink-0 border-2 border-gray-100">
                 @else
                 <div class="w-20 h-20 rounded-full bg-[#1a2535] flex items-center justify-center flex-shrink-0">
-                    <span class="text-2xl font-bold text-white">{{ strtoupper(substr($cohort->facilitator_name, 0, 1)) }}</span>
+                    <span class="text-2xl font-bold text-white">{{ strtoupper(substr($facName, 0, 1)) }}</span>
                 </div>
                 @endif
                 <div>
-                    <h3 class="text-base font-bold text-[#1a1a2e]">{{ $cohort->facilitator_name }}</h3>
-                    @if($cohort->facilitator_bio)
-                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">{{ $cohort->facilitator_bio }}</p>
+                    <h3 class="text-base font-bold text-[#1a1a2e]">{{ $facName }}</h3>
+                    @if($facBio)
+                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">{{ $facBio }}</p>
                     @endif
                 </div>
             </div>
