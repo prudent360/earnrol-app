@@ -30,7 +30,7 @@
                     <tr>
                         <td style="background-color:#ffffff;padding:40px;border-left:1px solid #e8eaf0;border-right:1px solid #e8eaf0;">
                             <div style="color:#1a1a2e;font-size:15px;line-height:1.7;">
-                                {!! nl2br(e($body)) !!}
+                                {!! $body !!}
                             </div>
                         </td>
                     </tr>

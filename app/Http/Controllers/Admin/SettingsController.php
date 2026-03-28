@@ -160,7 +160,7 @@ class SettingsController extends Controller
 
         return response()->json([
             'subject' => $subject,
-            'body'    => nl2br(e($body)),
+            'body'    => str_contains($body, '<') ? $body : nl2br(e($body)),
         ]);
     }
 

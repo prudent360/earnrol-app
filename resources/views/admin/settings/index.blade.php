@@ -4,6 +4,16 @@
 @section('page_title', 'Settings')
 @section('page_subtitle', 'Configure your platform')
 
+@push('head')
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<style>
+    .ql-toolbar.ql-snow { border-radius: 8px 8px 0 0; border-color: #e8eaf0; }
+    .ql-container.ql-snow { border-radius: 0 0 8px 8px; border-color: #e8eaf0; font-size: 14px; font-family: 'Inter', sans-serif; }
+    .ql-editor { min-height: 200px; }
+</style>
+@endpush
+
 @section('content')
 <div class="mb-8">
     {{-- Tab Navigation --}}
@@ -917,8 +927,9 @@
                     </div>
                     <div>
                         <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Body</label>
-                        <textarea name="" id="edit-body" rows="12" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm leading-relaxed resize-y" placeholder="Email body..."></textarea>
-                        <p class="text-[10px] text-gray-400 mt-2">Plain text format. Use the variables below to personalise each email.</p>
+                        <input type="hidden" name="" id="edit-body">
+                        <div id="quill-editor" style="height: 250px; background: #fff;"></div>
+                        <p class="text-[10px] text-gray-400 mt-2">Use the toolbar to format text. Click variables below to insert them.</p>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-4">
                         <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Available Variables</h4>
@@ -970,15 +981,37 @@ function previewFavicon(input) {
     reader.readAsDataURL(input.files[0]);
 }
 
+// Quill WYSIWYG editor
+let quillEditor = null;
+
+function initQuill() {
+    if (quillEditor) return;
+    quillEditor = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'align': [] }],
+                ['link'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Write your email body here...'
+    });
+
+    // Sync Quill content to hidden input on form submit
+    document.getElementById('edit-form').addEventListener('submit', function() {
+        document.getElementById('edit-body').value = quillEditor.root.innerHTML;
+    });
+}
+
 function insertVar(variable) {
-    const textarea = document.getElementById('edit-body');
-    if (!textarea) return;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    textarea.value = text.substring(0, start) + variable + text.substring(end);
-    textarea.focus();
-    textarea.setSelectionRange(start + variable.length, start + variable.length);
+    if (!quillEditor) return;
+    const range = quillEditor.getSelection(true);
+    quillEditor.insertText(range.index, variable);
+    quillEditor.setSelection(range.index + variable.length);
 }
 
 // Live color swatch updates
@@ -1122,6 +1155,8 @@ function editTemplate(key, label) {
     const tpl = templateData[key];
     if (!tpl) return;
 
+    initQuill();
+
     document.getElementById('edit-title').textContent = 'Edit: ' + label;
 
     const subjectInput = document.getElementById('edit-subject');
@@ -1131,7 +1166,16 @@ function editTemplate(key, label) {
     bodyInput.name = 'tpl_' + key + '_body';
 
     subjectInput.value = savedSettings['tpl_' + key + '_subject'] || tpl.subject;
-    bodyInput.value = savedSettings['tpl_' + key + '_body'] || tpl.body;
+
+    // Load body into Quill — handle both HTML and plain text
+    const bodyContent = savedSettings['tpl_' + key + '_body'] || tpl.body;
+    if (bodyContent.includes('<') && bodyContent.includes('>')) {
+        quillEditor.root.innerHTML = bodyContent;
+    } else {
+        // Convert plain text (with newlines) to HTML paragraphs
+        const html = bodyContent.split('\n').map(line => line.trim() === '' ? '<p><br></p>' : '<p>' + line + '</p>').join('');
+        quillEditor.root.innerHTML = html;
+    }
 
     // Populate variables
     const varsDiv = document.getElementById('edit-vars');
