@@ -64,7 +64,14 @@ class MembershipController extends Controller
             }
         }
 
-        MembershipPlan::create($data);
+        $membership = MembershipPlan::create($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $membership->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.memberships.index')
             ->with('success', 'Membership plan submitted for review! It will be visible once approved by an admin.');
@@ -125,6 +132,13 @@ class MembershipController extends Controller
         }
 
         $membership->update($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $membership->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.memberships.index')
             ->with('success', 'Membership plan updated.' . ($membership->approval_status === 'pending' ? ' It will be re-reviewed by an admin.' : ''));

@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\CoachingBookingConfirmed;
+use App\Services\AffiliateCommissionService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -73,6 +74,7 @@ class CoachingPaymentController extends Controller
                 'gateway' => 'stripe',
                 'status' => 'pending',
                 'currency' => $currency,
+                'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(CoachingService::class, $coaching->id),
             ]);
 
             return redirect($session->url);
@@ -161,6 +163,7 @@ class CoachingPaymentController extends Controller
             'status'       => 'pending',
             'currency'     => Setting::get('currency', 'GBP'),
             'receipt_path' => $receiptPath,
+            'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(CoachingService::class, $coaching->id),
         ]);
 
         // Create a pending booking
@@ -224,6 +227,7 @@ class CoachingPaymentController extends Controller
             $user->notify(new CoachingBookingConfirmed($coaching, $slot));
 
             ReferralService::creditCommissionIfEligible($payment);
+            AffiliateCommissionService::creditIfEligible($payment);
             \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);
 
             return redirect()->route('coaching.my-bookings')

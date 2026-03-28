@@ -68,6 +68,30 @@
                 <p class="text-xs text-gray-400 mt-1">Recommended: 800x600px.</p>
             </div>
 
+            @if(\App\Models\Setting::get('affiliate_enabled'))
+            <div class="border-b border-gray-100 pb-4 pt-2">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Affiliate Promotion</h3>
+            </div>
+
+            <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+                <div>
+                    <p class="text-sm font-medium text-[#1a1a2e]">Allow Affiliate Promotion</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Let affiliates promote this item and earn commission per sale</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="hidden" name="affiliate_enabled" value="0">
+                    <input type="checkbox" name="affiliate_enabled" value="1" class="sr-only peer" {{ old('affiliate_enabled', '') ? 'checked' : '' }}>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#e05a3a]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e05a3a]"></div>
+                </label>
+            </div>
+
+            <div>
+                <label for="affiliate_commission" class="form-label">Affiliate Commission (%)</label>
+                <input type="number" name="affiliate_commission" id="affiliate_commission" step="0.1" min="0" max="90" class="form-input" value="{{ old('affiliate_commission', '') }}" placeholder="e.g. 20">
+                <p class="text-xs text-gray-400 mt-1">Platform fee on affiliate sales: {{ \App\Models\Setting::get('affiliate_admin_fee', '5') }}% (deducted from your share after affiliate commission)</p>
+            </div>
+            @endif
+
             <div class="pt-4 border-t border-[#e8eaf0] flex justify-end">
                 <button type="submit" class="btn-primary">Submit for Review</button>
             </div>

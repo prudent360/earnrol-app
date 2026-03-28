@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AffiliateSale;
 use App\Models\Cohort;
 use App\Models\CreatorEarning;
 use App\Models\DigitalProduct;
@@ -49,8 +50,15 @@ class CreatorEarningService
             return;
         }
 
-        $commissionRate = (float) Setting::get('creator_commission', 80);
-        $commissionAmount = round($payment->amount * ($commissionRate / 100), 2);
+        // If this is an affiliate sale, use the pre-calculated creator_amount
+        $affiliateSale = AffiliateSale::where('payment_id', $payment->id)->first();
+        if ($affiliateSale) {
+            $commissionAmount = (float) $affiliateSale->creator_amount;
+            $commissionRate = round(($commissionAmount / $payment->amount) * 100, 2);
+        } else {
+            $commissionRate = (float) Setting::get('creator_commission', 80);
+            $commissionAmount = round($payment->amount * ($commissionRate / 100), 2);
+        }
 
         if ($commissionAmount <= 0) {
             return;

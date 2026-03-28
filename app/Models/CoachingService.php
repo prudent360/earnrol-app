@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 
 class CoachingService extends Model
@@ -65,6 +66,11 @@ class CoachingService extends Model
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    public function affiliateProduct(): MorphOne
+    {
+        return $this->morphOne(AffiliateProduct::class, 'affiliable');
     }
 
     public function approvedReviews(): MorphMany

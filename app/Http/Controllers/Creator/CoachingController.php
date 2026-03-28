@@ -48,7 +48,14 @@ class CoachingController extends Controller
             $data['cover_image'] = $request->file('cover_image')->store('coaching/covers', 'public');
         }
 
-        CoachingService::create($data);
+        $coaching = CoachingService::create($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $coaching->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.coaching.index')
             ->with('success', 'Coaching service submitted for review! It will be visible once approved.');
@@ -88,6 +95,13 @@ class CoachingController extends Controller
         }
 
         $coaching->update($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $coaching->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.coaching.index')
             ->with('success', 'Coaching service updated.' . ($coaching->approval_status === 'pending' ? ' It will be re-reviewed.' : ''));

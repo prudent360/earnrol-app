@@ -52,7 +52,14 @@ class ProductController extends Controller
             $data['file_size'] = $file->getSize();
         }
 
-        DigitalProduct::create($data);
+        $product = DigitalProduct::create($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $product->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.products.index')
             ->with('success', 'Product submitted for review! It will be visible once approved by an admin.');
@@ -104,6 +111,13 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $product->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.products.index')
             ->with('success', 'Product updated.' . ($product->approval_status === 'pending' ? ' It will be re-reviewed by an admin.' : ''));

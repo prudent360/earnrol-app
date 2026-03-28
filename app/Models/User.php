@@ -160,6 +160,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Certificate::class);
     }
 
+    public function affiliateLinks(): HasMany
+    {
+        return $this->hasMany(AffiliateLink::class);
+    }
+
+    public function affiliateSales(): HasMany
+    {
+        return $this->hasMany(AffiliateSale::class, 'affiliate_user_id');
+    }
+
     public function coachingServices(): HasMany
     {
         return $this->hasMany(CoachingService::class);

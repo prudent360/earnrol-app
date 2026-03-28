@@ -8,6 +8,7 @@ use App\Models\ProductPurchase;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\ProductPurchaseConfirmed;
+use App\Services\AffiliateCommissionService;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
 use App\Services\CouponService;
@@ -84,6 +85,7 @@ class ProductPaymentController extends Controller
                 'gateway' => 'stripe',
                 'status' => 'pending',
                 'currency' => $currency,
+                'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(DigitalProduct::class, $product->id),
             ]);
 
             return redirect($session->url);
@@ -194,6 +196,7 @@ class ProductPaymentController extends Controller
                         'gateway' => 'paypal',
                         'status' => 'pending',
                         'currency' => $currency,
+                        'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(DigitalProduct::class, $product->id),
                     ]);
                     return redirect($approveUrl);
                 }
@@ -322,6 +325,7 @@ class ProductPaymentController extends Controller
             'status'          => 'pending',
             'currency'        => Setting::get('currency', 'GBP'),
             'receipt_path'    => $receiptPath,
+            'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(DigitalProduct::class, $product->id),
         ]);
 
         $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
@@ -372,6 +376,9 @@ class ProductPaymentController extends Controller
             $user->notify(new ProductPurchaseConfirmed($product));
 
             ReferralService::creditCommissionIfEligible($payment);
+
+            // Credit affiliate commission if eligible
+            AffiliateCommissionService::creditIfEligible($payment);
 
             // Credit creator commission if eligible
             \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);

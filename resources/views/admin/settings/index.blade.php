@@ -159,6 +159,39 @@
             </div>
         </div>
 
+        {{-- Affiliate System --}}
+        <div class="card space-y-5">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+                <h3 class="text-lg font-bold text-[#1a1a2e]">Affiliate System</h3>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">Enable Affiliate System</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Allow users to promote products and earn commission per sale</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="affiliate_enabled" value="0">
+                        <input type="checkbox" name="affiliate_enabled" value="1" class="sr-only peer" {{ ($settings['affiliate_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#e05a3a] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Platform Fee on Affiliate Sales (%)</label>
+                    <input type="number" name="affiliate_admin_fee" value="{{ $settings['affiliate_admin_fee'] ?? '5' }}" min="0" max="50" step="0.1" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="5">
+                    <p class="text-[11px] text-gray-400 mt-1.5">After the affiliate commission is deducted from a sale, this percentage is taken from the remaining amount as a platform fee.</p>
+                </div>
+                <div>
+                    <label class="form-label uppercase text-[10px] tracking-widest text-gray-400">Affiliate Cookie Duration (days)</label>
+                    <input type="number" name="affiliate_cookie_days" value="{{ $settings['affiliate_cookie_days'] ?? '30' }}" min="1" max="365" class="form-input bg-gray-50 border-transparent focus:bg-white transition-all" placeholder="30">
+                    <p class="text-[11px] text-gray-400 mt-1.5">How long the affiliate tracking cookie lasts after a customer clicks an affiliate link</p>
+                </div>
+            </div>
+        </div>
+
         {{-- Announcement --}}
         <div class="card space-y-5">
             <div class="flex items-center gap-3 border-b border-gray-100 pb-4">

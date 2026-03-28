@@ -83,6 +83,9 @@ class SettingsController extends Controller
                 'creator_enabled'         => '0',
                 'creator_commission'      => '80',
                 'creator_min_withdrawal'  => '1000',
+                'affiliate_enabled'       => '0',
+                'affiliate_admin_fee'     => '5',
+                'affiliate_cookie_days'   => '30',
             ],
             default => [],
         };

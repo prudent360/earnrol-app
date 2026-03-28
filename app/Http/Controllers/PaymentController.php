@@ -14,6 +14,7 @@ use App\Notifications\NewEnrollmentAdmin;
 use App\Services\Payment\StripeService;
 use App\Services\Payment\PayPalService;
 use App\Services\CouponService;
+use App\Services\AffiliateCommissionService;
 use App\Services\ReferralService;
 use App\Models\CouponUsage;
 use Illuminate\Http\Request;
@@ -72,6 +73,7 @@ class PaymentController extends Controller
                 'gateway' => 'stripe',
                 'status' => 'pending',
                 'currency' => Setting::get('currency', 'GBP'),
+                'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(Cohort::class, $cohort->id),
             ]);
             return redirect($session->url);
         }
@@ -137,6 +139,7 @@ class PaymentController extends Controller
                 'gateway' => 'paypal',
                 'status' => 'pending',
                 'currency' => Setting::get('currency', 'GBP'),
+                'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(Cohort::class, $cohort->id),
             ]);
             return redirect($order['approve_url']);
         }
@@ -245,6 +248,7 @@ class PaymentController extends Controller
             'status'         => 'pending',
             'currency'       => Setting::get('currency', 'GBP'),
             'receipt_path'   => $receiptPath,
+            'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(Cohort::class, $cohort->id),
         ]);
 
         // Notify all admins
@@ -312,6 +316,9 @@ class PaymentController extends Controller
             // Credit referral commission if eligible
             ReferralService::creditCommissionIfEligible($payment);
 
+            // Credit affiliate commission if eligible
+            AffiliateCommissionService::creditIfEligible($payment);
+
             // Credit creator commission if eligible
             \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);
 
@@ -368,6 +375,7 @@ class PaymentController extends Controller
             'gateway'         => 'coupon',
             'status'          => 'completed',
             'currency'        => Setting::get('currency', 'GBP'),
+            'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(Cohort::class, $cohort->id),
         ]);
 
         return $this->finalizePayment($payment, ['coupon' => $couponData['coupon']->code]);

@@ -36,6 +36,10 @@ use App\Http\Controllers\CreatorProfileController;
 use App\Http\Controllers\Creator\DashboardController as CreatorDashboardController;
 use App\Http\Controllers\Creator\ProductController as CreatorProductController;
 use App\Http\Controllers\Creator\CohortController as CreatorCohortController;
+use App\Http\Controllers\AffiliateTrackingController;
+use App\Http\Controllers\AffiliateDashboardController;
+use App\Http\Controllers\Creator\AffiliateController as CreatorAffiliateController;
+use App\Http\Controllers\Admin\AffiliateController as AdminAffiliateController;
 use App\Http\Controllers\Creator\CoachingController as CreatorCoachingController;
 use App\Http\Controllers\Creator\CouponController as CreatorCouponController;
 use App\Http\Controllers\CoachingController;
@@ -65,6 +69,9 @@ Route::get('/verify/{certificate_number}', [CertificateVerificationController::c
 
 // Creator Public Storefront
 Route::get('/c/{username}', [CreatorProfileController::class, 'show'])->name('creator.profile');
+
+// Affiliate Tracking (no auth)
+Route::get('/ref/{code}', [AffiliateTrackingController::class, 'track'])->name('affiliate.track');
 
 // Stripe Webhook (no auth)
 Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])->name('webhooks.stripe');
@@ -187,6 +194,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/coaching/{coaching:slug}/bank-transfer', [CoachingPaymentController::class, 'bankTransferForm'])->name('coaching.bank-transfer');
     Route::post('/coaching/{coaching:slug}/bank-transfer', [CoachingPaymentController::class, 'bankTransferSubmit'])->name('coaching.bank-transfer.submit');
 
+    // Affiliate Dashboard
+    Route::prefix('affiliate')->name('affiliate.')->group(function () {
+        Route::get('/dashboard', [AffiliateDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/products', [AffiliateDashboardController::class, 'products'])->name('products');
+        Route::post('/generate-link', [AffiliateDashboardController::class, 'generateLink'])->name('generate-link');
+        Route::get('/my-links', [AffiliateDashboardController::class, 'myLinks'])->name('links');
+        Route::get('/earnings', [AffiliateDashboardController::class, 'earnings'])->name('earnings');
+    });
+
     // Digital Products
     Route::get('/products', [DigitalProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [DigitalProductController::class, 'show'])->name('products.show');
@@ -244,6 +260,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/coaching/bookings/{booking}/meeting-link', [CreatorCoachingController::class, 'updateMeetingLink'])->name('coaching.bookings.meeting-link');
         Route::post('/coaching/bookings/{booking}/complete', [CreatorCoachingController::class, 'markCompleted'])->name('coaching.bookings.complete');
         Route::get('/earnings', [CreatorEarningController::class, 'index'])->name('earnings.index');
+        Route::get('/affiliate-sales', [CreatorAffiliateController::class, 'index'])->name('affiliate-sales.index');
     });
 
     // Stop Impersonation (outside admin middleware — impersonated user isn't admin)
@@ -307,6 +324,9 @@ Route::middleware('auth')->group(function () {
 
         // Coupons
         Route::resource('coupons', AdminCouponController::class)->except(['show']);
+
+        // Affiliates
+        Route::get('/affiliates', [AdminAffiliateController::class, 'index'])->name('affiliates.index');
 
         // Coaching
         Route::get('/coaching', [AdminCoachingController::class, 'index'])->name('coaching.index');

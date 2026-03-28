@@ -84,6 +84,15 @@
                     Coaching
                 </a>
 
+                @if(\App\Models\Setting::get('affiliate_enabled'))
+                <a href="{{ route('creator.affiliate-sales.index') }}" class="sidebar-link {{ request()->routeIs('creator.affiliate-sales.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    Affiliate Sales
+                </a>
+                @endif
+
                 <a href="{{ route('creator.earnings.index') }}" class="sidebar-link {{ request()->routeIs('creator.earnings.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -137,6 +146,15 @@
                         </a>
                     </div>
                 </div>
+
+                @if(\App\Models\Setting::get('affiliate_enabled'))
+                <a href="{{ route('affiliate.dashboard') }}" class="sidebar-link {{ request()->routeIs('affiliate.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    Affiliate
+                </a>
+                @endif
 
                 @else
                 {{-- ==============================
@@ -254,6 +272,15 @@
                     </div>
                 </div>
 
+                @if(\App\Models\Setting::get('affiliate_enabled'))
+                <a href="{{ route('affiliate.dashboard') }}" class="sidebar-link {{ request()->routeIs('affiliate.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    Affiliate
+                </a>
+                @endif
+
                 @if(!auth()->user()->isCreator() && \App\Models\Setting::get('creator_enabled'))
                     @php $creatorApp = auth()->user()->creatorApplication; @endphp
                     @if($creatorApp && $creatorApp->isPending())
@@ -322,6 +349,12 @@
                     <span class="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-white">{{ $pendingApps }}</span>
                     @endif
                 </a>
+                @if(\App\Models\Setting::get('affiliate_enabled'))
+                <a href="{{ route('admin.affiliates.index') }}" class="sidebar-link {{ request()->routeIs('admin.affiliates.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    Affiliates
+                </a>
+                @endif
                 <a href="{{ route('admin.payments.index') }}" class="sidebar-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     Payments

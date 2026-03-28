@@ -63,7 +63,14 @@ class CohortController extends Controller
             $data['facilitator_image'] = $request->file('facilitator_image')->store('cohorts/facilitators', 'public');
         }
 
-        Cohort::create($data);
+        $cohort = Cohort::create($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $cohort->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.cohorts.index')
             ->with('success', 'Cohort submitted for review! It will be visible once approved by an admin.');
@@ -125,6 +132,13 @@ class CohortController extends Controller
         }
 
         $cohort->update($data);
+
+        if (\App\Models\Setting::get('affiliate_enabled')) {
+            $cohort->affiliateProduct()->updateOrCreate([], [
+                'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                'commission_percentage' => $request->input('affiliate_commission', 0),
+            ]);
+        }
 
         return redirect()->route('creator.cohorts.index')
             ->with('success', 'Cohort updated.' . ($cohort->approval_status === 'pending' ? ' It will be re-reviewed by an admin.' : ''));

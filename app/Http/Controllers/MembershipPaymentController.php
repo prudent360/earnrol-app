@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\MembershipSubscriptionConfirmed;
 use App\Services\CouponService;
 use App\Services\Payment\StripeService;
+use App\Services\AffiliateCommissionService;
 use App\Services\ReferralService;
 use App\Models\CouponUsage;
 use Illuminate\Http\Request;
@@ -53,6 +54,7 @@ class MembershipPaymentController extends Controller
                 'gateway' => 'stripe',
                 'status' => 'pending',
                 'currency' => Setting::get('currency', 'GBP'),
+                'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(MembershipPlan::class, $membership->id),
             ]);
 
             return redirect($session->url);
@@ -146,6 +148,7 @@ class MembershipPaymentController extends Controller
             'status'       => 'pending',
             'currency'     => Setting::get('currency', 'GBP'),
             'receipt_path' => $receiptPath,
+            'affiliate_link_id' => AffiliateCommissionService::resolveAffiliateLinkId(MembershipPlan::class, $membership->id),
         ]);
 
         $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
@@ -211,6 +214,7 @@ class MembershipPaymentController extends Controller
             $user->notify(new MembershipSubscriptionConfirmed($membership));
 
             ReferralService::creditCommissionIfEligible($payment);
+            AffiliateCommissionService::creditIfEligible($payment);
             \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);
 
             return redirect()->route('memberships.show', $membership)

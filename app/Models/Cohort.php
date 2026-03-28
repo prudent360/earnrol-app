@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Cohort extends Model
 {
@@ -109,6 +110,11 @@ class Cohort extends Model
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    public function affiliateProduct(): MorphOne
+    {
+        return $this->morphOne(AffiliateProduct::class, 'affiliable');
     }
 
     public function approvedReviews(): MorphMany
