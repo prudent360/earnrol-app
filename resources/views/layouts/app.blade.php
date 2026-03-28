@@ -35,8 +35,98 @@
 
             {{-- Navigation --}}
             <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+
+                @if(auth()->user()->inCreatorMode())
                 {{-- ==============================
-                     EXPLORE — Browse available content
+                     CREATOR MODE
+                ============================== --}}
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Creator</p>
+
+                <a href="{{ route('creator.dashboard') }}" class="sidebar-link {{ request()->routeIs('creator.dashboard') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="{{ route('creator.products.index') }}" class="sidebar-link {{ request()->routeIs('creator.products.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                    My Products
+                </a>
+
+                <a href="{{ route('creator.cohorts.index') }}" class="sidebar-link {{ request()->routeIs('creator.cohorts.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    My Cohorts
+                </a>
+
+                <a href="{{ route('creator.memberships.index') }}" class="sidebar-link {{ request()->routeIs('creator.memberships.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                    </svg>
+                    Membership Plans
+                </a>
+
+                <a href="{{ route('creator.earnings.index') }}" class="sidebar-link {{ request()->routeIs('creator.earnings.*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Earnings
+                </a>
+
+                <a href="{{ route('creator.profile', auth()->user()->username) }}" target="_blank" class="sidebar-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    My Storefront
+                </a>
+
+                {{-- Creator Account --}}
+                <div class="pt-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Account</p>
+                </div>
+
+                <a href="{{ route('profile.edit') }}" class="sidebar-link {{ request()->routeIs('profile*') ? 'active' : '' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Profile
+                </a>
+
+                <div x-data="{ open: {{ request()->routeIs('referrals*') || request()->routeIs('user.report') ? 'true' : 'false' }} }">
+                    <button @click="open = !open" class="sidebar-link w-full justify-between {{ request()->routeIs('referrals*') || request()->routeIs('user.report') ? 'active' : '' }}">
+                        <span class="flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Earnings
+                        </span>
+                        <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" class="ml-6 mt-1 space-y-1">
+                        <a href="{{ route('referrals.index') }}" class="sidebar-link text-sm {{ request()->routeIs('referrals*') ? 'active' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                            </svg>
+                            Wallet
+                        </a>
+                        <a href="{{ route('user.report') }}" class="sidebar-link text-sm {{ request()->routeIs('user.report') ? 'active' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Report
+                        </a>
+                    </div>
+                </div>
+
+                @else
+                {{-- ==============================
+                     LEARNER MODE
                 ============================== --}}
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Explore</p>
 
@@ -68,9 +158,7 @@
                     Memberships
                 </a>
 
-                {{-- ==============================
-                     ACCOUNT — User's personal items
-                ============================== --}}
+                {{-- Learner Account --}}
                 <div class="pt-4">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Account</p>
                 </div>
@@ -156,56 +244,6 @@
                     </a>
                     @endif
                 @endif
-
-                {{-- ==============================
-                     CREATOR — Creator tools & management
-                ============================== --}}
-                @if(auth()->user()->inCreatorMode())
-                <div class="pt-4">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-3">Creator</p>
-                </div>
-
-                <a href="{{ route('creator.dashboard') }}" class="sidebar-link {{ request()->routeIs('creator.dashboard') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    Creator Dashboard
-                </a>
-
-                <a href="{{ route('creator.products.index') }}" class="sidebar-link {{ request()->routeIs('creator.products.*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
-                    My Products
-                </a>
-
-                <a href="{{ route('creator.cohorts.index') }}" class="sidebar-link {{ request()->routeIs('creator.cohorts.*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                    My Cohorts
-                </a>
-
-                <a href="{{ route('creator.memberships.index') }}" class="sidebar-link {{ request()->routeIs('creator.memberships.*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                    </svg>
-                    Membership Plans
-                </a>
-
-                <a href="{{ route('creator.earnings.index') }}" class="sidebar-link {{ request()->routeIs('creator.earnings.*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Earnings
-                </a>
-
-                <a href="{{ route('creator.profile', auth()->user()->username) }}" target="_blank" class="sidebar-link">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
-                    My Storefront
-                </a>
                 @endif
 
                 {{-- ==============================
