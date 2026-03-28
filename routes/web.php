@@ -37,6 +37,7 @@ use App\Http\Controllers\Creator\DashboardController as CreatorDashboardControll
 use App\Http\Controllers\Creator\ProductController as CreatorProductController;
 use App\Http\Controllers\Creator\CohortController as CreatorCohortController;
 use App\Http\Controllers\Creator\EarningController as CreatorEarningController;
+use App\Http\Controllers\UserReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -140,6 +141,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/referrals', [ReferralController::class, 'index'])->name('referrals.index');
     Route::put('/referrals/bank-details', [ReferralController::class, 'updateBankDetails'])->name('referrals.bank-details');
     Route::post('/referrals/withdraw', [ReferralController::class, 'requestWithdrawal'])->name('referrals.withdraw');
+
+    // User Report
+    Route::get('/my-report', [UserReportController::class, 'index'])->name('user.report');
 
     // Digital Products
     Route::get('/products', [DigitalProductController::class, 'index'])->name('products.index');
