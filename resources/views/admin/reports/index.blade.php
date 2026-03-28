@@ -727,8 +727,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     hoverBackgroundColor: color + '60',
                     borderColor: color,
                     borderWidth: 1.5,
-                    borderRadius: 6,
-                    borderSkipped: false,
                 }]
             },
             options: {
