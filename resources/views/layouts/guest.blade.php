@@ -149,5 +149,12 @@
         });
     </script>
     @stack('scripts')
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(r) { r.unregister(); });
+            });
+        }
+    </script>
 </body>
 </html>
