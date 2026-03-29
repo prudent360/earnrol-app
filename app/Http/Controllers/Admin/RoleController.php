@@ -15,11 +15,15 @@ class RoleController extends Controller
         $selectedRole = null;
         $groupedPermissions = Permission::groupedPermissions();
 
+        $roleUsers = collect();
         if ($request->has('role')) {
             $selectedRole = Role::with('permissions')->find($request->role);
+            if ($selectedRole) {
+                $roleUsers = $selectedRole->users()->select('users.id', 'users.name', 'users.email')->take(20)->get();
+            }
         }
 
-        return view('admin.roles.index', compact('roles', 'selectedRole', 'groupedPermissions'));
+        return view('admin.roles.index', compact('roles', 'selectedRole', 'groupedPermissions', 'roleUsers'));
     }
 
     public function create()

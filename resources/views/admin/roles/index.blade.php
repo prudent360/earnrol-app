@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Manage user roles and their permissions')
 
 @section('content')
-<div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6" x-data="{ editing: false }">
     {{-- Left Panel: Roles List --}}
     <div class="lg:col-span-2">
         <div class="card !p-0 overflow-hidden">
@@ -20,7 +20,7 @@
             <div class="divide-y divide-gray-100">
                 @foreach($roles as $role)
                 <a href="{{ route('admin.roles.index', ['role' => $role->id]) }}"
-                   class="block px-5 py-4 hover:bg-gray-50 transition-colors {{ $selectedRole && $selectedRole->id === $role->id ? 'bg-[#e05a3a]/5 border-l-2 border-[#e05a3a]' : '' }}">
+                   class="block px-5 py-4 hover:bg-gray-50 transition-colors {{ $selectedRole && $selectedRole->id === $role->id ? 'bg-[#e05a3a]/5 border-l-3 border-[#e05a3a]' : '' }}">
                     <div class="flex items-center justify-between">
                         <div>
                             @php
@@ -49,41 +49,70 @@
         </div>
     </div>
 
-    {{-- Right Panel: Permissions --}}
+    {{-- Right Panel --}}
     <div class="lg:col-span-3">
         @if($selectedRole)
         <div class="card !p-0 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            {{-- Role Header --}}
+            <div class="px-6 py-5 border-b border-gray-100 flex items-start justify-between">
                 <div>
-                    <h3 class="text-sm font-bold text-[#1a1a2e]">{{ $selectedRole->name }}</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">{{ $selectedRole->description }}</p>
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">{{ $selectedRole->name }}</span>
+                    <p class="text-base font-bold text-[#1a1a2e] mt-0.5">{{ $selectedRole->description ?? $selectedRole->name }}</p>
                 </div>
                 <div class="flex items-center gap-2">
+                    @if($selectedRole->slug !== 'superadmin')
+                    <button @click="editing = !editing" class="btn-primary text-sm py-2" x-text="editing ? 'Cancel' : 'Edit Permissions'">
+                        Edit Permissions
+                    </button>
+                    @endif
                     @if(!$selectedRole->isBuiltIn())
-                    <a href="{{ route('admin.roles.edit', $selectedRole) }}" class="text-xs font-medium text-blue-600 hover:underline">Edit</a>
-                    <form action="{{ route('admin.roles.destroy', $selectedRole) }}" method="POST" class="inline">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="text-xs font-medium text-red-600 hover:underline" onclick="return confirm('Delete this role?')">Delete</button>
-                    </form>
+                    <a href="{{ route('admin.roles.edit', $selectedRole) }}" class="btn-outline text-sm py-2">Edit Role</a>
                     @endif
                 </div>
             </div>
 
+            {{-- Users with this role --}}
+            <div class="px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <h4 class="text-sm font-semibold text-[#1a1a2e]">Users with this role ({{ $selectedRole->users_count }})</h4>
+                </div>
+                @if($roleUsers->count() > 0)
+                <div class="flex flex-wrap gap-2">
+                    @foreach($roleUsers as $u)
+                    <a href="{{ route('admin.users.show', $u) }}" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg transition-colors">{{ $u->name }}</a>
+                    @endforeach
+                    @if($selectedRole->users_count > 20)
+                    <span class="text-xs text-gray-400 px-2 py-1">+{{ $selectedRole->users_count - 20 }} more</span>
+                    @endif
+                </div>
+                @else
+                <p class="text-xs text-gray-400">No users assigned to this role</p>
+                @endif
+            </div>
+
+            {{-- Permissions --}}
             @if($selectedRole->slug === 'superadmin')
-            <div class="px-5 py-8 text-center">
+            <div class="px-6 py-8 text-center">
                 <svg class="w-10 h-10 text-amber-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 <p class="text-sm font-bold text-[#1a1a2e]">Super Admin has all permissions</p>
                 <p class="text-xs text-gray-400 mt-1">This role bypasses all permission checks automatically.</p>
             </div>
             @else
-            <form action="{{ route('admin.roles.permissions.update', $selectedRole) }}" method="POST">
-                @csrf @method('PUT')
-                <div class="max-h-[60vh] overflow-y-auto">
-                    @php $rolePermissionIds = $selectedRole->permissions->pluck('id')->toArray(); @endphp
+            <div class="px-6 py-3 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <h4 class="text-sm font-semibold text-[#1a1a2e]">Permissions</h4>
+                </div>
+            </div>
 
+            <form action="{{ route('admin.roles.permissions.update', $selectedRole) }}" method="POST" x-show="editing" x-transition>
+                @csrf @method('PUT')
+                <div class="max-h-[50vh] overflow-y-auto">
+                    @php $rolePermissionIds = $selectedRole->permissions->pluck('id')->toArray(); @endphp
                     @foreach($groupedPermissions as $group => $permissions)
                     <div class="border-b border-gray-50">
-                        <div class="px-5 py-3 bg-gray-50 flex items-center justify-between">
+                        <div class="px-6 py-3 bg-gray-50 flex items-center justify-between">
                             <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider">{{ $group }}</h4>
                             <label class="flex items-center gap-1.5 cursor-pointer">
                                 <span class="text-[10px] text-gray-400">All</span>
@@ -92,7 +121,7 @@
                                        {{ $permissions->every(fn($p) => in_array($p->id, $rolePermissionIds)) ? 'checked' : '' }}>
                             </label>
                         </div>
-                        <div class="px-5 py-2 space-y-1">
+                        <div class="px-6 py-2 space-y-1">
                             @foreach($permissions as $permission)
                             <label class="flex items-center justify-between py-1.5 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
                                 <span class="text-sm text-gray-700">{{ $permission->name }}</span>
@@ -105,10 +134,43 @@
                     </div>
                     @endforeach
                 </div>
-                <div class="px-5 py-4 border-t border-gray-100 flex justify-end">
+                <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
                     <button type="submit" class="btn-primary text-sm py-2">Save Permissions</button>
                 </div>
             </form>
+
+            {{-- Read-only accordion view --}}
+            <div x-show="!editing" x-transition>
+                @php $rolePermissionIds = $selectedRole->permissions->pluck('id')->toArray(); @endphp
+                @foreach($groupedPermissions as $group => $permissions)
+                @php
+                    $assignedCount = $permissions->filter(fn($p) => in_array($p->id, $rolePermissionIds))->count();
+                    $totalCount = $permissions->count();
+                @endphp
+                <div x-data="{ open: false }" class="border-b border-gray-50">
+                    <button @click="open = !open" type="button" class="w-full px-6 py-3.5 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                        <span class="text-sm font-medium text-[#1a1a2e]">{{ $group }}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold {{ $assignedCount === $totalCount ? 'text-emerald-600' : ($assignedCount > 0 ? 'text-amber-600' : 'text-gray-400') }}">{{ $assignedCount }}/{{ $totalCount }}</span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </button>
+                    <div x-show="open" x-transition class="px-6 pb-3 space-y-1">
+                        @foreach($permissions as $permission)
+                        <div class="flex items-center gap-2 py-1 text-sm">
+                            @if(in_array($permission->id, $rolePermissionIds))
+                            <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-gray-700">{{ $permission->name }}</span>
+                            @else
+                            <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span class="text-gray-400">{{ $permission->name }}</span>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+            </div>
             @endif
         </div>
         @else
