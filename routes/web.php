@@ -49,6 +49,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Creator\EarningController as CreatorEarningController;
 use App\Http\Controllers\Creator\MembershipController as CreatorMembershipController;
 use App\Http\Controllers\Creator\MembershipContentController as CreatorMembershipContentController;
+use App\Http\Controllers\Creator\StudentController as CreatorStudentController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipPaymentController;
 use App\Http\Controllers\StripeWebhookController;
@@ -260,6 +261,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/coaching/{coaching:slug}/bookings', [CreatorCoachingController::class, 'bookings'])->name('coaching.bookings');
         Route::put('/coaching/bookings/{booking}/meeting-link', [CreatorCoachingController::class, 'updateMeetingLink'])->name('coaching.bookings.meeting-link');
         Route::post('/coaching/bookings/{booking}/complete', [CreatorCoachingController::class, 'markCompleted'])->name('coaching.bookings.complete');
+        Route::get('/students', [CreatorStudentController::class, 'index'])->name('students.index');
         Route::get('/earnings', [CreatorEarningController::class, 'index'])->name('earnings.index');
         Route::get('/affiliate-sales', [CreatorAffiliateController::class, 'index'])->name('affiliate-sales.index');
     });
