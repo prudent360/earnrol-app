@@ -45,16 +45,14 @@
             </div>
 
             <div>
-                <label for="role" class="form-label">User Role</label>
-                <select name="role" id="role" class="form-input @error('role') border-red-500 @enderror" required>
-                    <option value="learner" {{ old('role') == 'learner' ? 'selected' : '' }}>Learner</option>
-                    <option value="mentor" {{ old('role') == 'mentor' ? 'selected' : '' }}>Mentor</option>
-                    <option value="employer" {{ old('role') == 'employer' ? 'selected' : '' }}>Employer</option>
-                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="superadmin" {{ old('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+                <label for="role_id" class="form-label">User Role</label>
+                <select name="role_id" id="role_id" class="form-input @error('role_id') border-red-500 @enderror" required>
+                    @foreach(\App\Models\Role::orderBy('name')->get() as $role)
+                    <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                    @endforeach
                 </select>
-                @error('role') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                <p class="text-xs text-gray-400 mt-2">Superadmins have full access to manage the platform and users.</p>
+                @error('role_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                <p class="text-xs text-gray-400 mt-2">Assign a role to control what this user can access.</p>
             </div>
 
             <div class="pt-4 border-t border-[#e8eaf0] flex justify-end">

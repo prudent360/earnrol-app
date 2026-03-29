@@ -45,6 +45,7 @@ use App\Http\Controllers\Creator\CouponController as CreatorCouponController;
 use App\Http\Controllers\CoachingController;
 use App\Http\Controllers\CoachingPaymentController;
 use App\Http\Controllers\Admin\CoachingController as AdminCoachingController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Creator\EarningController as CreatorEarningController;
 use App\Http\Controllers\Creator\MembershipController as CreatorMembershipController;
 use App\Http\Controllers\Creator\MembershipContentController as CreatorMembershipContentController;
@@ -341,6 +342,10 @@ Route::middleware('auth')->group(function () {
 
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+        // Roles & Permissions
+        Route::resource('roles', RoleController::class);
+        Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
 
         // Settings
         Route::post('/settings/test-email', [SettingsController::class, 'sendTestEmail'])->name('settings.test-email');

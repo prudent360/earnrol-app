@@ -47,15 +47,13 @@
             </div>
 
             <div>
-                <label for="role" class="form-label">User Role</label>
-                <select name="role" id="role" class="form-input @error('role') border-red-500 @enderror" required>
-                    <option value="learner" {{ old('role', $user->role) == 'learner' ? 'selected' : '' }}>Learner</option>
-                    <option value="mentor" {{ old('role', $user->role) == 'mentor' ? 'selected' : '' }}>Mentor</option>
-                    <option value="employer" {{ old('role', $user->role) == 'employer' ? 'selected' : '' }}>Employer</option>
-                    <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+                <label for="role_id" class="form-label">User Role</label>
+                <select name="role_id" id="role_id" class="form-input @error('role_id') border-red-500 @enderror" required>
+                    @foreach($roles as $role)
+                    <option value="{{ $role->id }}" {{ old('role_id', $user->roles->first()?->id) == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                    @endforeach
                 </select>
-                @error('role') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                @error('role_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="pt-4 border-t border-[#e8eaf0] flex justify-end">
