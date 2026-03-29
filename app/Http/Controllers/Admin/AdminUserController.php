@@ -158,6 +158,27 @@ class AdminUserController extends Controller
             return back()->with('error', 'You cannot delete yourself.');
         }
 
+        // Delete related records that don't cascade automatically
+        // Coaching: bookings → slots → services (bookings block service deletion)
+        $serviceIds = $user->coachingServices()->pluck('id');
+        if ($serviceIds->isNotEmpty()) {
+            \App\Models\CoachingBooking::whereIn('coaching_service_id', $serviceIds)->delete();
+            \App\Models\CoachingSlot::whereIn('coaching_service_id', $serviceIds)->delete();
+            $user->coachingServices()->delete();
+        }
+
+        // Digital products (no cascade on user_id)
+        $productIds = $user->digitalProducts()->pluck('id');
+        if ($productIds->isNotEmpty()) {
+            \App\Models\ProductPurchase::whereIn('digital_product_id', $productIds)->delete();
+            $user->digitalProducts()->delete();
+        }
+
+        // Affiliate sales referencing this user
+        \App\Models\AffiliateSale::where('affiliate_user_id', $user->id)
+            ->orWhere('buyer_user_id', $user->id)
+            ->delete();
+
         $user->delete();
 
         return redirect()->route('admin.users.index')
