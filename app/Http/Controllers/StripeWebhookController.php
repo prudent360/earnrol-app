@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CreatorPlan;
+use App\Models\CreatorSubscription;
 use App\Models\MembershipPlan;
 use App\Models\MembershipSubscription;
 use App\Models\Payment;
@@ -49,15 +51,28 @@ class StripeWebhookController extends Controller
         $subscriptionId = $invoice->subscription ?? ($invoice['subscription'] ?? null);
         if (!$subscriptionId) return;
 
-        $subscription = MembershipSubscription::where('gateway_subscription_id', $subscriptionId)->first();
-        if (!$subscription) return;
-
-        // Skip initial payment (already handled by callback)
         $billingReason = $invoice->billing_reason ?? ($invoice['billing_reason'] ?? null);
         if ($billingReason === 'subscription_create') return;
 
         $amount = ($invoice->amount_paid ?? ($invoice['amount_paid'] ?? 0)) / 100;
 
+        // Check MembershipSubscription first
+        $membershipSub = MembershipSubscription::where('gateway_subscription_id', $subscriptionId)->first();
+        if ($membershipSub) {
+            $this->handleMembershipRenewal($membershipSub, $invoice, $amount);
+            return;
+        }
+
+        // Check CreatorSubscription
+        $creatorSub = CreatorSubscription::where('gateway_subscription_id', $subscriptionId)->first();
+        if ($creatorSub) {
+            $this->handleCreatorRenewal($creatorSub, $invoice, $amount);
+            return;
+        }
+    }
+
+    private function handleMembershipRenewal(MembershipSubscription $subscription, $invoice, float $amount)
+    {
         $payment = Payment::create([
             'user_id' => $subscription->user_id,
             'payable_type' => MembershipPlan::class,
@@ -71,14 +86,11 @@ class StripeWebhookController extends Controller
             'is_renewal' => true,
         ]);
 
-        $billingIntervalMonths = [
-            'monthly' => 1,
+        $months = match ($subscription->membershipPlan->billing_interval ?? 'monthly') {
             'quarterly' => 3,
             'yearly' => 12,
-        ];
-
-        $membership = $subscription->membershipPlan;
-        $months = $billingIntervalMonths[$membership->billing_interval] ?? 1;
+            default => 1,
+        };
 
         $subscription->update([
             'status' => 'active',
@@ -87,11 +99,33 @@ class StripeWebhookController extends Controller
         ]);
 
         \App\Services\CreatorEarningService::creditCreatorIfEligible($payment);
+        Log::info('Membership renewal processed', ['subscription_id' => $subscription->id]);
+    }
 
-        Log::info('Membership renewal processed', [
+    private function handleCreatorRenewal(CreatorSubscription $subscription, $invoice, float $amount)
+    {
+        Payment::create([
+            'user_id' => $subscription->user_id,
+            'payable_type' => CreatorPlan::class,
+            'payable_id' => $subscription->creator_plan_id,
+            'amount' => $amount,
+            'reference' => $invoice->id ?? ($invoice['id'] ?? 'renewal-' . uniqid()),
+            'gateway' => 'stripe',
+            'status' => 'completed',
+            'currency' => Setting::get('currency', 'GBP'),
             'subscription_id' => $subscription->id,
-            'payment_id' => $payment->id,
+            'is_renewal' => true,
         ]);
+
+        $months = $subscription->creatorPlan->billing_interval === 'yearly' ? 12 : 1;
+
+        $subscription->update([
+            'status' => 'active',
+            'current_period_start' => now(),
+            'current_period_end' => now()->addMonths($months),
+        ]);
+
+        Log::info('Creator subscription renewal processed', ['subscription_id' => $subscription->id]);
     }
 
     protected function handleInvoicePaymentFailed($invoice)
@@ -99,12 +133,18 @@ class StripeWebhookController extends Controller
         $subscriptionId = $invoice->subscription ?? ($invoice['subscription'] ?? null);
         if (!$subscriptionId) return;
 
-        $subscription = MembershipSubscription::where('gateway_subscription_id', $subscriptionId)->first();
-        if (!$subscription) return;
+        $membershipSub = MembershipSubscription::where('gateway_subscription_id', $subscriptionId)->first();
+        if ($membershipSub) {
+            $membershipSub->update(['status' => 'past_due']);
+            Log::warning('Membership payment failed', ['subscription_id' => $membershipSub->id]);
+            return;
+        }
 
-        $subscription->update(['status' => 'past_due']);
-
-        Log::warning('Membership payment failed', ['subscription_id' => $subscription->id]);
+        $creatorSub = CreatorSubscription::where('gateway_subscription_id', $subscriptionId)->first();
+        if ($creatorSub) {
+            $creatorSub->update(['status' => 'past_due']);
+            Log::warning('Creator subscription payment failed', ['subscription_id' => $creatorSub->id]);
+        }
     }
 
     protected function handleSubscriptionDeleted($stripeSubscription)
@@ -112,14 +152,17 @@ class StripeWebhookController extends Controller
         $subscriptionId = $stripeSubscription->id ?? ($stripeSubscription['id'] ?? null);
         if (!$subscriptionId) return;
 
-        $subscription = MembershipSubscription::where('gateway_subscription_id', $subscriptionId)->first();
-        if (!$subscription) return;
+        $membershipSub = MembershipSubscription::where('gateway_subscription_id', $subscriptionId)->first();
+        if ($membershipSub) {
+            $membershipSub->update(['status' => 'expired', 'ends_at' => now()]);
+            Log::info('Membership subscription expired', ['subscription_id' => $membershipSub->id]);
+            return;
+        }
 
-        $subscription->update([
-            'status' => 'expired',
-            'ends_at' => now(),
-        ]);
-
-        Log::info('Membership subscription expired', ['subscription_id' => $subscription->id]);
+        $creatorSub = CreatorSubscription::where('gateway_subscription_id', $subscriptionId)->first();
+        if ($creatorSub) {
+            $creatorSub->update(['status' => 'expired', 'ends_at' => now()]);
+            Log::info('Creator subscription expired', ['subscription_id' => $creatorSub->id]);
+        }
     }
 }

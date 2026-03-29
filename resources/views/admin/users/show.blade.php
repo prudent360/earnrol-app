@@ -25,6 +25,23 @@
                 Login as User
             </button>
         </form>
+        @if($user->is_banned)
+        <form method="POST" action="{{ route('admin.users.unban', $user) }}">
+            @csrf
+            <button type="submit" class="btn-primary text-sm py-2 !bg-green-600 hover:!bg-green-700" onclick="return confirm('Unban {{ $user->name }}?')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Unban User
+            </button>
+        </form>
+        @else
+        <form method="POST" action="{{ route('admin.users.ban', $user) }}">
+            @csrf
+            <button type="submit" class="btn-primary text-sm py-2 !bg-red-600 hover:!bg-red-700" onclick="return confirm('Ban {{ $user->name }}? They will be logged out and unable to login.')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                Ban User
+            </button>
+        </form>
+        @endif
         @endif
     </div>
 </div>
@@ -47,6 +64,15 @@
                 <span class="badge bg-green-100 text-green-700 ml-1">Verified</span>
                 @else
                 <span class="badge bg-red-100 text-red-700 ml-1">Unverified</span>
+                @endif
+                @if($user->is_banned)
+                <span class="badge bg-red-100 text-red-700 ml-1">Banned</span>
+                @endif
+                @if($user->is_creator)
+                <span class="badge bg-purple-100 text-purple-700 ml-1">Creator</span>
+                @endif
+                @if($user->is_affiliate)
+                <span class="badge bg-blue-100 text-blue-700 ml-1">Affiliate</span>
                 @endif
             </div>
         </div>

@@ -3,6 +3,7 @@
 namespace App\Services\Payment;
 
 use App\Models\Cohort;
+use App\Models\CreatorPlan;
 use App\Models\MembershipPlan;
 use App\Models\Setting;
 use App\Models\User;
@@ -111,6 +112,55 @@ class StripeService
             return $price->id;
         } catch (\Exception $e) {
             Log::error('Stripe Price Creation Error', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function createCreatorPlanProduct(string $title): ?string
+    {
+        try {
+            $product = Product::create([
+                'name' => $title,
+                'description' => 'Creator subscription plan',
+            ]);
+            return $product->id;
+        } catch (\Exception $e) {
+            Log::error('Stripe Creator Plan Product Error', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function createCreatorPlanPrice(string $productId, float $amount, string $interval): ?string
+    {
+        return $this->createSubscriptionPrice($productId, $amount, $interval);
+    }
+
+    public function createCreatorPlanCheckout(CreatorPlan $plan, User $user): ?Session
+    {
+        try {
+            $priceId = $plan->stripe_price_id;
+            if (!$priceId) {
+                Log::error('Stripe Creator Plan Checkout: No price ID', ['plan_id' => $plan->id]);
+                return null;
+            }
+
+            return Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price' => $priceId,
+                    'quantity' => 1,
+                ]],
+                'mode' => 'subscription',
+                'success_url' => route('creator.plans.stripe.callback') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('creator.plans.index'),
+                'customer_email' => $user->email,
+                'metadata' => [
+                    'creator_plan_id' => $plan->id,
+                    'user_id' => $user->id,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Stripe Creator Plan Checkout Error', ['message' => $e->getMessage()]);
             return null;
         }
     }

@@ -41,6 +41,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'bank_account_number',
         'bank_sort_code',
         'is_creator',
+        'is_affiliate',
+        'is_banned',
         'active_mode',
     ];
 
@@ -57,6 +59,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'wallet_balance' => 'decimal:2',
             'date_of_birth' => 'date',
             'is_creator' => 'boolean',
+            'is_affiliate' => 'boolean',
+            'is_banned' => 'boolean',
         ];
     }
 
@@ -88,6 +92,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function inCreatorMode(): bool
     {
         return $this->isCreator() && $this->active_mode === 'creator';
+    }
+
+    public function isAffiliate(): bool
+    {
+        return (bool) $this->is_affiliate;
+    }
+
+    public function inAffiliateMode(): bool
+    {
+        return $this->isAffiliate() && $this->active_mode === 'affiliate';
+    }
+
+    public function isBanned(): bool
+    {
+        return (bool) $this->is_banned;
     }
 
     public function creatorApplication(): \Illuminate\Database\Eloquent\Relations\HasOne
@@ -190,6 +209,27 @@ class User extends Authenticatable implements MustVerifyEmail
     public function membershipSubscriptions(): HasMany
     {
         return $this->hasMany(MembershipSubscription::class);
+    }
+
+    public function creatorSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CreatorSubscription::class)->latest();
+    }
+
+    public function creatorSubscriptions(): HasMany
+    {
+        return $this->hasMany(CreatorSubscription::class);
+    }
+
+    public function hasActiveCreatorSubscription(): bool
+    {
+        $sub = $this->creatorSubscription;
+        return $sub && $sub->isActive();
+    }
+
+    public function salesPages(): HasMany
+    {
+        return $this->hasMany(SalesPage::class);
     }
 
     public function hasActiveSubscription(MembershipPlan $plan): bool

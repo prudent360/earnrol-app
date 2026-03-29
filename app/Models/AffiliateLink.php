@@ -36,6 +36,11 @@ class AffiliateLink extends Model
         return $this->hasMany(AffiliateSale::class);
     }
 
+    public function clickLogs(): HasMany
+    {
+        return $this->hasMany(AffiliateClick::class);
+    }
+
     public function getUrlAttribute(): string
     {
         return url('/ref/' . $this->code);

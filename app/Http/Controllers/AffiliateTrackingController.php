@@ -8,11 +8,13 @@ use App\Models\CoachingService;
 use App\Models\DigitalProduct;
 use App\Models\MembershipPlan;
 use App\Models\Setting;
+use App\Services\FraudDetectionService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
 class AffiliateTrackingController extends Controller
 {
-    public function track(string $code)
+    public function track(string $code, Request $request)
     {
         $link = AffiliateLink::where('code', $code)->first();
 
@@ -20,8 +22,13 @@ class AffiliateTrackingController extends Controller
             return redirect('/');
         }
 
-        // Increment click counter
-        $link->increment('clicks');
+        // Log click with fraud detection
+        $click = FraudDetectionService::logClick($link, $request);
+
+        // Only increment counter for unique, non-suspicious clicks
+        if ($click->is_unique && !$click->is_suspicious) {
+            $link->increment('clicks');
+        }
 
         // Set affiliate cookie
         $days = (int) Setting::get('affiliate_cookie_days', 30);

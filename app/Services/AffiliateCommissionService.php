@@ -9,7 +9,9 @@ use App\Models\Payment;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\AffiliateCommissionEarned;
+use App\Services\FraudDetectionService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AffiliateCommissionService
 {
@@ -35,6 +37,16 @@ class AffiliateCommissionService
 
         // Prevent self-referral
         if ($link->user_id === $payment->user_id) {
+            return false;
+        }
+
+        // Check for fraud flags
+        if (FraudDetectionService::hasSuspiciousActivity($link->id, $payment->user_id)) {
+            Log::warning('Affiliate commission rejected due to suspicious activity', [
+                'link_id' => $link->id,
+                'payment_id' => $payment->id,
+                'buyer_id' => $payment->user_id,
+            ]);
             return false;
         }
 

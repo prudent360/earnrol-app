@@ -72,6 +72,11 @@ class MembershipPlan extends Model
         return $this->morphOne(AffiliateProduct::class, 'affiliable');
     }
 
+    public function salesPage(): MorphOne
+    {
+        return $this->morphOne(SalesPage::class, 'pageable');
+    }
+
     public function approvedReviews(): MorphMany
     {
         return $this->reviews()->where('is_approved', true);

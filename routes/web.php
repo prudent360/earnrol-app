@@ -53,6 +53,12 @@ use App\Http\Controllers\Creator\StudentController as CreatorStudentController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipPaymentController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\AffiliateToggleController;
+use App\Http\Controllers\Admin\FraudController as AdminFraudController;
+use App\Http\Controllers\Admin\CreatorPlanController as AdminCreatorPlanController;
+use App\Http\Controllers\CreatorPlanPaymentController;
+use App\Http\Controllers\SalesPageController;
+use App\Http\Controllers\Creator\SalesPageController as CreatorSalesPageController;
 use App\Http\Controllers\Admin\MembershipController as AdminMembershipController;
 use App\Http\Controllers\UserReportController;
 
@@ -74,6 +80,7 @@ Route::get('/c/{username}', [CreatorProfileController::class, 'show'])->name('cr
 
 // Affiliate Tracking (no auth)
 Route::get('/ref/{code}', [AffiliateTrackingController::class, 'track'])->name('affiliate.track');
+Route::get('/s/{slug}', [SalesPageController::class, 'show'])->name('sales-page.show');
 
 // Stripe Webhook (no auth)
 Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])->name('webhooks.stripe');
@@ -196,8 +203,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/coaching/{coaching:slug}/bank-transfer', [CoachingPaymentController::class, 'bankTransferForm'])->name('coaching.bank-transfer');
     Route::post('/coaching/{coaching:slug}/bank-transfer', [CoachingPaymentController::class, 'bankTransferSubmit'])->name('coaching.bank-transfer.submit');
 
-    // Affiliate Dashboard
-    Route::prefix('affiliate')->name('affiliate.')->group(function () {
+    // Affiliate Toggle & Mode Switching
+    Route::post('/become-affiliate', [AffiliateToggleController::class, 'become'])->name('affiliate.become');
+    Route::post('/switch-mode', [CreatorToggleController::class, 'switchMode'])->name('mode.switch');
+
+    // Creator Plan Selection & Payment
+    Route::get('/creator-plans', [CreatorPlanPaymentController::class, 'index'])->name('creator.plans.index');
+    Route::post('/creator-plans/{plan:slug}/checkout/stripe', [CreatorPlanPaymentController::class, 'stripeCheckout'])->name('creator.plans.stripe.checkout');
+    Route::get('/creator-plans/stripe/callback', [CreatorPlanPaymentController::class, 'stripeCallback'])->name('creator.plans.stripe.callback');
+    Route::post('/creator-plans/cancel', [CreatorPlanPaymentController::class, 'cancel'])->name('creator.plans.cancel');
+
+    // Affiliate Dashboard (requires affiliate role)
+    Route::middleware(\App\Http\Middleware\AffiliateMiddleware::class)->prefix('affiliate')->name('affiliate.')->group(function () {
         Route::get('/dashboard', [AffiliateDashboardController::class, 'index'])->name('dashboard');
         Route::get('/products', [AffiliateDashboardController::class, 'products'])->name('products');
         Route::post('/generate-link', [AffiliateDashboardController::class, 'generateLink'])->name('generate-link');
@@ -262,6 +279,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/coaching/bookings/{booking}/meeting-link', [CreatorCoachingController::class, 'updateMeetingLink'])->name('coaching.bookings.meeting-link');
         Route::post('/coaching/bookings/{booking}/complete', [CreatorCoachingController::class, 'markCompleted'])->name('coaching.bookings.complete');
         Route::get('/students', [CreatorStudentController::class, 'index'])->name('students.index');
+        Route::resource('sales-pages', CreatorSalesPageController::class);
+        Route::get('/sales-pages/{salesPage}/preview', [CreatorSalesPageController::class, 'preview'])->name('sales-pages.preview');
         Route::get('/earnings', [CreatorEarningController::class, 'index'])->name('earnings.index');
         Route::get('/affiliate-sales', [CreatorAffiliateController::class, 'index'])->name('affiliate-sales.index');
     });
@@ -286,6 +305,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{user}/credit-wallet', [AdminUserController::class, 'creditWallet'])->name('users.credit-wallet');
         Route::post('/users/{user}/impersonate', [AdminUserController::class, 'impersonate'])->name('users.impersonate');
+        Route::post('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
+        Route::post('/users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
+
+        // Creator Plans Management
+        Route::resource('creator-plans', AdminCreatorPlanController::class);
+        Route::get('/creator-plans/{plan:slug}/subscribers', [AdminCreatorPlanController::class, 'subscribers'])->name('creator-plans.subscribers');
+
+        // Fraud Detection
+        Route::get('/fraud', [AdminFraudController::class, 'index'])->name('fraud.index');
 
         // Cohort Management
         Route::resource('cohorts', AdminCohortController::class);

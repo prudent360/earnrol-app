@@ -190,4 +190,22 @@ class AdminUserController extends Controller
 
         return back()->with('success', \App\Models\Setting::get('currency_symbol', '£') . number_format($amount, 2) . ' credited to ' . $user->name . "'s wallet.");
     }
+
+    public function ban(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot ban yourself.');
+        }
+
+        $user->update(['is_banned' => true]);
+
+        return back()->with('success', $user->name . ' has been banned.');
+    }
+
+    public function unban(User $user)
+    {
+        $user->update(['is_banned' => false]);
+
+        return back()->with('success', $user->name . ' has been unbanned.');
+    }
 }

@@ -66,23 +66,32 @@ class CreatorToggleController extends Controller
     }
 
     /**
-     * Switch between student and creator modes (for approved creators only).
+     * Switch between available modes (student/creator/affiliate).
      */
-    public function switchMode()
+    public function switchMode(Request $request)
     {
         $user = Auth::user();
 
-        if (!$user->isCreator()) {
-            return back()->with('error', 'You are not a creator.');
+        $availableModes = ['student'];
+        if ($user->isCreator()) $availableModes[] = 'creator';
+        if ($user->isAffiliate()) $availableModes[] = 'affiliate';
+
+        $requestedMode = $request->input('mode');
+
+        if ($requestedMode && in_array($requestedMode, $availableModes)) {
+            $newMode = $requestedMode;
+        } else {
+            // Cycle to next mode
+            $currentIndex = array_search($user->active_mode, $availableModes);
+            $newMode = $availableModes[($currentIndex + 1) % count($availableModes)];
         }
 
-        $newMode = $user->active_mode === 'creator' ? 'student' : 'creator';
         $user->update(['active_mode' => $newMode]);
 
-        if ($newMode === 'creator') {
-            return redirect()->route('creator.dashboard')->with('success', 'Switched to Creator mode.');
-        }
-
-        return redirect()->route('dashboard')->with('success', 'Switched to Student mode.');
+        return match ($newMode) {
+            'creator' => redirect()->route('creator.dashboard')->with('success', 'Switched to Creator mode.'),
+            'affiliate' => redirect()->route('affiliate.dashboard')->with('success', 'Switched to Affiliate mode.'),
+            default => redirect()->route('dashboard')->with('success', 'Switched to Student mode.'),
+        };
     }
 }
