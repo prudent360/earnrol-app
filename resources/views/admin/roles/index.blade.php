@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Manage user roles and their permissions')
 
 @section('content')
-<div class="grid grid-cols-1 lg:grid-cols-5 gap-6" x-data="{ editing: false }">
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
     {{-- Left Panel: Roles List --}}
     <div class="lg:col-span-2">
         <div class="card !p-0 overflow-hidden">
@@ -59,16 +59,9 @@
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">{{ $selectedRole->name }}</span>
                     <p class="text-base font-bold text-[#1a1a2e] mt-0.5">{{ $selectedRole->description ?? $selectedRole->name }}</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    @if($selectedRole->slug !== 'superadmin')
-                    <button @click="editing = !editing" class="btn-primary text-sm py-2" x-text="editing ? 'Cancel' : 'Edit Permissions'">
-                        Edit Permissions
-                    </button>
-                    @endif
-                    @if(!$selectedRole->isBuiltIn())
-                    <a href="{{ route('admin.roles.edit', $selectedRole) }}" class="btn-outline text-sm py-2">Edit Role</a>
-                    @endif
-                </div>
+                @if(!$selectedRole->isBuiltIn())
+                <a href="{{ route('admin.roles.edit', $selectedRole) }}" class="btn-outline text-sm py-2">Edit Role</a>
+                @endif
             </div>
 
             {{-- Users with this role --}}
@@ -93,61 +86,36 @@
 
             {{-- Permissions --}}
             @if($selectedRole->slug === 'superadmin')
+            <div class="px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <h4 class="text-sm font-semibold text-[#1a1a2e]">Permissions</h4>
+                </div>
+            </div>
             <div class="px-6 py-8 text-center">
                 <svg class="w-10 h-10 text-amber-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 <p class="text-sm font-bold text-[#1a1a2e]">Super Admin has all permissions</p>
                 <p class="text-xs text-gray-400 mt-1">This role bypasses all permission checks automatically.</p>
             </div>
             @else
-            <div class="px-6 py-3 border-b border-gray-100">
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    <h4 class="text-sm font-semibold text-[#1a1a2e]">Permissions</h4>
-                </div>
-            </div>
-
-            <form action="{{ route('admin.roles.permissions.update', $selectedRole) }}" method="POST" x-show="editing" x-transition>
+            <form action="{{ route('admin.roles.permissions.update', $selectedRole) }}" method="POST">
                 @csrf @method('PUT')
-                <div class="max-h-[50vh] overflow-y-auto">
-                    @php $rolePermissionIds = $selectedRole->permissions->pluck('id')->toArray(); @endphp
-                    @foreach($groupedPermissions as $group => $permissions)
-                    <div class="border-b border-gray-50">
-                        <div class="px-6 py-3 bg-gray-50 flex items-center justify-between">
-                            <h4 class="text-xs font-bold text-gray-600 uppercase tracking-wider">{{ $group }}</h4>
-                            <label class="flex items-center gap-1.5 cursor-pointer">
-                                <span class="text-[10px] text-gray-400">All</span>
-                                <input type="checkbox" class="rounded border-gray-300 text-[#e05a3a] focus:ring-[#e05a3a]"
-                                       onchange="toggleGroup(this, '{{ Str::slug($group) }}')"
-                                       {{ $permissions->every(fn($p) => in_array($p->id, $rolePermissionIds)) ? 'checked' : '' }}>
-                            </label>
-                        </div>
-                        <div class="px-6 py-2 space-y-1">
-                            @foreach($permissions as $permission)
-                            <label class="flex items-center justify-between py-1.5 cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2">
-                                <span class="text-sm text-gray-700">{{ $permission->name }}</span>
-                                <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                       class="rounded border-gray-300 text-[#e05a3a] focus:ring-[#e05a3a] group-{{ Str::slug($group) }}"
-                                       {{ in_array($permission->id, $rolePermissionIds) ? 'checked' : '' }}>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
-                    <button type="submit" class="btn-primary text-sm py-2">Save Permissions</button>
-                </div>
-            </form>
 
-            {{-- Read-only accordion view --}}
-            <div x-show="!editing" x-transition>
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <h4 class="text-sm font-semibold text-[#1a1a2e]">Permissions</h4>
+                    </div>
+                </div>
+
                 @php $rolePermissionIds = $selectedRole->permissions->pluck('id')->toArray(); @endphp
+
                 @foreach($groupedPermissions as $group => $permissions)
                 @php
                     $assignedCount = $permissions->filter(fn($p) => in_array($p->id, $rolePermissionIds))->count();
                     $totalCount = $permissions->count();
                 @endphp
-                <div x-data="{ open: false }" class="border-b border-gray-50">
+                <div x-data="{ open: false }" class="border-b border-gray-100">
                     <button @click="open = !open" type="button" class="w-full px-6 py-3.5 flex items-center justify-between hover:bg-gray-50 transition-colors">
                         <span class="text-sm font-medium text-[#1a1a2e]">{{ $group }}</span>
                         <div class="flex items-center gap-2">
@@ -155,22 +123,26 @@
                             <svg class="w-4 h-4 text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </button>
-                    <div x-show="open" x-transition class="px-6 pb-3 space-y-1">
+                    <div x-show="open" x-transition class="px-6 pb-4 space-y-3">
                         @foreach($permissions as $permission)
-                        <div class="flex items-center gap-2 py-1 text-sm">
-                            @if(in_array($permission->id, $rolePermissionIds))
-                            <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <span class="text-gray-700">{{ $permission->name }}</span>
-                            @else
-                            <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            <span class="text-gray-400">{{ $permission->name }}</span>
-                            @endif
-                        </div>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
+                                   class="rounded border-gray-300 text-[#e05a3a] focus:ring-[#e05a3a] w-5 h-5 group-{{ Str::slug($group) }}"
+                                   {{ in_array($permission->id, $rolePermissionIds) ? 'checked' : '' }}>
+                            <div>
+                                <p class="text-sm font-medium text-[#1a1a2e]">{{ $permission->name }}</p>
+                                <p class="text-[11px] text-gray-400">{{ $permission->slug }}</p>
+                            </div>
+                        </label>
                         @endforeach
                     </div>
                 </div>
                 @endforeach
-            </div>
+
+                <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
+                    <button type="submit" class="btn-primary text-sm py-2">Save Permissions</button>
+                </div>
+            </form>
             @endif
         </div>
         @else
